@@ -4,6 +4,7 @@ import DefaultHeader from "@/components/defaultHeader.vue";
 import AssetsImage from "@/components/AssetsImage.vue";
 import Icon from "@/components/Icon.vue";
 import { onLoad} from '@dcloudio/uni-app'
+import {updateImInfo} from "@/utils/request";
 const name = ref('');
 
 
@@ -25,9 +26,8 @@ function save() {
   if(name.value == ""){
     return;
   }
-  uni.$UIKitNIM.V2NIMUserService.updateSelfUserProfile({sign: name.value}).then((res) => {
-    uni.navigateBack();
-  })
+  updateImInfo({signature:name.value})
+
 }
 </script>
 

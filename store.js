@@ -6149,6 +6149,8 @@ var TeamStore = /** @class */ (function () {
     ;(_a = this.logger) === null || _a === void 0
       ? void 0
       : _a.log('V2NIMTeamService _onTeamJoined: ', data)
+
+    console.log('V2NIMTeamService _onTeamJoined: ', data)
     this.addTeam([data])
     // 不用自己插入会话了，因为 SDK 会有会话创建回调
   }

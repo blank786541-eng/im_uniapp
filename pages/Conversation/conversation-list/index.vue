@@ -280,8 +280,7 @@ const conversationListWatch = autorun(() => {
   conversationList.value = _conversationList
     ?.map(
       (conversation: V2NIMConversationForUI | V2NIMLocalConversationForUI) => {
-        console.log(conversation);
-        console.log("conversation=====");
+
         return {
           ...conversation,
           // 为什么要加一个renderKey 直接在渲染的时候写 :key = conversation.conversationId 不就行了吗？

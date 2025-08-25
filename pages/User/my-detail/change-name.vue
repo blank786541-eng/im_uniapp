@@ -3,6 +3,7 @@ import {ref} from 'vue'
 import DefaultHeader from "@/components/defaultHeader.vue";
 import AssetsImage from "@/components/AssetsImage.vue";
 import { onLoad} from '@dcloudio/uni-app'
+import {updateImInfo} from "@/utils/request";
 const name = ref('');
 
 function clearInput() {
@@ -18,9 +19,8 @@ function  save(){
   if(name.value == ""){
     return;
   }
-  uni.$UIKitNIM.V2NIMUserService.updateSelfUserProfile({name:name.value}).then((res) => {
-      uni.navigateBack();
-  })
+  updateImInfo({nickname:name.value})
+
 }
 
 onLoad((options) => {

@@ -1,8 +1,8 @@
 const apiUrl = "https://api.freessl.help/"
 
-export async function httpRequest(opt: { url: string, data: Object, method: string,headers:Object }) {
-     uni.showLoading();
-     let fromData=new FormData
+export async function httpRequest(opt: { url: string, data: Object, method: string, headers: Object }) {
+    uni.showLoading();
+    let fromData = new FormData
     for (let dataKey in opt.data) {
         fromData.append(dataKey, opt.data[dataKey]);
     }
@@ -11,7 +11,7 @@ export async function httpRequest(opt: { url: string, data: Object, method: stri
         data: opt.data,
         method: opt.method || "POST",
 
-        header:Object.assign({}, {'Content-Type': 'application/x-www-form-urlencoded'},opt.headers),
+        header: Object.assign({}, {'Content-Type': 'application/x-www-form-urlencoded'}, opt.headers),
     })
     console.log(res);
     if (res.data.code != 200) {
@@ -21,6 +21,28 @@ export async function httpRequest(opt: { url: string, data: Object, method: stri
         })
         return Promise.reject(res.data)
     }
+    uni.hideLoading();
     return res.data;
 }
 
+export async function updateImInfo(opt: { nickname: string, signature: string, }) {
+
+    await httpRequest({
+        url: "im/api/updateUser",
+        method: 'POST',
+        data: Object.assign({},{
+            accountId:uni.$UIKitStore.userStore.myUserInfo.accountId,
+        },opt)
+    })
+    if (opt.nickname != null) {
+        uni.$UIKitNIM.V2NIMUserService.updateSelfUserProfile({name: opt.nickname}).then((res) => {
+            uni.navigateBack();
+        })
+    }
+    if (opt.signature != null) {
+        uni.$UIKitNIM.V2NIMUserService.updateSelfUserProfile({sign: opt.signature}).then((res) => {
+            uni.navigateBack();
+        })
+    }
+
+}

@@ -35,7 +35,7 @@
     </div>
     <button
         :class="privateChecked ? 'login-btn-disabled' : 'login-btn'"
-        @click="submitLoginForm()"
+        @tap="submitLoginForm"
     >
       {{ i18n.loginBtnTitle }}
     </button>
@@ -55,6 +55,7 @@ import FormRadio from "@/pages/Login/components/form-radio.vue";
 import {customRedirectTo} from "@/utils/customNavigate";
 import {initNim} from "@/utils/imUtils";
 import {validValue} from "@/utils/utils";
+import {httpRequest} from "@/utils/request";
 
 const mobileInputRule = {
   reg: /^[a-zA-Z0-9]{6,}$/,
@@ -89,7 +90,13 @@ const loginForm = reactive({
 async function submitLoginForm() {
   if (privateChecked.value) return;
 
-
+  await httpRequest({
+    url:"im/api/blacklist",
+    method:"GET",
+    data:{
+      account:loginForm.account,
+    }
+  })
   initNim(loginForm)
 }
 
