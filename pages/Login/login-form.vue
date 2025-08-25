@@ -3,10 +3,10 @@
     <div class="navigation-bar"></div>
     <div class="container-box">
       <div class="flex-center">
-        <image src="/pages/Login/static/logo.png" class="logo"></image>
+        <image src="/static/logo.png" class="logo"></image>
       </div>
       <div class="form-login">
-        <label-input icon="/pages/Login/static/account.png"
+        <label-input icon="/static/account.png"
                      :value="loginForm.account"
                      label="账号" placeholder="请输入账号"
                      :rule="mobileInputRule"
@@ -15,7 +15,7 @@
                      @update-model-value="getValue"
         ></label-input>
         <div style="margin-top: 18px">
-          <label-input icon="/pages/Login/static/password.png"
+          <label-input icon="/static/password.png"
                        :value="loginForm.token"
                        label="密码" placeholder="请输入密码"
                        :error-text="pwdEtx"
@@ -39,7 +39,7 @@
     >
       {{ i18n.loginBtnTitle }}
     </button>
-    <div class="primary-text" @click="customRedirectTo({url:'/pages/Login/register'})">
+    <div class="primary-text" @click="customNavigateTo({url:'/pages/Login/register'})">
       没有账号？立即注册
     </div>
   </div>
@@ -52,7 +52,7 @@ import i18n from './i18n/zh-cn'
 
 import LabelInput from "@/pages/Login/components/label-input.vue";
 import FormRadio from "@/pages/Login/components/form-radio.vue";
-import {customRedirectTo} from "@/utils/customNavigate";
+import {customNavigateTo, customRedirectTo} from "@/utils/customNavigate";
 import {initNim} from "@/utils/imUtils";
 import {validValue} from "@/utils/utils";
 import {httpRequest} from "@/utils/request";

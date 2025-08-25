@@ -22,13 +22,14 @@ onBeforeMount(() => {
 })
 
 function backToConversation() {
+  console.log('backToConversation');
   uni.navigateBack();
 }
 </script>
 
 <template>
   <div class="default-header">
-    <div :style="{height:appStatusHeight}"></div>
+    <div :style="{height:appStatusHeight}" class="header"></div>
     <AssetsImage path="/static/back-b.png" width="21px" height="21px" @tap="backToConversation" class="back"
                  v-if="showBack"></AssetsImage>
     {{ props.title }}

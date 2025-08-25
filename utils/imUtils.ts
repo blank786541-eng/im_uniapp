@@ -291,7 +291,13 @@ function initNim(opts: { account: string; token: string; appkey: string }) {
                 title:"密码错误",
                 icon: "error",
             })
+        }else if(e.code==102422){
+            uni.showToast({
+                title:e.message,
+                icon: "error",
+            })
         }
+
     }).finally(()=>{
         uni.hideLoading()
     });

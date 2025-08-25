@@ -110,7 +110,7 @@
 /** 验证消息页面 */
 
 import { autorun } from 'mobx'
-import { onUnmounted, ref } from 'vue'
+import {onBeforeMount, onMounted, onUnmounted, ref} from 'vue'
 import Empty from '../../../components/Empty.vue'
 import Avatar from '../../../components/Avatar.vue'
 import NavBar from '../../../components/NavBar.vue'
@@ -194,11 +194,17 @@ const handleAcceptApplyFriendClick = async (
 /** 监听验证消息 */
 const validMsgWatch = autorun(() => {
 
-  validMsg.value = uni.$UIKitStore?.sysMsgStore.friendApplyMsgs
+   validMsg.value= uni.$UIKitStore?.sysMsgStore.friendApplyMsg
+
+
+
   uni.$UIKitStore?.sysMsgStore.friendApplyMsgs?.map((item) => {
     uni.$UIKitStore?.userStore.getUserActive(item.applicantAccountId)
   })
+
 })
+
+
 
 onUnmounted(() => {
   validMsgWatch()

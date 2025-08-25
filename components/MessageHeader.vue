@@ -17,9 +17,14 @@ const props = withDefaults(
 )
 const appStatusHeight = ref(0);
 onBeforeMount(() => {
+
   // #ifdef APP-PLUS
   appStatusHeight.value = plus.navigator.getStatusbarHeight();
   // #endif
+  uni.setNavigationBarColor({
+    backgroundColor:'#DBB077'
+  })
+
 })
 
 
@@ -52,7 +57,7 @@ function toMore() {
 
 <template>
   <div class="message-header">
-    <div :style="{height:appStatusHeight}"></div>
+    <div :style="{height:appStatusHeight+'px'}" class="status-bar"></div>
     <div class="row">
       <AssetsImage path="/static/back.png" width="21px" height="21px" @tap="backToConversation"></AssetsImage>
       <span>{{ props.title }}</span>
@@ -62,7 +67,7 @@ function toMore() {
 </template>
 
 <style scoped lang="scss">
-.message-header {
+.message-header,.status-bar {
   background-color: $uni-color-primary;
 }
 

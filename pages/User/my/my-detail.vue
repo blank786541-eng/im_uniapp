@@ -1,138 +1,141 @@
 <template>
-  <div class="wrapper">
+  <div>
     <default-header :title="t('FriendPageText')" ></default-header>
-    <div class="flex-box " style="margin-top: 20px">
-      <UserCard
-          :account="userInfo && userInfo.accountId"
-          :nick="userInfo && userInfo.name"
-          :is-me="true"
-      ></UserCard>
-    </div>
-    <div class="default-wrapper " style="margin-top: 12px;">
-      <div class="row " @tap="goToPage('/pages/User/my-detail/change-name?name='+userInfo.name)">
-        <span class="label">昵称</span>
-        <div class="container-box"></div>
-        <span class="value">{{ userInfo.name }}</span>
-        <AssetsImage path="/static/right.png" width="6px" height="12px"></AssetsImage>
+    <div class="wrapper">
+
+      <div class="flex-box " style="margin-top: 20px">
+        <UserCard
+            :account="userInfo && userInfo.accountId"
+            :nick="userInfo && userInfo.name"
+            :is-me="true"
+        ></UserCard>
       </div>
-      <div class="row">
-        <span class="label">性别</span>
-        <div class="container-box"></div>
-        <div class="value">{{
-            userInfo && userInfo.gender === 0
-                ? t('unknow')
-                : userInfo && userInfo.gender === 1
-                    ? t('男')
-                    : t('女')
-          }}
+      <div class="default-wrapper " style="margin-top: 12px;">
+        <div class="row " @tap="goToPage('/pages/User/my-detail/change-name?name='+userInfo.name)">
+          <span class="label">昵称</span>
+          <div class="container-box"></div>
+          <span class="value">{{ userInfo.name }}</span>
+          <AssetsImage path="/static/right.png" width="6px" height="12px"></AssetsImage>
         </div>
-        <AssetsImage path="/static/right.png" width="6px" height="12px"></AssetsImage>
+        <div class="row">
+          <span class="label">性别</span>
+          <div class="container-box"></div>
+          <div class="value">{{
+              userInfo && userInfo.gender === 0
+                  ? t('unknow')
+                  : userInfo && userInfo.gender === 1
+                      ? t('男')
+                      : t('女')
+            }}
+          </div>
+          <AssetsImage path="/static/right.png" width="6px" height="12px"></AssetsImage>
+        </div>
+        <div class="row " @tap="copyAccount">
+          <span class="label">账号</span>
+          <div class="container-box"></div>
+          <span class="value">{{ userInfo.accountId }}</span>
+          <AssetsImage path="/static/copy.png" width="16px" height="16px"></AssetsImage>
+        </div>
+        <!--      <div class="row">-->
+        <!--        <span class="label">手机号</span>-->
+        <!--        <div class="container-box"></div>-->
+        <!--        <div class="value">{{-->
+        <!--            userInfo.mobile-->
+        <!--          }}-->
+        <!--        </div>-->
+        <!--        <AssetsImage path="/static/right.png" width="6px" height="12px"></AssetsImage>-->
+        <!--      </div>-->
+        <div class="row" @tap="goToPage('/pages/User/my-detail/change-sign?name='+(userInfo.sign ?? ''))">
+          <span class="label">个性签名</span>
+          <div class="container-box"></div>
+          <div class="value">{{ userInfo.sign }}</div>
+          <AssetsImage path="/static/right.png" width="6px" height="12px"></AssetsImage>
+        </div>
+        <!--      <div class="row">-->
+        <!--        <span class="label">二维码</span>-->
+        <!--        <div class="container-box"></div>-->
+        <!--        <AssetsImage path="/static/erweima.png" width="15px" height="15px" style="margin-right: 6px"></AssetsImage>-->
+        <!--        <AssetsImage path="/static/right.png" width="6px" height="12px"></AssetsImage>-->
+        <!--      </div>-->
+        <!--      <div class="row">-->
+        <!--        <span class="label">支付密码</span>-->
+        <!--        <div class="container-box"></div>-->
+        <!--        <div class="value">修改</div>-->
+        <!--        <AssetsImage path="/static/right.png" width="6px" height="12px"></AssetsImage>-->
+        <!--      </div>-->
       </div>
-      <div class="row " @tap="copyAccount">
-        <span class="label">账号</span>
-        <div class="container-box"></div>
-        <span class="value">{{ userInfo.accountId }}</span>
-        <AssetsImage path="/static/copy.png" width="16px" height="16px"></AssetsImage>
-      </div>
-<!--      <div class="row">-->
-<!--        <span class="label">手机号</span>-->
-<!--        <div class="container-box"></div>-->
-<!--        <div class="value">{{-->
-<!--            userInfo.mobile-->
-<!--          }}-->
-<!--        </div>-->
-<!--        <AssetsImage path="/static/right.png" width="6px" height="12px"></AssetsImage>-->
-<!--      </div>-->
-      <div class="row" @tap="goToPage('/pages/User/my-detail/change-sign?name='+(userInfo.sign ?? ''))">
-        <span class="label">个性签名</span>
-        <div class="container-box"></div>
-        <div class="value">{{ userInfo.sign }}</div>
-        <AssetsImage path="/static/right.png" width="6px" height="12px"></AssetsImage>
-      </div>
-<!--      <div class="row">-->
-<!--        <span class="label">二维码</span>-->
-<!--        <div class="container-box"></div>-->
-<!--        <AssetsImage path="/static/erweima.png" width="15px" height="15px" style="margin-right: 6px"></AssetsImage>-->
-<!--        <AssetsImage path="/static/right.png" width="6px" height="12px"></AssetsImage>-->
-<!--      </div>-->
-<!--      <div class="row">-->
-<!--        <span class="label">支付密码</span>-->
-<!--        <div class="container-box"></div>-->
-<!--        <div class="value">修改</div>-->
-<!--        <AssetsImage path="/static/right.png" width="6px" height="12px"></AssetsImage>-->
-<!--      </div>-->
+
+
+      <!--    <UserCard-->
+      <!--      :account="userInfo && userInfo.accountId"-->
+      <!--      :nick="userInfo && userInfo.name"-->
+      <!--    ></UserCard>-->
+      <!--    <template v-if="relation === 'stranger'">-->
+      <!--      <div class="userInfo-item-wrapper">-->
+      <!--        <div class="userInfo-item">-->
+      <!--          <div class="item-left">{{ t('addBlacklist') }}</div>-->
+      <!--          <switch-->
+      <!--            :checked="isInBlacklist"-->
+      <!--            @change="(checked:boolean) => handleSwitchChange(checked)"-->
+      <!--          />-->
+      <!--        </div>-->
+      <!--      </div>-->
+
+      <!--      <div class="button" :style="{ marginTop: '10px' }" @click="addFriend">-->
+      <!--        {{ t('addFriendText') }}-->
+      <!--      </div>-->
+      <!--    </template>-->
+      <!--    <template v-else>-->
+      <!--      <div class="userInfo-item-wrapper">-->
+      <!--        <div class="userInfo-item" @tap="handleAliasClick">-->
+      <!--          <div class="item-left">{{ t('remarkText') }}</div>-->
+      <!--          <div class="item-right">-->
+      <!--            <Icon iconClassName="more-icon" color="#999" type="icon-jiantou" />-->
+      <!--          </div>-->
+      <!--        </div>-->
+      <!--        <div class="userInfo-item">-->
+      <!--          <div class="item-left">{{ t('genderText') }}</div>-->
+      <!--          <div class="item-right">-->
+      <!--            {{-->
+      <!--              userInfo && userInfo.gender === 0-->
+      <!--                ? t('unknow')-->
+      <!--                : userInfo && userInfo.gender === 1-->
+      <!--                ? t('man')-->
+      <!--                : t('woman')-->
+      <!--            }}-->
+      <!--          </div>-->
+      <!--        </div>-->
+      <!--        <div class="box-shadow"></div>-->
+      <!--        <div class="userInfo-item">-->
+      <!--          <div class="item-left">{{ t('birthText') }}</div>-->
+      <!--          <div class="item-right">-->
+      <!--            {{ (userInfo && userInfo.birthday) || t('unknow') }}-->
+      <!--          </div>-->
+      <!--        </div>-->
+      <!--        <div class="box-shadow"></div>-->
+      <!--        <div class="userInfo-item">-->
+      <!--          <div class="item-left">{{ t('mobile') }}</div>-->
+      <!--          <div class="item-right">-->
+      <!--            {{ (userInfo && userInfo.mobile) || t('unknow') }}-->
+      <!--          </div>-->
+      <!--        </div>-->
+      <!--        <div class="box-shadow"></div>-->
+      <!--        <div class="userInfo-item">-->
+      <!--          <div class="item-left">{{ t('email') }}</div>-->
+      <!--          <div class="item-right">-->
+      <!--            {{ (userInfo && userInfo.email) || t('unknow') }}-->
+      <!--          </div>-->
+      <!--        </div>-->
+      <!--        <div class="userInfo-item">-->
+      <!--          <div class="item-left">{{ t('sign') }}</div>-->
+      <!--          <div class="item-right">-->
+      <!--            {{ (userInfo && userInfo.sign) || t('unknow') }}-->
+      <!--          </div>-->
+      <!--        </div>-->
+      <!--      </div>-->
+
+      <!--    </template>-->
     </div>
-
-
-    <!--    <UserCard-->
-    <!--      :account="userInfo && userInfo.accountId"-->
-    <!--      :nick="userInfo && userInfo.name"-->
-    <!--    ></UserCard>-->
-    <!--    <template v-if="relation === 'stranger'">-->
-    <!--      <div class="userInfo-item-wrapper">-->
-    <!--        <div class="userInfo-item">-->
-    <!--          <div class="item-left">{{ t('addBlacklist') }}</div>-->
-    <!--          <switch-->
-    <!--            :checked="isInBlacklist"-->
-    <!--            @change="(checked:boolean) => handleSwitchChange(checked)"-->
-    <!--          />-->
-    <!--        </div>-->
-    <!--      </div>-->
-
-    <!--      <div class="button" :style="{ marginTop: '10px' }" @click="addFriend">-->
-    <!--        {{ t('addFriendText') }}-->
-    <!--      </div>-->
-    <!--    </template>-->
-    <!--    <template v-else>-->
-    <!--      <div class="userInfo-item-wrapper">-->
-    <!--        <div class="userInfo-item" @tap="handleAliasClick">-->
-    <!--          <div class="item-left">{{ t('remarkText') }}</div>-->
-    <!--          <div class="item-right">-->
-    <!--            <Icon iconClassName="more-icon" color="#999" type="icon-jiantou" />-->
-    <!--          </div>-->
-    <!--        </div>-->
-    <!--        <div class="userInfo-item">-->
-    <!--          <div class="item-left">{{ t('genderText') }}</div>-->
-    <!--          <div class="item-right">-->
-    <!--            {{-->
-    <!--              userInfo && userInfo.gender === 0-->
-    <!--                ? t('unknow')-->
-    <!--                : userInfo && userInfo.gender === 1-->
-    <!--                ? t('man')-->
-    <!--                : t('woman')-->
-    <!--            }}-->
-    <!--          </div>-->
-    <!--        </div>-->
-    <!--        <div class="box-shadow"></div>-->
-    <!--        <div class="userInfo-item">-->
-    <!--          <div class="item-left">{{ t('birthText') }}</div>-->
-    <!--          <div class="item-right">-->
-    <!--            {{ (userInfo && userInfo.birthday) || t('unknow') }}-->
-    <!--          </div>-->
-    <!--        </div>-->
-    <!--        <div class="box-shadow"></div>-->
-    <!--        <div class="userInfo-item">-->
-    <!--          <div class="item-left">{{ t('mobile') }}</div>-->
-    <!--          <div class="item-right">-->
-    <!--            {{ (userInfo && userInfo.mobile) || t('unknow') }}-->
-    <!--          </div>-->
-    <!--        </div>-->
-    <!--        <div class="box-shadow"></div>-->
-    <!--        <div class="userInfo-item">-->
-    <!--          <div class="item-left">{{ t('email') }}</div>-->
-    <!--          <div class="item-right">-->
-    <!--            {{ (userInfo && userInfo.email) || t('unknow') }}-->
-    <!--          </div>-->
-    <!--        </div>-->
-    <!--        <div class="userInfo-item">-->
-    <!--          <div class="item-left">{{ t('sign') }}</div>-->
-    <!--          <div class="item-right">-->
-    <!--            {{ (userInfo && userInfo.sign) || t('unknow') }}-->
-    <!--          </div>-->
-    <!--        </div>-->
-    <!--      </div>-->
-
-    <!--    </template>-->
   </div>
 </template>
 

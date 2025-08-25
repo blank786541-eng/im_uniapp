@@ -3,7 +3,10 @@
 		{
 			"path": "pages/Conversation/index",
 			"style": {
-				"navigationStyle": "custom"
+				"navigationStyle": "custom",
+				"app-plus": {
+					"titleNView": false
+				}
 			}
 		},
 		{
@@ -154,7 +157,10 @@
 		{
 			"path": "pages/Contact/index",
 			"style": {
-				"navigationStyle": "custom"
+				"navigationStyle": "custom",
+				"app-plus": {
+					"titleNView": false
+				}
 			}
 		},
 		{
@@ -257,6 +263,7 @@
 	],
 	"globalStyle": {
 		"navigationBarTextStyle": "black"
+
 	},
 	"tabBar": {
 		"backgroundColor": "#FFFFFF",

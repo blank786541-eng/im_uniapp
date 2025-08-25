@@ -62,17 +62,17 @@ function getValue(value, key) {
     <default-header title="注册"></default-header>
     <div class="container-box">
       <div class="flex-center">
-        <image src="/pages/Login/static/logo.png" class="logo"></image>
+        <image src="/static/logo.png" class="logo"></image>
       </div>
       <div class="form-login">
-        <label-input icon="/pages/Login/static/account.png"
+        <label-input icon="/static/account.png"
                      label="账号" placeholder="请输入账号"
                      label-key="account"
                      @update-model-value="getValue"
                      :value="query.account"
                      :rule="mobileInputRule"></label-input>
         <div style="margin-top: 18px">
-          <label-input icon="/pages/Login/static/password.png"
+          <label-input icon="/static/password.png"
                        type="password"
                        label-key="password"
                        @update-model-value="getValue"
@@ -81,7 +81,7 @@ function getValue(value, key) {
                        label="密码" placeholder="请输入密码"></label-input>
         </div>
         <div style="margin-top: 18px">
-          <label-input icon="/pages/Login/static/password.png"
+          <label-input icon="/static/password.png"
                        type="password"
                        label-key="confirmPassword"
                        @update-model-value="getValue"
