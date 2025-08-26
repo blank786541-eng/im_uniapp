@@ -1,21 +1,25 @@
 <template>
   <div class="team-set-container">
-    <NavBar :title="t('updateNameText')" />
+<!--    <NavBar :title="t('updateNameText')" />-->
+    <default-header title="修改名称" :tap-action="handleSave" :show-action="hasPermission">
+
+
+
+    </default-header>
     <div v-if="hasPermission" class="team-name-input-container">
       <FormInput
         :model-value="teamName"
         :allow-clear="true"
         :maxlength="30"
         @input="handleInput"
+
       />
       <div class="input-length">{{ inputLengthTips }}</div>
     </div>
     <div v-else class="team-name-input-container">
       <input class="input" :value="teamName" />
     </div>
-    <div v-if="hasPermission" class="ok-btn" @tap="handleSave">
-      {{ t('saveText') }}
-    </div>
+
   </div>
 </template>
 
@@ -25,6 +29,7 @@ import FormInput from '../../../components/FormInput.vue'
 import { onLoad } from '@dcloudio/uni-app'
 import { ref, computed } from 'vue'
 import { t } from '../../../utils/i18n'
+import DefaultHeader from "@/components/defaultHeader.vue";
 
 let hasPermission = ref<boolean>(false)
 // 群名称

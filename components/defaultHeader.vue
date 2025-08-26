@@ -7,10 +7,14 @@ const props = withDefaults(
     defineProps<{
       title: string,
       showBack: boolean,
+      showAction:boolean,
+      tapAction:Function,
     }>(),
     {
       title: '',
-      showBack: true
+      showBack: true,
+      showAction:false,
+      tapAction:()=>{},
     }
 )
 
@@ -32,8 +36,8 @@ function backToConversation() {
     <AssetsImage path="/static/back-b.png" width="21px" height="21px" @tap="backToConversation" class="back"
                  v-if="showBack"></AssetsImage>
     {{ props.title }}
-    <div class="action">
-      <slot></slot>
+    <div class="action" v-if="showAction">
+      <div class="save" @tap="tapAction">保存设置</div>
     </div>
 
   </div>
@@ -71,4 +75,10 @@ function backToConversation() {
   align-items: center;
 }
 
+.save {
+  font-weight: 400;
+  font-size: 14px;
+  letter-spacing: 0;
+  color: #0066C5;
+}
 </style>

@@ -1,6 +1,7 @@
 <template>
   <div class="team-set-container">
-    <NavBar :title="t('teamIntro')" />
+<!--    <NavBar :title="t('teamIntro')" />-->
+    <default-header title="修改名称" :tap-action="handleSave" :show-action="hasPermission"/>
     <div v-if="hasPermission" class="group-intro-input-container">
       <FormInput
         :model-value="teamIntro"
@@ -8,15 +9,14 @@
         :maxlength="100"
         @input="handleInput"
         @clear="clearInput"
+       class="input"
       />
       <div class="input-length">{{ inputLengthTips }}</div>
     </div>
     <div v-else class="group-intro-input-container">
       <div class="input">{{ teamIntro }}</div>
     </div>
-    <div v-if="hasPermission" class="ok-btn" @tap="handleSave">
-      {{ t('saveText') }}
-    </div>
+
   </div>
 </template>
 
@@ -26,7 +26,7 @@ import { onLoad } from '@dcloudio/uni-app'
 import { ref, computed } from 'vue'
 import { t } from '../../../utils/i18n'
 import FormInput from '../../../components/FormInput.vue'
-
+import DefaultHeader from "@/components/defaultHeader.vue";
 let hasPermission = ref<boolean>(false)
 
 const teamIntro = ref<string>()
@@ -129,8 +129,7 @@ page {
     color: #999999;
   }
   .input {
-    padding: 10px 10px 5px 0px;
-    height: 30px;
+    padding: 0 12px;flex:1
   }
 
   ::v-deep.form-input-item {
