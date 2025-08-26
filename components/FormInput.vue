@@ -1,22 +1,22 @@
 <template>
   <div>
     <div :class="inputClass">
-      <slot name="addonBefore" />
+      <slot name="addonBefore"/>
       <input
-        class="input"
-        :type="type"
-        :value="inputValue"
-        @input="handleInput"
-        :focus="inputFocus"
-        @focus="handleFocus"
-        @blur="handleBlur"
-        :placeholder="placeholder"
-        :maxlength="maxlength"
+          class="input default-text font-14"
+          :type="type"
+          :value="inputValue"
+          @input="handleInput"
+          :focus="inputFocus"
+          @focus="handleFocus"
+          @blur="handleBlur"
+          :placeholder="placeholder"
+          :maxlength="maxlength"
       />
       <div class="clear-icon" @tap="clearInput()">
-        <icon v-show="modelValue && allowClear" type="clear" size="16" />
+        <icon v-show="modelValue && allowClear" type="clear" size="16"/>
       </div>
-      <slot name="addonAfter" />
+      <slot name="addonAfter"/>
     </div>
 
     <div v-if="inputError && rule" class="error-tips">{{ rule.message }}</div>
@@ -24,7 +24,8 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, computed } from 'vue'
+import {ref, computed} from 'vue'
+
 const $emit = defineEmits([
   'update:modelValue',
   'input',
@@ -33,24 +34,24 @@ const $emit = defineEmits([
   'clear',
 ])
 const props = withDefaults(
-  defineProps<{
-    className?: string
-    type?: string
-    modelValue?: string
-    placeholder?: string
-    allowClear?: boolean
-    rule?: any
-    maxlength?: number
-  }>(),
-  {
-    className: '',
-    type: 'text',
-    modelValue: '',
-    placeholder: '',
-    allowClear: false,
-    rule: null,
-    maxlength: 140,
-  }
+    defineProps<{
+      className?: string
+      type?: string
+      modelValue?: string
+      placeholder?: string
+      allowClear?: boolean
+      rule?: any
+      maxlength?: number
+    }>(),
+    {
+      className: '',
+      type: 'text',
+      modelValue: '',
+      placeholder: '',
+      allowClear: false,
+      rule: null,
+      maxlength: 140,
+    }
 )
 
 const inputFocus = ref(false)
@@ -61,7 +62,7 @@ const inputClass = computed(() => {
   return [
     props.className,
     'form-input-item',
-    { focus: inputFocus.value, error: inputError.value },
+    {focus: inputFocus.value, error: inputError.value},
   ]
 })
 
@@ -107,7 +108,6 @@ $primary-color: #337eff;
 $error-color: #f56c6c;
 
 .form-input-item {
-  border-bottom: 1px solid #dcdfe5;
   padding: 10px 10px 5px 0px;
   display: flex;
   height: 44px;
@@ -124,10 +124,10 @@ $error-color: #f56c6c;
 
 .input {
   flex: 1;
-  height: 30px;
   border: none;
   outline: none;
 }
+
 .clear-icon {
   width: 40px;
   text-align: right;

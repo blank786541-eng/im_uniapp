@@ -33,8 +33,7 @@ function save() {
 
 <template>
   <div>
-    <default-header title="个性签名">
-      <div class="save" @tap="save">保存设置</div>
+    <default-header title="个性签名" :show-action="true" :tap-action="save">
     </default-header>
     <div class="input-container">
       <textarea class="input" placeholder="请输入个性签名"
@@ -54,12 +53,6 @@ page {
   background-color: #eff1f2;
 }
 
-.save {
-  font-weight: 400;
-  font-size: 14px;
-  letter-spacing: 0;
-  color: #0066C5;
-}
 
 .input-container {
   margin: 12px 10px 0;

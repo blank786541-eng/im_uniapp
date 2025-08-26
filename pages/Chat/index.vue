@@ -35,10 +35,12 @@
           :reply-msgs-map="replyMsgsMap"
           :conversation-type="conversationType"
           :to="to"
+          :show-more="close"
       />
     </div>
   </div>
 </template>
+<!--@change-state="getState"-->
 
 <script lang="ts" setup>
 import {onShow, onHide} from '@dcloudio/uni-app'
@@ -301,9 +303,10 @@ const getHistory = async (endTime: number, lastMsgId?: string) => {
     throw error
   }
 }
-
+const close =ref(true)
 /** 加载更多消息 */
 const loadMoreMsgs = (lastMsg: V2NIMMessage) => {
+  close.value = false;
   if (lastMsg) {
     getHistory(lastMsg.createTime, lastMsg.messageServerId)
   } else {
@@ -642,6 +645,7 @@ onUnload(() => {
   uni.$off(events.CONFIRM_FORWARD_MSG)
   uni.$off(events.CANCEL_FORWARD_MSG)
 })
+
 </script>
 
 <style scoped lang="scss">

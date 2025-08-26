@@ -6,10 +6,9 @@
       :scroll-top="scrollTop"
       class="message-scroll-list"
     >
-      <!-- 查看更多 -->
-<!--      <div v-show="!noMore" @click="onLoadMore" class="view-more-text">-->
-<!--        {{ t('viewMoreText') }}-->
-<!--      </div>-->
+      <div v-show="!noMore" @click="onLoadMore" class="view-more-text">
+        {{ t('viewMoreText') }}
+      </div>
       <view class="msg-tip" v-show="noMore">{{ t('noMoreText') }}</view>
       <div v-for="(item, index) in finalMsgs" :key="item.renderKey">
         <MessageItem

@@ -97,6 +97,8 @@
           </div>
         </div>
         <div class="flex-box flex-y-center">
+          <AssetsImage path="/static/emoji.png" width="30px" height="30px" @tap="handleEmojiVisible"
+                       v-show="!showEmojiInput" style="margin-right: 4px"></AssetsImage>
           <input
               v-show="!showEmojiInput"
               :focus="isFocus"
@@ -118,8 +120,8 @@
               id="msg-input"
           />
 
-          <AssetsImage path="/static/emoji.png" width="30px" height="30px" @tap="handleEmojiVisible"
-                       v-show="!showEmojiInput"></AssetsImage>
+          <AssetsImage path="/static/audio1.png" width="26px" height="26px"
+                       v-show="platform=='app'" @tap="handleAudioVisible"></AssetsImage>
           <AssetsImage path="/static/action.png" width="30px" height="30px " v-show="!showEmojiInput"
                        @tap="showMoreAction" v-if="!inputText"></AssetsImage>
           <el-button size="mini" v-else style="background:#DBB077;padding:4px 8px;border-radius: 8px;margin-left: 4px">
@@ -232,7 +234,7 @@
 import Face from './face.vue'
 import VoicePanel from './voice-panel.vue'
 import Icon from '../../../components/Icon.vue'
-import {ref, getCurrentInstance, computed, onUnmounted, onMounted} from 'vue'
+import {ref, getCurrentInstance, computed, onUnmounted, onMounted, watch} from 'vue'
 import {ALLOW_AT, events, REPLY_MSG_TYPE_MAP} from '../../../utils/constants'
 import {emojiMap} from '../../../utils/emoji'
 import {t} from '../../../utils/i18n'
@@ -247,7 +249,7 @@ import {
   isWxApp,
   startCall,
   isAndroidOrIosApp,
-  isHarmonyOs,
+  isHarmonyOs, getUniPlatform,
 } from '../../../utils'
 // @ts-ignore
 import UniPopup from '../../../components/uni-components/uni-popup/components/uni-popup/uni-popup.vue'
@@ -283,9 +285,15 @@ const props = withDefaults(
       replyMsgsMap?: {
         [key: string]: V2NIMMessageForUI
       }
+      showMore:boolean
     }>(),
-    {}
+    {
+
+    }
 )
+
+
+const platform=ref(getUniPlatform());
 /** 会话ID */
 const conversationId =
     props.conversationType ===
@@ -361,7 +369,7 @@ const isGroupOwner = ref(false)
 const isGroupManager = ref(false)
 /** 群是否禁言 */
 const isTeamMute = ref(false)
-
+const emit = defineEmits(['changeState']);
 /** 是否允许@ 所有人 */
 const allowAtAll = computed(() => {
   let ext: YxServerExt = {}
@@ -442,6 +450,7 @@ function showMoreAction() {
   handleInputBlur();
   uni.hideKeyboard();
   showMore.value = !showMore.value;
+  emit('changeState', showMore.value)
 }
 
 /** 输入框失焦 */
@@ -849,6 +858,12 @@ onUnmounted(() => {
   removeReplyMsg()
   teamWatch()
 })
+
+watch(()=>props.showMore,(o,n)=>{
+   console.log(o,n)
+   console.log("o,n=====")
+})
+
 </script>
 
 <style scoped lang="scss">

@@ -276,7 +276,6 @@ const conversationListWatch = autorun(() => {
   const _conversationList = enableV2CloudConversation
     ? uni.$UIKitStore?.uiStore?.conversations
     : uni.$UIKitStore?.uiStore?.localConversations
-
   conversationList.value = _conversationList
     ?.map(
       (conversation: V2NIMConversationForUI | V2NIMLocalConversationForUI) => {
