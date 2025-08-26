@@ -1,29 +1,9 @@
 <template>
   <div>
-    <NavBar :title="t('searchTitleText')" />
-    <div class="search-wrapper">
-      <div class="input-wrapper">
-        <div class="search-icon-wrapper">
-          <Icon
-            iconClassName="search-icon"
-            :size="16"
-            color="#A6ADB6"
-            type="icon-sousuo"
-          ></Icon>
-        </div>
-        <input
-          class="input"
-          :value="searchText"
-          @input="onInput"
-          :focus="inputFocus"
-          @focus="onInputFocus"
-          @blur="onInputBlur"
-          :placeholder="t('searchText')"
-        />
-        <div v-if="searchText" class="clear-icon" @tap="clearInput()">
-          <Icon type="icon-shandiao" :size="16" />
-        </div>
-      </div>
+<!--    <NavBar :title="t('searchTitleText')" />-->
+    <default-header :title="t('searchTitleText')"></default-header>
+    <div style="padding:0 16px">
+      <search-input @change="onInput" @search="search" placeholder="输入账号或者名称"></search-input>
     </div>
     <div v-if="searchResult.length > 0" class="search-result-wrapper">
       <div class="search-result-list">
@@ -34,9 +14,7 @@
           <div class="result-title" v-else-if="item.title == 'groups'">
             {{ t('teamText') }}
           </div>
-          <div class="result-title" v-else-if="item.title == 'discussions'">
-            {{ t('discussionText') }}
-          </div>
+
           <div v-else>
             <SearchResultItem :item="item" />
           </div>
@@ -61,6 +39,8 @@ import SearchResultItem from './search-result-item.vue'
 import Empty from '../../../components/Empty.vue'
 import { isDiscussionFunc } from '../../../utils'
 import { V2NIMTeam } from 'nim-web-sdk-ng/dist/esm/nim/src/V2NIMTeamService'
+import DefaultHeader from "@/components/defaultHeader.vue";
+import SearchInput from "@/components/search-input.vue";
 
 const inputFocus = ref(false)
 
@@ -72,45 +52,36 @@ const searchList = ref<{ id: string; list: any }[]>([])
 
 /** 搜索列表 */
 const searchListWatch = autorun(() => {
+
+})
+
+
+function search(value){
   const friends =
-    uni.$UIKitStore.uiStore.friends
-      .filter(
-        (item) =>
-          !uni.$UIKitStore.relationStore.blacklist.includes(item.accountId)
-      )
-      .map((item) => {
-        const user = uni.$UIKitStore.userStore.users.get(item.accountId) || {
-          accountId: '',
-          name: '',
-          createTime: Date.now(),
-        }
+      uni.$UIKitStore.uiStore.friends
+          .filter(
+              (item) =>
+                  !uni.$UIKitStore.relationStore.blacklist.includes(item.accountId)
+          )
+          .map((item) => {
+            const user = uni.$UIKitStore.userStore.users.get(item.accountId) || {
+              accountId: '',
+              name: '',
+              createTime: Date.now(),
+            }
 
-        return {
-          ...item,
-          ...user,
-        }
-      }) || []
+            return {
+              ...item,
+              ...user,
+            }
+          }) || []
   const teamList =
-    uni.$UIKitStore.uiStore.teamList.filter((team) => {
-      if (team?.serverExtension) {
-        try {
-          return !isDiscussionFunc(team.serverExtension)
-        } catch (e) {
-          return true
-        }
-      }
-    }) || []
+      uni.$UIKitStore.uiStore.teamList.filter((team:V2NIMTeam) => {
+        return team.teamId.indexOf(value)>-1 || team.name.indexOf(value)>-1 || team.ownerAccountId.indexOf(value)>-1
 
-  const discussionList =
-    uni.$UIKitStore.uiStore.teamList.filter((team) => {
-      if (team?.serverExtension) {
-        try {
-          return isDiscussionFunc(team.serverExtension)
-        } catch (e) {
-          return true
-        }
-      }
-    }) || []
+      }) || []
+
+
 
   searchList.value = [
     {
@@ -121,27 +92,26 @@ const searchListWatch = autorun(() => {
       id: 'groups',
       list: teamList,
     },
-    {
-      id: 'discussions',
-      list: discussionList,
-    },
-  ].filter((item) => !!item.list.length)
-})
 
-/** 搜索结果 */
-const searchResult = computed(() => {
+  ].filter((item) => !!item.list.length)
+
+  console.log(searchList.value)
+  searchResult.value=getResult(value)
+}
+
+const searchResult=ref(<{ title?: string; renderKey: string }>[])
+function getResult(value){
   const res: { title?: string; renderKey: string }[] = []
-  if (searchText.value) {
-    const finalSections = searchList.value
+  const finalSections = searchList.value
       .map((item) => {
         if (item.id === 'friends') {
           return {
             ...item,
             list: item.list?.filter((item: any) => {
               return (
-                item.alias?.includes(searchText.value) ||
-                item.name?.includes(searchText.value) ||
-                item.accountId?.includes(searchText.value)
+                  item.alias?.includes(value) ||
+                  item.name?.includes(value) ||
+                  item.accountId?.includes(value)
               )
             }),
           }
@@ -151,7 +121,7 @@ const searchResult = computed(() => {
           return {
             ...item,
             list: item.list?.filter((item: V2NIMTeam) => {
-              return (item.name || item.teamId).includes(searchText.value)
+              return (item.name || item.teamId).includes(value)
             }),
           }
         }
@@ -160,7 +130,7 @@ const searchResult = computed(() => {
           return {
             ...item,
             list: item.list?.filter((item: V2NIMTeam) => {
-              return (item.name || item.teamId).includes(searchText.value)
+              return (item.name || item.teamId).includes(value)
             }),
           }
         }
@@ -169,45 +139,125 @@ const searchResult = computed(() => {
       })
       .filter((item) => !!item.list?.length)
 
-    finalSections.forEach((item) => {
-      if (item.id === 'friends') {
+
+
+
+
+  finalSections.forEach((item) => {
+
+    if (item.id === 'friends') {
+      res.push({
+        title: 'friends',
+        renderKey: 'friends',
+      })
+      item.list.forEach((item: any) => {
         res.push({
-          title: 'friends',
-          renderKey: 'friends',
+          ...item,
+          renderKey: item.accountId,
         })
-        item.list.forEach((item: any) => {
-          res.push({
-            ...item,
-            renderKey: item.accountId,
-          })
-        })
-      } else if (item.id === 'groups') {
+      })
+    } else if (item.id === 'groups') {
+      res.push({
+        title: 'groups',
+        renderKey: 'groups',
+      })
+      item.list.forEach((item: V2NIMTeam) => {
         res.push({
-          title: 'groups',
-          renderKey: 'groups',
+          ...item,
+          renderKey: item.teamId,
         })
-        item.list.forEach((item: V2NIMTeam) => {
-          res.push({
-            ...item,
-            renderKey: item.teamId,
-          })
-        })
-      } else if (item.id === 'discussions') {
-        res.push({
-          title: 'discussions',
-          renderKey: 'discussions',
-        })
-        item.list.forEach((item: V2NIMTeam) => {
-          res.push({
-            ...item,
-            renderKey: item.teamId,
-          })
-        })
-      }
-    })
-  }
-  return res
-})
+      })
+    }
+  })
+  return res;
+}
+
+// /** 搜索结果 */
+// const searchResult = computed(() => {
+//   const res: { title?: string; renderKey: string }[] = []
+//   if (searchText.value) {
+//     const finalSections = searchList.value
+//       .map((item) => {
+//         if (item.id === 'friends') {
+//           return {
+//             ...item,
+//             list: item.list?.filter((item: any) => {
+//               return (
+//                 item.alias?.includes(searchText.value) ||
+//                 item.name?.includes(searchText.value) ||
+//                 item.accountId?.includes(searchText.value)
+//               )
+//             }),
+//           }
+//         }
+//
+//         if (item.id === 'groups') {
+//           return {
+//             ...item,
+//             list: item.list?.filter((item: V2NIMTeam) => {
+//               return (item.name || item.teamId).includes(searchText.value)
+//             }),
+//           }
+//         }
+//
+//         if (item.id === 'discussions') {
+//           return {
+//             ...item,
+//             list: item.list?.filter((item: V2NIMTeam) => {
+//               return (item.name || item.teamId).includes(searchText.value)
+//             }),
+//           }
+//         }
+//
+//         return { ...item }
+//       })
+//       .filter((item) => !!item.list?.length)
+//
+//
+//
+//
+//
+//     finalSections.forEach((item) => {
+//       console.log(item);
+//       console.log("item====");
+//       if (item.id === 'friends') {
+//         res.push({
+//           title: 'friends',
+//           renderKey: 'friends',
+//         })
+//         item.list.forEach((item: any) => {
+//           res.push({
+//             ...item,
+//             renderKey: item.accountId,
+//           })
+//         })
+//       } else if (item.id === 'groups') {
+//         res.push({
+//           title: 'groups',
+//           renderKey: 'groups',
+//         })
+//         item.list.forEach((item: V2NIMTeam) => {
+//           res.push({
+//             ...item,
+//             renderKey: item.teamId,
+//           })
+//         })
+//       } else if (item.id === 'discussions') {
+//         res.push({
+//           title: 'discussions',
+//           renderKey: 'discussions',
+//         })
+//         item.list.forEach((item: V2NIMTeam) => {
+//           res.push({
+//             ...item,
+//             renderKey: item.teamId,
+//           })
+//         })
+//       }
+//     })
+//   }
+//   return res
+// })
 
 const onInputBlur = () => {
   inputFocus.value = false
@@ -217,8 +267,10 @@ const onInputFocus = () => {
   inputFocus.value = true
 }
 
-const onInput = (event: any) => {
-  searchText.value = event.detail.value
+const onInput = (value:string) => {
+
+  searchText.value = value
+  if(value.length==0) searchResult.value=[];
 }
 
 const clearInput = () => {
@@ -280,6 +332,7 @@ $error-color: #f56c6c;
   color: #c0c0c1;
   font-size: 14px;
   border-bottom: 1px solid #c0c0c1;
+  margin-top: 16px;
 }
 
 .input {

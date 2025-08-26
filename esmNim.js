@@ -2871,7 +2871,7 @@ var ve = {
   10414: 'Signaling: request parameter error',
   10417: 'Signaling: uid conflict',
   10419: 'Signaling: the number of members of channel exceed the limit',
-  10420: 'Signaling: member is already in the channel on other client',
+  10420: 'Signaling: member is already in the channel on Other client',
   10700: 'Signaling: phased success',
   13002: 'Abnormal chatroom status',
   13003: 'In the blacklist',

@@ -256,10 +256,9 @@ function initNim(opts: { account: string; token: string; appkey: string }) {
                                 console.log("ret")
                                 // 登录失败
                             } else {
-                                // 登录成功
-                                customRedirectTo({
-                                    url:  "/pages/index/index",
-                                });
+
+
+
                             }
                         }
                     );
@@ -270,9 +269,17 @@ function initNim(opts: { account: string; token: string; appkey: string }) {
         // #endif
         // 判断时手动点击唤起 还是 点击推送通知栏唤起,点击通知栏唤起直接跳转到聊天页面
         if (!startByNotificationId) {
-            customSwitchTab({
-                url: "/pages/Conversation/index",
-            });
+            uni.showToast({
+                title: "登录成功",
+                icon: 'success',
+                duration:1000,
+                success: () => {
+                    customSwitchTab({
+                        url: "/pages/Conversation/index",
+                    });
+                }
+            })
+
         } else {
             if (startByNotificationId) {
                 await uni.$UIKitStore.uiStore.selectConversation(
@@ -285,25 +292,25 @@ function initNim(opts: { account: string; token: string; appkey: string }) {
                 startByNotificationId = "";
             }
         }
-    }).catch((e)=>{
-        if(e.code==102302){
+    }).catch((e) => {
+        if (e.code == 102302) {
             uni.showToast({
-                title:"密码错误",
+                title: "密码错误",
                 icon: "error",
             })
-        }else if(e.code==102422){
+        } else if (e.code == 102422) {
             uni.showToast({
-                title:e.message,
+                title: e.message,
                 icon: "error",
             })
         }
 
-    }).finally(()=>{
+    }).finally(() => {
         uni.hideLoading()
     });
 }
 
-function  onImShowApp(){
+function onImShowApp() {
     // #ifdef APP-PLUS
     uni?.$UIKitNIM?.V2NIMSettingService?.setAppBackground(false);
 
@@ -321,7 +328,7 @@ function  onImShowApp(){
     // #endif
 }
 
-function onImHideApp(){
+function onImHideApp() {
     // #ifdef APP-PLUS
     uni?.$UIKitNIM?.V2NIMSettingService?.setAppBackground(true);
     // #endif
@@ -329,7 +336,8 @@ function onImHideApp(){
     // 重置推送 startByNotificationId
     startByNotificationId = "";
 }
-function  logout() {
+
+function logout() {
     uni.removeStorageSync(STORAGE_KEY);
     try {
         nimCallKit.logout({}, (ret: any) => {
@@ -350,4 +358,5 @@ function  logout() {
         });
     });
 }
-export {onImShowApp,onImHideApp,initPlugin,initNim,logout}
+
+export {onImShowApp, onImHideApp, initPlugin, initNim, logout}

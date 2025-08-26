@@ -1,35 +1,35 @@
 <template>
   <div class="valid-list-container">
-    <NavBar :title="t('validMsgText')" />
+    <NavBar :title="t('validMsgText')"/>
     <div class="valid-list-content">
-      <Empty v-if="validMsg.length === 0" :text="t('validEmptyText')" />
+      <Empty v-if="validMsg.length === 0 && teamMsg.length==0" :text="t('validEmptyText')"/>
       <template v-else>
         <div class="valid-item" v-for="msg in validMsg" :key="msg.timestamp">
           <!-- 好友申请 已同意 -->
           <template
-            v-if="
+              v-if="
               msg.status ===
               V2NIMConst.V2NIMFriendAddApplicationStatus
                 .V2NIM_FRIEND_ADD_APPLICATION_STATUS_AGREED
             "
           >
             <div class="valid-item-left">
-              <Avatar :account="msg.applicantAccountId" />
+              <Avatar :account="msg.applicantAccountId"/>
               <div class="valid-name-container">
                 <div class="valid-name">
-                  <Appellation :account="msg.applicantAccountId" />
+                  <Appellation :account="msg.applicantAccountId"/>
                 </div>
                 <div class="valid-action">{{ t('applyFriendText') }}</div>
               </div>
             </div>
             <div class="valid-state">
-              <Icon type="icon-yidu" />
+              <Icon type="icon-yidu"/>
               <span class="valid-state-text">{{ t('acceptResultText') }}</span>
             </div>
           </template>
           <!--好友申请 已拒绝 -->
           <template
-            v-else-if="
+              v-else-if="
               msg.status ===
               V2NIMConst.V2NIMFriendAddApplicationStatus
                 .V2NIM_FRIEND_ADD_APPLICATION_STATUS_REJECTED
@@ -37,10 +37,10 @@
           >
             <template v-if="isMeApplicant(msg)">
               <div class="valid-item-left">
-                <Avatar :account="msg.recipientAccountId" />
+                <Avatar :account="msg.recipientAccountId"/>
                 <div class="valid-name-container">
                   <div class="valid-name">
-                    <Appellation :account="msg.recipientAccountId" />
+                    <Appellation :account="msg.recipientAccountId"/>
                   </div>
                   <div class="valid-action">{{ t('beRejectResultText') }}</div>
                 </div>
@@ -48,25 +48,25 @@
             </template>
             <template v-else>
               <div class="valid-item-left">
-                <Avatar :account="msg.applicantAccountId" />
+                <Avatar :account="msg.applicantAccountId"/>
                 <div class="valid-name-container">
                   <div class="valid-name">
-                    <Appellation :account="msg.applicantAccountId" />
+                    <Appellation :account="msg.applicantAccountId"/>
                   </div>
                   <div class="valid-action">{{ t('applyFriendText') }}</div>
                 </div>
               </div>
               <div class="valid-state">
-                <Icon type="icon-shandiao" />
+                <Icon type="icon-shandiao"/>
                 <span class="valid-state-text">{{
-                  t('rejectResultText')
-                }}</span>
+                    t('rejectResultText')
+                  }}</span>
               </div>
             </template>
           </template>
           <!-- 好友申请 未处理 -->
           <template
-            v-else-if="
+              v-else-if="
               msg.status ===
               V2NIMConst.V2NIMFriendAddApplicationStatus
                 .V2NIM_FRIEND_ADD_APPLICATION_STATUS_INIT
@@ -74,26 +74,27 @@
           >
             <template v-if="!isMeApplicant(msg)">
               <div class="valid-item-left">
-                <Avatar :account="msg.applicantAccountId" />
+                <Avatar :account="msg.applicantAccountId"/>
+
                 <div class="valid-name-container">
                   <div class="valid-name">
-                    <Appellation :account="msg.applicantAccountId" />
+                    <Appellation :account="msg.applicantAccountId"/>
                   </div>
                   <div class="valid-action">{{ t('applyFriendText') }}</div>
                 </div>
               </div>
               <div class="valid-buttons">
                 <div
-                  class="valid-button button-reject"
-                  @tap="handleRejectApplyFriendClick(msg)"
-                  :loading="applyFriendLoading"
+                    class="valid-button button-reject"
+                    @tap="handleRejectApplyFriendClick(msg)"
+                    :loading="applyFriendLoading"
                 >
                   {{ t('rejectText') }}
                 </div>
                 <div
-                  class="valid-button button-accept"
-                  @tap="handleAcceptApplyFriendClick(msg)"
-                  :loading="applyFriendLoading"
+                    class="valid-button button-accept"
+                    @tap="handleAcceptApplyFriendClick(msg)"
+                    :loading="applyFriendLoading"
                 >
                   {{ t('acceptText') }}
                 </div>
@@ -101,7 +102,46 @@
             </template>
           </template>
         </div>
+        <div class="valid-item" v-for="msg in teamMsg" :key="msg.timestamp">
+          <Avatar :account="msg.teamId"/>
+
+          <div class="valid-name-container">
+            <div class="valid-name">
+              <Appellation :team-id="msg.teamId" :account="msg.teamId" />
+              <span style="color:red">(群聊)</span>
+            </div>
+            <div class="valid-action">{{ msg.postscript }}</div>
+          </div>
+          <div class="valid-buttons" v-if="msg.actionStatus==0">
+            <div
+                class="valid-button button-reject"
+                @tap="handleRejectApplyTeam(msg)"
+                :loading="applyFriendLoading"
+            >
+              {{ t('rejectText') }}
+            </div>
+            <div
+                class="valid-button button-accept"
+                @tap="handleAcceptApplyTeam(msg)"
+                :loading="applyFriendLoading"
+            >
+              {{ t('acceptText') }}
+            </div>
+          </div>
+          <div class="valid-buttons" v-else>
+            <div
+                class="valid-button button-reject"
+
+            >
+              {{ msg.actionStatus == 1 ? '已同意' : msg.actionStatus == 2 ? '已拒绝' : '已过期' }}
+
+            </div>
+
+          </div>
+        </div>
       </template>
+
+
     </div>
   </div>
 </template>
@@ -109,20 +149,23 @@
 <script lang="ts" setup>
 /** 验证消息页面 */
 
-import { autorun } from 'mobx'
+import {autorun} from 'mobx'
 import {onBeforeMount, onMounted, onUnmounted, ref} from 'vue'
 import Empty from '../../../components/Empty.vue'
 import Avatar from '../../../components/Avatar.vue'
 import NavBar from '../../../components/NavBar.vue'
 import Icon from '../../../components/Icon.vue'
-import { t } from '../../../utils/i18n'
-import { V2NIMFriendAddApplicationForUI } from '@xkit-yx/im-store-v2/dist/types/types'
-import { V2NIMConst } from '../../../utils/nim'
+import {t} from '../../../utils/i18n'
+import {V2NIMFriendAddApplicationForUI, V2NIMTeamJoinActionInfoForUI} from '@xkit-yx/im-store-v2/dist/types/types'
+import {V2NIMConst} from '../../../utils/nim'
 import Appellation from '../../../components/Appellation.vue'
-import { V2NIMMessage } from 'nim-web-sdk-ng/dist/esm/nim/src/V2NIMMessageService'
+import {V2NIMMessage} from 'nim-web-sdk-ng/dist/esm/nim/src/V2NIMMessageService'
+import {logout} from "@/utils/imUtils";
+import {V2NIMTeamJoinActionType} from "nim-web-sdk-ng/dist/esm/nim/src/V2NIMTeamService";
 
 /** 验证消息 */
 const validMsg = ref<V2NIMFriendAddApplicationForUI[]>([])
+const teamMsg = ref<V2NIMTeamJoinActionInfoForUI[]>([])
 
 /** 申请好友 loading */
 const applyFriendLoading = ref(false)
@@ -130,13 +173,13 @@ const applyFriendLoading = ref(false)
 /** 是否是我发起的申请 */
 const isMeApplicant = (data: V2NIMFriendAddApplicationForUI) => {
   return (
-    data.applicantAccountId === uni.$UIKitStore.userStore.myUserInfo.accountId
+      data.applicantAccountId === uni.$UIKitStore.userStore.myUserInfo.accountId
   )
 }
 
 /** 拒绝好友申请 */
 const handleRejectApplyFriendClick = async (
-  msg: V2NIMFriendAddApplicationForUI
+    msg: V2NIMFriendAddApplicationForUI
 ) => {
   applyFriendLoading.value = true
   try {
@@ -157,7 +200,7 @@ const handleRejectApplyFriendClick = async (
 
 /** 接受好友申请 */
 const handleAcceptApplyFriendClick = async (
-  msg: V2NIMFriendAddApplicationForUI
+    msg: V2NIMFriendAddApplicationForUI
 ) => {
   applyFriendLoading.value = true
   try {
@@ -175,13 +218,13 @@ const handleAcceptApplyFriendClick = async (
     }
 
     const textMsg = uni.$UIKitNIM.V2NIMMessageCreator.createTextMessage(
-      t('passFriendAskText')
+        t('passFriendAskText')
     ) as unknown as V2NIMMessage
 
     await uni.$UIKitStore.msgStore.sendMessageActive({
       msg: textMsg,
       conversationId: uni.$UIKitNIM.V2NIMConversationIdUtil.p2pConversationId(
-        msg.operatorAccountId
+          msg.operatorAccountId
       ),
     })
   } catch (error) {
@@ -191,19 +234,54 @@ const handleAcceptApplyFriendClick = async (
   }
 }
 
+async function handleAcceptApplyTeam(msg: V2NIMTeamJoinActionInfoForUI) {
+  msg.read = true;
+  msg.actionStatus = 1
+  await uni.$UIKitStore.teamStore.acceptTeamInviteActive(msg);
+  await uni.$UIKitStore.teamStore.updateTeamActive(msg)
+  uni.showToast({
+    title: '已加入群聊'
+  })
+
+}
+
+async function handleRejectApplyTeam(msg: V2NIMTeamJoinActionInfoForUI) {
+
+  uni.showModal({
+    title: "提示",
+    content: '拒绝加入群聊吗',
+    showCancel: true,
+    success: async function (res) {
+      if (res.confirm) {
+        msg.read = true;
+        msg.actionStatus = 2
+        await uni.$UIKitStore.teamStore.rejectTeamInviteActive(msg)
+      } else if (res.cancel) {
+        console.log('用户点击取消')
+      }
+    },
+  })
+
+}
+
 /** 监听验证消息 */
 const validMsgWatch = autorun(() => {
 
-   validMsg.value= uni.$UIKitStore?.sysMsgStore.friendApplyMsg
+  validMsg.value = uni.$UIKitStore?.sysMsgStore.friendApplyMsgs
+  teamMsg.value = uni.$UIKitStore?.sysMsgStore.teamJoinActionMsgs
 
-
+  console.log(validMsg.value);
+  console.log("validMsg.value");
+  console.log(teamMsg.value);
 
   uni.$UIKitStore?.sysMsgStore.friendApplyMsgs?.map((item) => {
     uni.$UIKitStore?.userStore.getUserActive(item.applicantAccountId)
   })
+  uni.$UIKitStore?.sysMsgStore.teamJoinActionMsgs?.map((item) => {
+    uni.$UIKitStore?.teamStore.getTeamActive(item.teamId)
+  })
 
 })
-
 
 
 onUnmounted(() => {
@@ -238,6 +316,7 @@ page {
   align-items: center;
   height: 60px;
   padding: 0 20px;
+  margin-top: 20px;
 }
 
 .valid-name-container {

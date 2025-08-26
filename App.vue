@@ -51,7 +51,7 @@ export default {
     }
     const opts = uni.getStorageSync(STORAGE_KEY);
     const autoLogin = uni.getStorageSync("autoLogin");
-    if (opts && opts.account && opts.token) {
+    if (opts && opts.account && opts.token && autoLogin) {
       initNim(opts)
     } else {
       customRedirectTo({

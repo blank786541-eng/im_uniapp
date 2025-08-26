@@ -36,33 +36,33 @@
           <span class="value">{{ userInfo.accountId }}</span>
           <AssetsImage path="/static/copy.png" width="16px" height="16px"></AssetsImage>
         </div>
-        <!--      <div class="row">-->
-        <!--        <span class="label">手机号</span>-->
-        <!--        <div class="container-box"></div>-->
-        <!--        <div class="value">{{-->
-        <!--            userInfo.mobile-->
-        <!--          }}-->
-        <!--        </div>-->
-        <!--        <AssetsImage path="/static/right.png" width="6px" height="12px"></AssetsImage>-->
-        <!--      </div>-->
+              <div class="row">
+                <span class="label">手机号</span>
+                <div class="container-box"></div>
+                <div class="value">{{
+                    userInfo.mobile
+                  }}
+                </div>
+                <AssetsImage path="/static/right.png" width="6px" height="12px"></AssetsImage>
+              </div>
         <div class="row" @tap="goToPage('/pages/User/my-detail/change-sign?name='+(userInfo.sign ?? ''))">
           <span class="label">个性签名</span>
           <div class="container-box"></div>
           <div class="value">{{ userInfo.sign }}</div>
           <AssetsImage path="/static/right.png" width="6px" height="12px"></AssetsImage>
         </div>
-        <!--      <div class="row">-->
-        <!--        <span class="label">二维码</span>-->
-        <!--        <div class="container-box"></div>-->
-        <!--        <AssetsImage path="/static/erweima.png" width="15px" height="15px" style="margin-right: 6px"></AssetsImage>-->
-        <!--        <AssetsImage path="/static/right.png" width="6px" height="12px"></AssetsImage>-->
-        <!--      </div>-->
-        <!--      <div class="row">-->
-        <!--        <span class="label">支付密码</span>-->
-        <!--        <div class="container-box"></div>-->
-        <!--        <div class="value">修改</div>-->
-        <!--        <AssetsImage path="/static/right.png" width="6px" height="12px"></AssetsImage>-->
-        <!--      </div>-->
+              <div class="row">
+                <span class="label">二维码</span>
+                <div class="container-box"></div>
+                <AssetsImage path="/static/erweima.png" width="15px" height="15px" style="margin-right: 6px"></AssetsImage>
+                <AssetsImage path="/static/right.png" width="6px" height="12px"></AssetsImage>
+              </div>
+              <div class="row">
+                <span class="label">支付密码</span>
+                <div class="container-box"></div>
+                <div class="value">修改</div>
+                <AssetsImage path="/static/right.png" width="6px" height="12px"></AssetsImage>
+              </div>
       </div>
 
 

@@ -210,7 +210,7 @@ export default {
   getMessageFailed: 'Fail to get message',
   getForwardMessageFailed: 'Fail to get forward message',
   sendFailWithInBlackText:
-    'The other party has blocked you, message sending failed',
+    'The Other party has blocked you, message sending failed',
   sendFailWithDeleteText:
     'The relationship between both parties has been terminated, please reapply for contact',
   friendVerificationText: 'Friend Verification',

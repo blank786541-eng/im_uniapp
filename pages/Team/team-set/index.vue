@@ -1,16 +1,16 @@
 <template>
   <div>
-    <NavBar :title="t('setText')" />
+    <NavBar :title="t('setText')"/>
     <div class="team-set-container" v-if="team">
       <div class="team-set-card">
         <div class="team-set-item">
           <div class="team-info-item" @tap="handleInfoClick">
             <Avatar
-              :account="team && team.teamId"
-              :avatar="team && team.avatar"
+                :account="team && team.teamId"
+                :avatar="team && team.avatar"
             />
             <div class="team-info-title">{{ team && team.name }}</div>
-            <Icon iconClassName="more-icon" color="#999" type="icon-jiantou" />
+            <Icon iconClassName="more-icon" color="#999" type="icon-jiantou"/>
           </div>
         </div>
         <div class="team-set-item">
@@ -20,8 +20,8 @@
                 <div class="team-info-title">
                   {{
                     isDiscussion
-                      ? t('discussionMemberText')
-                      : t('teamMemberText')
+                        ? t('discussionMemberText')
+                        : t('teamMemberText')
                   }}
                 </div>
                 <div class="group-info-subtitle">
@@ -29,27 +29,27 @@
                 </div>
               </div>
               <Icon
-                iconClassName="more-icon"
-                color="#999"
-                type="icon-jiantou"
+                  iconClassName="more-icon"
+                  color="#999"
+                  type="icon-jiantou"
               />
             </div>
             <div class="member-list">
               <div class="member-add">
                 <div @tap="addTeamMember" :style="{ display: 'flex' }">
-                  <Icon type="icon-tianjiaanniu" />
+                  <Icon type="icon-tianjiaanniu"/>
                 </div>
               </div>
               <div
-                class="member-item"
-                v-for="member in teamMembers"
-                :key="member.accountId"
+                  class="member-item"
+                  v-for="member in teamMembers"
+                  :key="member.accountId"
               >
                 <Avatar
-                  :account="member.accountId"
-                  size="32"
-                  :key="member.accountId"
-                  font-size="10"
+                    :account="member.accountId"
+                    size="32"
+                    :key="member.accountId"
+                    font-size="10"
                 />
               </div>
             </div>
@@ -57,41 +57,46 @@
         </div>
       </div>
 
-      <div class="team-set-item" v-if="team.intro">
-        <div style="margin-bottom: 10px">群介绍</div>
-        <div style="background:#efefef;padding:14px 10px;border-radius: 6px   ">{{team.intro}}</div>
-      </div>
+
       <div class="team-set-item">
         <div class=" team-set-item-flex" @tap="goPinInTeam">
           <div>{{ t('pinText') }}</div>
-          <Icon iconClassName="more-icon" color="#999" type="icon-jiantou" />
+          <Icon iconClassName="more-icon" color="#999" type="icon-jiantou"/>
+        </div>
+        <div class=" team-set-item-flex" @tap="toChangeContent(1,team.intro)">
+          <div>群介绍</div>
+          <Icon iconClassName="more-icon" color="#999" type="icon-jiantou"/>
+        </div>
+        <div class=" team-set-item-flex" @tap="toChangeContent(2,team.announcement)">
+          <div>群公告</div>
+          <Icon iconClassName="more-icon" color="#999" type="icon-jiantou"/>
         </div>
         <div class="team-set-item-flex">
           <div>{{ t('stickTopText') }}</div>
           <switch
-            :checked="conversation && !!conversation.stickTop"
-            @change="changeStickTopInfo"
+              :checked="conversation && !!conversation.stickTop"
+              @change="changeStickTopInfo"
           />
         </div>
         <div class="team-set-item-flex">
           <div>{{ t('sessionMuteText') }}</div>
           <switch
-            :checked="
+              :checked="
               team &&
               teamMuteMode !==
                 V2NIMConst.V2NIMTeamMessageMuteMode
                   .V2NIM_TEAM_MESSAGE_MUTE_MODE_ON
             "
-            @change="changeTeamMute"
+              @change="changeTeamMute"
           />
         </div>
         <div
-          v-if="!isDiscussion"
-          class="team-set-item-flex"
-          @tap="goNickInTeam"
+            v-if="!isDiscussion"
+            class="team-set-item-flex"
+            @tap="goNickInTeam"
         >
           <div>{{ t('nickInTeam') }}</div>
-          <Icon iconClassName="more-icon" color="#999" type="icon-jiantou" />
+          <Icon iconClassName="more-icon" color="#999" type="icon-jiantou"/>
         </div>
         <div class="team-set-item-flex">
           <div>{{ t('teamBannedText') }}</div>
@@ -110,15 +115,15 @@
         >
           <div class="team-set-item-flex" @tap="goTeamManage">
             <div>{{ t('teamManagerText') }}</div>
-            <Icon iconClassName="more-icon" color="#999" type="icon-jiantou" />
+            <Icon iconClassName="more-icon" color="#999" type="icon-jiantou"/>
           </div>
         </div>
       </div>
 
       <div
-        class="team-set-button"
-        v-if="isGroupOwner"
-        @tap="showDismissConfirm"
+          class="team-set-button"
+          v-if="isGroupOwner"
+          @tap="showDismissConfirm"
       >
         {{ isDiscussion ? t('leaveDiscussionTitle') : t('dismissTeamText') }}
       </div>
@@ -133,11 +138,11 @@
 import NavBar from '../../../components/NavBar.vue'
 import Avatar from '../../../components/Avatar.vue'
 import Icon from '../../../components/Icon.vue'
-import { onLoad } from '@dcloudio/uni-app'
-import { ref, computed, onUnmounted } from 'vue'
-import { autorun } from 'mobx'
-import { t } from '../../../utils/i18n'
-import { isDiscussionFunc } from '../../../utils'
+import {onLoad} from '@dcloudio/uni-app'
+import {ref, computed, onUnmounted} from 'vue'
+import {autorun} from 'mobx'
+import {t} from '../../../utils/i18n'
+import {isDiscussionFunc} from '../../../utils'
 import {
   customNavigateTo,
   customSwitchTab,
@@ -146,7 +151,7 @@ import {
   V2NIMTeam,
   V2NIMTeamMember,
 } from 'nim-web-sdk-ng/dist/esm/nim/src/V2NIMTeamService'
-import { V2NIMConst } from '../../../utils/nim'
+import {V2NIMConst} from '../../../utils/nim'
 import {
   V2NIMConversationForUI,
   V2NIMLocalConversationForUI,
@@ -163,14 +168,14 @@ const teamMuteMode = ref<V2NIMConst.V2NIMTeamMessageMuteMode>()
 
 /**是否是云端会话 */
 const enableV2CloudConversation =
-  uni.$UIKitStore?.sdkOptions?.enableV2CloudConversation
+    uni.$UIKitStore?.sdkOptions?.enableV2CloudConversation
 
 /** 是否是群主 */
 const isGroupOwner = computed(() => {
   const myUser = uni.$UIKitStore.userStore.myUserInfo
   return (
-    (team.value ? team.value.ownerAccountId : '') ===
-    (myUser ? myUser.accountId : '')
+      (team.value ? team.value.ownerAccountId : '') ===
+      (myUser ? myUser.accountId : '')
   )
 })
 
@@ -184,21 +189,21 @@ const isDiscussion = computed(() => {
 const isGroupManager = computed(() => {
   const myUser = uni.$UIKitStore.userStore.myUserInfo
   return teamMembers.value
-    .filter(
-      (item) =>
-        //@ts-ignore
-        item.memberRole ===
-        V2NIMConst.V2NIMTeamMemberRole.V2NIM_TEAM_MEMBER_ROLE_MANAGER
-    )
-    .some((member) => member.accountId === (myUser ? myUser.accountId : ''))
+      .filter(
+          (item) =>
+              //@ts-ignore
+              item.memberRole ===
+              V2NIMConst.V2NIMTeamMemberRole.V2NIM_TEAM_MEMBER_ROLE_MANAGER
+      )
+      .some((member) => member.accountId === (myUser ? myUser.accountId : ''))
 })
 
 /** 是否可以添加成员 */
 const canAddMember = computed(() => {
   if (
-    //@ts-ignore
-    team.value?.inviteMode ===
-    V2NIMConst.V2NIMTeamInviteMode.V2NIM_TEAM_INVITE_MODE_ALL
+      //@ts-ignore
+      team.value?.inviteMode ===
+      V2NIMConst.V2NIMTeamInviteMode.V2NIM_TEAM_INVITE_MODE_ALL
   ) {
     return true
   }
@@ -233,10 +238,17 @@ const goNickInTeam = () => {
   })
 }
 
+const toChangeContent = (type, content) => {
+  customNavigateTo({
+    url: `/pages/Team/team-set/change-intro?id=${teamId}&type=${type}&content=${content}`,
+
+  })
+}
+
 /** 群标记 */
 const goPinInTeam = () => {
   const conversationId =
-    uni.$UIKitNIM.V2NIMConversationIdUtil.teamConversationId(teamId)
+      uni.$UIKitNIM.V2NIMConversationIdUtil.teamConversationId(teamId)
   customNavigateTo({
     url: `/pages/Chat/message/pin-list?conversationId=${conversationId}`,
   })
@@ -277,17 +289,17 @@ const leaveDiscussion = () => {
           if (isGroupOwner.value) {
             const myUser = uni.$UIKitStore.userStore.myUserInfo
             const teamMembersWithoutAiUserAndMySelf = teamMembers.value
-              .filter(
-                (item: V2NIMTeamMember) =>
-                  !uni.$UIKitStore.aiUserStore.aiUsers.has(item.accountId)
-              )
-              .filter(
-                (item: V2NIMTeamMember) => item.accountId !== myUser?.accountId
-              )
+                .filter(
+                    (item: V2NIMTeamMember) =>
+                        !uni.$UIKitStore.aiUserStore.aiUsers.has(item.accountId)
+                )
+                .filter(
+                    (item: V2NIMTeamMember) => item.accountId !== myUser?.accountId
+                )
 
             if (teamMembersWithoutAiUserAndMySelf.length === 0) {
               await uni.$UIKitStore.teamStore.dismissTeamActive(
-                team.value.teamId
+                  team.value.teamId
               )
             } else {
               await uni.$UIKitStore.teamStore.transferTeamActive({
@@ -313,7 +325,8 @@ const leaveDiscussion = () => {
         })
       }
     },
-    cancel: function () {},
+    cancel: function () {
+    },
   })
 }
 
@@ -331,19 +344,19 @@ const showDismissConfirm = () => {
       success: function (res) {
         if (res.confirm) {
           uni.$UIKitStore.teamStore
-            .dismissTeamActive(teamId)
-            .then(() => {
-              uni.showToast({
-                title: t('dismissTeamSuccessText'),
-                icon: 'none',
+              .dismissTeamActive(teamId)
+              .then(() => {
+                uni.showToast({
+                  title: t('dismissTeamSuccessText'),
+                  icon: 'none',
+                })
               })
-            })
-            .catch(() => {
-              uni.showToast({
-                title: t('dismissTeamFailedText'),
-                icon: 'error',
+              .catch(() => {
+                uni.showToast({
+                  title: t('dismissTeamFailedText'),
+                  icon: 'error',
+                })
               })
-            })
         }
       },
     })
@@ -364,43 +377,45 @@ const showLeaveConfirm = () => {
       success: function (res) {
         if (res.confirm) {
           uni.$UIKitStore.teamStore
-            .leaveTeamActive(teamId)
-            .then(() => {
-              uni.showToast({
-                title: t('leaveTeamSuccessText'),
-                icon: 'none',
+              .leaveTeamActive(teamId)
+              .then(() => {
+                uni.showToast({
+                  title: t('leaveTeamSuccessText'),
+                  icon: 'none',
+                })
+                goBackChat()
               })
-              goBackChat()
-            })
-            .catch(() => {
-              uni.showToast({
-                title: t('leaveTeamFailedText'),
-                icon: 'error',
+              .catch(() => {
+                uni.showToast({
+                  title: t('leaveTeamFailedText'),
+                  icon: 'error',
+                })
               })
-            })
         }
       },
     })
   }
 }
-let teamWatch = () => {}
-let conversationWatch = () => {}
+let teamWatch = () => {
+}
+let conversationWatch = () => {
+}
 
 /** 群聊天置顶 */
 const changeStickTopInfo = async (e: any) => {
   const checked = e.detail.value
   const conversationId =
-    uni.$UIKitNIM.V2NIMConversationIdUtil.teamConversationId(teamId)
+      uni.$UIKitNIM.V2NIMConversationIdUtil.teamConversationId(teamId)
   try {
     if (enableV2CloudConversation) {
       await uni.$UIKitStore.conversationStore?.stickTopConversationActive(
-        conversationId,
-        checked
+          conversationId,
+          checked
       )
     } else {
       await uni.$UIKitStore.localConversationStore?.stickTopConversationActive(
-        conversationId,
-        checked
+          conversationId,
+          checked
       )
     }
   } catch (error) {
@@ -416,37 +431,37 @@ const changeTeamMute = (e: any) => {
   const checked = e.detail.value
 
   uni.$UIKitStore.teamStore
-    .setTeamMessageMuteModeActive(
-      teamId,
-      V2NIMConst.V2NIMTeamType.V2NIM_TEAM_TYPE_ADVANCED,
-      checked
-        ? V2NIMConst.V2NIMTeamMessageMuteMode.V2NIM_TEAM_MESSAGE_MUTE_MODE_OFF
-        : V2NIMConst.V2NIMTeamMessageMuteMode.V2NIM_TEAM_MESSAGE_MUTE_MODE_ON
-    )
-    .then(() => {
-      teamMuteMode.value = checked
-        ? V2NIMConst.V2NIMTeamMessageMuteMode.V2NIM_TEAM_MESSAGE_MUTE_MODE_OFF
-        : V2NIMConst.V2NIMTeamMessageMuteMode.V2NIM_TEAM_MESSAGE_MUTE_MODE_ON
-    })
-    .catch((error: any) => {
-      switch (error?.code) {
-        // 无权限
-        case 109432:
-          uni.showToast({
-            title: t('noPermission'),
-            icon: 'none',
-          })
-          break
-        default:
-          uni.showToast({
-            title: checked
-              ? t('sessionMuteFailText')
-              : t('sessionUnMuteFailText'),
-            icon: 'none',
-          })
-          break
-      }
-    })
+      .setTeamMessageMuteModeActive(
+          teamId,
+          V2NIMConst.V2NIMTeamType.V2NIM_TEAM_TYPE_ADVANCED,
+          checked
+              ? V2NIMConst.V2NIMTeamMessageMuteMode.V2NIM_TEAM_MESSAGE_MUTE_MODE_OFF
+              : V2NIMConst.V2NIMTeamMessageMuteMode.V2NIM_TEAM_MESSAGE_MUTE_MODE_ON
+      )
+      .then(() => {
+        teamMuteMode.value = checked
+            ? V2NIMConst.V2NIMTeamMessageMuteMode.V2NIM_TEAM_MESSAGE_MUTE_MODE_OFF
+            : V2NIMConst.V2NIMTeamMessageMuteMode.V2NIM_TEAM_MESSAGE_MUTE_MODE_ON
+      })
+      .catch((error: any) => {
+        switch (error?.code) {
+            // 无权限
+          case 109432:
+            uni.showToast({
+              title: t('noPermission'),
+              icon: 'none',
+            })
+            break
+          default:
+            uni.showToast({
+              title: checked
+                  ? t('sessionMuteFailText')
+                  : t('sessionUnMuteFailText'),
+              icon: 'none',
+            })
+            break
+        }
+      })
 }
 
 /** 群禁言 */
@@ -456,13 +471,13 @@ const setTeamChatBanned = async (e: any) => {
     await uni.$UIKitStore.teamStore.setTeamChatBannedActive({
       teamId,
       chatBannedMode: checked
-        ? V2NIMConst.V2NIMTeamChatBannedMode
-            .V2NIM_TEAM_CHAT_BANNED_MODE_BANNED_NORMAL
-        : V2NIMConst.V2NIMTeamChatBannedMode.V2NIM_TEAM_CHAT_BANNED_MODE_UNBAN,
+          ? V2NIMConst.V2NIMTeamChatBannedMode
+              .V2NIM_TEAM_CHAT_BANNED_MODE_BANNED_NORMAL
+          : V2NIMConst.V2NIMTeamChatBannedMode.V2NIM_TEAM_CHAT_BANNED_MODE_UNBAN,
     })
   } catch (error: any) {
     switch (error?.code) {
-      // 无权限
+        // 无权限
       case 109432:
         uni.showToast({
           title: t('noPermission'),
@@ -472,8 +487,8 @@ const setTeamChatBanned = async (e: any) => {
       default:
         uni.showToast({
           title: checked
-            ? t('muteAllTeamFailedText')
-            : t('sessionUnMuteFailText'),
+              ? t('muteAllTeamFailedText')
+              : t('sessionUnMuteFailText'),
           icon: 'error',
         })
         break
@@ -484,14 +499,14 @@ const setTeamChatBanned = async (e: any) => {
 onLoad((option) => {
   teamId = option ? option.id : ''
   const conversationId =
-    uni.$UIKitNIM.V2NIMConversationIdUtil.teamConversationId(teamId)
+      uni.$UIKitNIM.V2NIMConversationIdUtil.teamConversationId(teamId)
 
   // 查询当前群是否开启免打扰
   uni.$UIKitStore.teamStore
-    .getTeamMessageMuteModeActive(teamId, 1)
-    .then((res: V2NIMConst.V2NIMTeamMessageMuteMode) => {
-      teamMuteMode.value = res
-    })
+      .getTeamMessageMuteModeActive(teamId, 1)
+      .then((res: V2NIMConst.V2NIMTeamMessageMuteMode) => {
+        teamMuteMode.value = res
+      })
 
   teamWatch = autorun(() => {
     if (teamId) {
@@ -502,9 +517,9 @@ onLoad((option) => {
 
   conversationWatch = autorun(() => {
     conversation.value = enableV2CloudConversation
-      ? uni.$UIKitStore.conversationStore?.conversations.get(conversationId)
-      : uni.$UIKitStore.localConversationStore?.conversations.get(
-          conversationId
+        ? uni.$UIKitStore.conversationStore?.conversations.get(conversationId)
+        : uni.$UIKitStore.localConversationStore?.conversations.get(
+            conversationId
         )
   })
 })
@@ -541,16 +556,20 @@ page {
   background: #ffffff;
   border-radius: 8px;
   color: #e6605c;
-  height: 40px;
-  line-height: 40px;
+  height: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
-.team-set-item{
+
+.team-set-item {
   background: #ffffff;
   border-radius: 8px;
   padding: 10px;
   box-sizing: border-box;
   margin-bottom: 16px;
 }
+
 .team-set-item:not(:last-child) {
   border-bottom: 1rpx solid #f5f8fc;
 }

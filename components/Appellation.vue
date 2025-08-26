@@ -1,7 +1,7 @@
 <template>
   <span
     class="appellation"
-
+    :style="{color:color}"
     >{{ appellation }}</span
   >
 </template>
@@ -37,6 +37,8 @@ const uninstallAppellationWatch = autorun(() => {
     ignoreAlias,
     nickFromMsg,
   })
+  console.log(appellation.value);
+  console.log("appellation.value");
 })
 onUnmounted(() => {
   uninstallAppellationWatch()

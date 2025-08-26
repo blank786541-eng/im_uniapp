@@ -97,8 +97,8 @@
           </div>
         </div>
         <div class="flex-box flex-y-center">
-          <AssetsImage path="/static/emoji.png" width="30px" height="30px" @tap="handleEmojiVisible"
-                       v-show="!showEmojiInput" style="margin-right: 4px"></AssetsImage>
+          <AssetsImage path="/static/audio1.png" width="26px" height="26px"
+                       v-show="platform=='app'" @tap="handleAudioVisible"></AssetsImage>
           <input
               v-show="!showEmojiInput"
               :focus="isFocus"
@@ -120,8 +120,9 @@
               id="msg-input"
           />
 
-          <AssetsImage path="/static/audio1.png" width="26px" height="26px"
-                       v-show="platform=='app'" @tap="handleAudioVisible"></AssetsImage>
+
+          <AssetsImage path="/static/emoji.png" width="30px" height="30px" @tap="handleEmojiVisible"
+                       v-show="!showEmojiInput" style="margin-right: 4px"></AssetsImage>
           <AssetsImage path="/static/action.png" width="30px" height="30px " v-show="!showEmojiInput"
                        @tap="showMoreAction" v-if="!inputText"></AssetsImage>
           <el-button size="mini" v-else style="background:#DBB077;padding:4px 8px;border-radius: 8px;margin-left: 4px">
@@ -292,7 +293,10 @@ const props = withDefaults(
     }
 )
 
-
+uni.$on('closeMore', () => {
+  uni.hideKeyboard();
+  showMore.value=false;
+})
 const platform=ref(getUniPlatform());
 /** 会话ID */
 const conversationId =
@@ -404,6 +408,7 @@ const updateTeamMute = () => {
 
 /** 弹窗*/
 const onPopupChange = (e: any) => {
+
   uni.$emit(events.HANDLE_MOVE_THROUGH, e.value)
 }
 
@@ -412,7 +417,7 @@ const handleMentionItemClick = (member: MentionedMember) => {
   //@ts-ignore
   ctx.refs.popupRef.close()
   uni.$emit(events.HANDLE_MOVE_THROUGH, false)
-  const nickInTeam = member.appellation
+  const nickInTeam = member.accountId
   selectedAtMembers.value = [
     ...selectedAtMembers.value.filter(
         (item) => item.accountId !== member.accountId
@@ -732,7 +737,7 @@ onMounted(() => {
       ),
       member,
     ]
-    const newInputText = inputText.value + '@' + member.appellation + ' '
+    const newInputText = inputText.value + '@' + member.accountId + ' '
     /** 更新input框的内容 */
     inputText.value = newInputText
   })
@@ -800,7 +805,7 @@ const onAtMembersExtHandler = () => {
           return true
         })
         .forEach((member) => {
-          const substr = `@${member.appellation}`
+          const substr = `@${member.accountId}`
           const positions: number[] = []
           let pos = inputText.value?.indexOf(substr)
           while (pos !== -1) {
@@ -859,10 +864,6 @@ onUnmounted(() => {
   teamWatch()
 })
 
-watch(()=>props.showMore,(o,n)=>{
-   console.log(o,n)
-   console.log("o,n=====")
-})
 
 </script>
 

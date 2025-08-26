@@ -45,7 +45,14 @@ async function submitLoginForm(){
   })
 
   if(res){
-    uni.navigateBack();
+    uni.showToast({
+      title:"注册成功",
+      duration:1000,
+      success:()=>{
+        uni.navigateBack();
+      }
+    })
+
   }
 }
 

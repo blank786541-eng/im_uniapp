@@ -1,31 +1,18 @@
 <template>
-  <div>
-    <NavBar :title="t('addFriendText')" />
-    <div class="search-input-wrapper">
-      <Icon
-        iconClassName="search-icon"
-        :size="20"
-        color="#A6ADB6"
-        type="icon-sousuo"
-      ></Icon>
-      <input
-        class="search-input"
-        type="text"
-        @input="onInputValueChange"
-        @confirm="handleSearch"
-        placeholder-class="placeholder"
-        confirm-type="search"
-        :placeholder="t('enterAccount')"
-      />
-    </div>
+  <default-header :title="t('addFriendText')"></default-header>
+  <div style="padding: 0 15px">
+    <!--    <NavBar :title="t('addFriendText')" />-->
+
+
+      <search-input :placeholder="t('enterAccount')" @search="handleSearch" @change="onInputValueChange"></search-input>
     <Empty
-      :text="t('noExistUser')"
-      v-if="searchResState == 'searchEmpty'"
+        :text="t('noExistUser')"
+        v-if="searchResState == 'searchEmpty'"
     ></Empty>
     <div class="user-wrapper" v-else-if="searchResState === 'searchResult'">
       <Avatar
-        class="user-avatar"
-        :account="(userInfo && userInfo.accountId) || ''"
+          class="user-avatar"
+          :account="(userInfo && userInfo.accountId) || ''"
       />
       <div class="user-info">
         <div class="user-nick">
@@ -35,14 +22,14 @@
       </div>
       <!-- 如果是好友之间去聊天，如果不是好友，添加好友 -->
       <button
-        v-if="relation !== 'stranger'"
-        class="go-chat-button"
-        type="primary"
-        @click="gotoChat"
+          v-if="relation !== 'stranger'"
+          class="go-chat-button"
+          type="primary"
+          @click="gotoChat"
       >
         {{ t('chatButtonText') }}
       </button>
-      <button v-else class="go-chat-button" type="primary" @click="applyFriend">
+      <button v-else class="go-chat-button" @click="applyFriend">
         {{ t('addText') }}
       </button>
     </div>
@@ -50,21 +37,24 @@
 </template>
 
 <script lang="ts" setup>
-import { onUnmounted, ref } from 'vue'
+import {onUnmounted, ref} from 'vue'
 import Avatar from '../../../components/Avatar.vue'
 import NavBar from '../../../components/NavBar.vue'
 import Icon from '../../../components/Icon.vue'
 import Empty from '../../../components/Empty.vue'
-import { t } from '../../../utils/i18n'
-import { customRedirectTo } from '../../../utils/customNavigate'
-import { V2NIMConst } from '../../../utils/nim'
-import { V2NIMUser } from 'nim-web-sdk-ng/dist/v2/NIM_UNIAPP_SDK/V2NIMUserService'
-import { autorun } from 'mobx'
-import type { Relation } from '@xkit-yx/im-store-v2'
+import {t} from '../../../utils/i18n'
+import {customRedirectTo} from '../../../utils/customNavigate'
+import {V2NIMConst} from '../../../utils/nim'
+import {V2NIMUser} from 'nim-web-sdk-ng/dist/v2/NIM_UNIAPP_SDK/V2NIMUserService'
+import {autorun} from 'mobx'
+import type {Relation} from '@xkit-yx/im-store-v2'
+import DefaultHeader from "@/components/defaultHeader.vue";
+import AssetsImage from "@/components/AssetsImage.vue";
+import SearchInput from "@/components/search-input.vue";
 
 // 搜索结果状态
 const searchResState = ref<'beginSearch' | 'searchEmpty' | 'searchResult'>(
-  'beginSearch'
+    'beginSearch'
 )
 
 // 用户信息
@@ -79,16 +69,18 @@ const relationWatch = autorun(() => {
   console.log('friends: ', uni.$UIKitStore.uiStore.friends)
   if (userInfo.value?.accountId) {
     relation.value = uni.$UIKitStore.uiStore.getRelation(
-      userInfo.value?.accountId
+        userInfo.value?.accountId
     ).relation
   }
 })
 
 // 搜索好友
-const handleSearch = async (event: any) => {
+const handleSearch = async (value:string) => {
+  console.log(value);
+  console.log("value====");
   try {
     const user: V2NIMUser = await uni.$UIKitStore.userStore.getUserActive(
-      event.detail.value
+       value
     )
 
     if (!user) {
@@ -97,7 +89,7 @@ const handleSearch = async (event: any) => {
       userInfo.value = user
 
       relation.value = uni.$UIKitStore.uiStore.getRelation(
-        user.accountId
+          user.accountId
       ).relation
       searchResState.value = 'searchResult'
     }
@@ -141,7 +133,7 @@ const gotoChat = async () => {
   if (to) {
     try {
       const conversationId =
-        uni.$UIKitNIM.V2NIMConversationIdUtil.p2pConversationId(to)
+          uni.$UIKitNIM.V2NIMConversationIdUtil.p2pConversationId(to)
       await uni.$UIKitStore.uiStore.selectConversation(conversationId)
       customRedirectTo({
         url: '/pages/Chat/index',
@@ -155,9 +147,9 @@ const gotoChat = async () => {
   }
 }
 
-const onInputValueChange = (event: any) => {
+const onInputValueChange = (value: string) => {
   //删除搜索内容,页面回到最原始状态，搜索结果都清空
-  if (event.detail.value === '') {
+  if (value === '') {
     searchResState.value = 'beginSearch'
   }
 }
@@ -175,27 +167,18 @@ onUnmounted(() => {
   align-items: center;
   background-color: #f2f4f5;
   box-sizing: border-box;
-  margin: 10px;
-  padding: 3px;
-  border-radius: 3px;
+  padding: 0 12px;
+  border-radius: 8px;
+  box-sizing: border-box;
 
-  .search-icon {
-    color: #a6adb6;
-    font-family: iconfont;
-    background-size: 100% 100%;
-    width: 20px;
-    height: 20px;
-    font-size: 20px;
-    padding-left: 10px;
-    padding-bottom: 5px;
-    display: inline-block;
-  }
 
   .search-input {
     display: inline-block;
     background-color: #f2f4f5;
     width: 85%;
     padding: 4px;
+    height: 40px;
+    margin-left: 8px;
   }
 
   .placeholder {
@@ -211,7 +194,7 @@ onUnmounted(() => {
   box-sizing: border-box;
 
   .user-avatar {
-    flex: 0 0 40px;
+
     height: 40px;
     border-radius: 50%;
     display: inline-block;
@@ -240,11 +223,13 @@ onUnmounted(() => {
   }
 
   .go-chat-button {
-    height: 30px;
     font-size: 14px;
-    line-height: 30px;
     margin: 5px;
-    flex: 0 0 70px;
+    padding: 0 16px;
+    box-sizing: border-box;
+    flex-shrink: 0;
+    background-color: $uni-color-primary !important;
+    color: #fff;
   }
 }
 </style>

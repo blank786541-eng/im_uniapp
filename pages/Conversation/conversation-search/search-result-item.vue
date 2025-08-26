@@ -3,12 +3,9 @@
     <div class="result-item-avatar">
       <Avatar :account="to" :avatar="teamAvatar" />
     </div>
-    <div v-if="!isTeam" class="result-item-title">
-      <Appellation :account="to" />
-      <div class="result-item-account">{{ to }}</div>
-    </div>
-    <div v-else class="result-item-title">
-      {{ teamName }}
+    <div  class="result-item-title">
+        <div>{{isTeam?teamName:to}}</div>
+        <div class="result-item-account">{{ to }}</div>
     </div>
   </div>
 </template>
@@ -114,21 +111,21 @@ const handleItemClick = async () => {
 .search-result-list-item {
   display: flex;
   align-items: center;
-  height: 50px;
-  margin: 10px 0;
+  margin-top: 16px;
 }
 
-.result-item-avatar {
-  width: 42px;
-}
+
 
 .result-item-title {
   flex: 1;
-  overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  margin-left: 10px;
   font-size: 14px;
+  margin-left: 14px;
+  color:#000;
+  flex-direction: column;
+  justify-content: space-between;
+  height: 100%;
 }
 .result-item-account {
   font-size: 13px;

@@ -29,7 +29,7 @@
           :conversation="conversation"
           @delete="handleSessionItemDeleteClick"
           @stickyToTop="handleSessionItemStickTopChange"
-          @click="handleSessionItemClick"
+          @tap="handleSessionItemClick"
           @leftSlide="handleSessionItemLeftSlide"
         />
       </div>
