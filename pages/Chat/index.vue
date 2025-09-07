@@ -18,7 +18,7 @@
     <div class="announcement" @tap.stop="closeInput" v-if="team">
       <AssetsImage path="/static/gonggao.png" width="14px" height="14px" style="margin-right: 4px"></AssetsImage>
       <span style="flex:1">{{ team.announcement }}</span>
-<!--      <AssetsImage path="/static/cancel.png" width="14px" height="14px" @tap="close"></AssetsImage>-->
+      <!--      <AssetsImage path="/static/cancel.png" width="14px" height="14px" @tap="close"></AssetsImage>-->
     </div>
     <div :class="isH5 ? 'msg-wrapper-h5' : 'msg-wrapper'" @tap.stop="closeInput">
       <MessageList
@@ -35,6 +35,7 @@
           :reply-msgs-map="replyMsgsMap"
           :conversation-type="conversationType"
           :to="to"
+
           :show-more="close"
       />
     </div>
@@ -50,7 +51,7 @@ import {autorun} from 'mobx'
 import {ref, onMounted, onUnmounted} from 'vue'
 import {getUniPlatform} from '../../utils'
 import {onLoad, onUnload} from '@dcloudio/uni-app'
-import {customSwitchTab} from '../../utils/customNavigate'
+import {customNavigateTo, customSwitchTab} from '../../utils/customNavigate'
 import NetworkAlert from '../../components/NetworkAlert.vue'
 import NavBar from './message/nav-bar.vue'
 import Icon from '../../components/Icon.vue'
@@ -68,6 +69,7 @@ import {TeamStore} from "@xkit-yx/im-store-v2/dist/types/teams";
 import {V2NIMConversation} from "nim-web-sdk-ng/dist/v2/NIM_UNIAPP_SDK/V2NIMConversationService";
 import {V2NIMTeam} from "nim-web-sdk-ng/dist/esm/nim/src/V2NIMTeamService";
 import {V2NIMConversationForUI, V2NIMLocalConversationForUI} from "@xkit-yx/im-store-v2/dist/types/types";
+import {getExtentionData} from "@/pages/Other/help/call";
 
 export interface YxReplyMsg {
   messageClientId: string
@@ -78,10 +80,12 @@ export interface YxReplyMsg {
   idServer: string
   time: number
 }
-function  closeInput(){
+
+function closeInput() {
 
   uni.$emit('closeMore');
 }
+
 trackInit('ChatUIKit')
 
 const title = ref('')
@@ -184,6 +188,7 @@ const onReceiveMessages = (msgs: V2NIMMessage[]) => {
     handleMsgReceipt(msgs)
   }
   uni.$emit(events.ON_SCROLL_BOTTOM, msgs)
+
 }
 
 /** 处理收到消息的已读回执 */
@@ -306,17 +311,18 @@ const getHistory = async (endTime: number, lastMsgId?: string) => {
     throw error
   }
 }
-const close =ref(true)
+const close = ref(true)
 /** 加载更多消息 */
 const loadMoreMsgs = (lastMsg: V2NIMMessage) => {
   close.value = false;
+  closeInput();
   if (lastMsg) {
     getHistory(lastMsg.createTime, lastMsg.messageServerId)
   } else {
     getHistory(Date.now())
   }
-}
 
+}
 /** 设置页面标题 */
 const setNavTitle = () => {
   // 如果是单聊

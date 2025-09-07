@@ -1,6 +1,6 @@
 <template>
-  <div class="friend-item-container">
-    <div class="friend-avatar" @click="handleClick">
+  <div class="friend-item-container" @click="handleClick">
+    <div class="friend-avatar"  style="position: relative" >
       <Avatar :account="friend.accountId" />
       <!-- 用户在线离线状态 -->
       <div class="login-state-icon" v-if="loginStateVisible && isOnline"></div>

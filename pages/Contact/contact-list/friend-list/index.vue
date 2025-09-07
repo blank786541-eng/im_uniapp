@@ -32,7 +32,7 @@ import { onShow } from '@dcloudio/uni-app'
 import { autorun } from 'mobx'
 import { onUnmounted, ref, watch } from 'vue'
 import { friendGroupByPy } from '../../../../utils/friend'
-import { customNavigateTo } from '../../../../utils/customNavigate'
+import {customNavigateTo, customRedirectTo} from '../../../../utils/customNavigate'
 import Empty from '../../../../components/Empty.vue'
 import { V2NIMConst } from '../../../../utils/nim'
 import { t } from '../../../../utils/i18n'
@@ -54,12 +54,20 @@ const friendListWithAccount = ref<string[]>([])
 const loginStateVisible = uni.$UIKitStore.localOptions.loginStateVisible
 
 /** 点击跳转好友名片页 */
-function handleFriendItemClick(friend: {
+async  function handleFriendItemClick(friend: {
   accountId: string
   appellation: string
 }) {
-  customNavigateTo({
-    url: `/pages/User/friend/index?account=${friend.accountId}`,
+  // customNavigateTo({
+  //   url: `/pages/User/friend/index?account=${friend.accountId}`,
+  // })
+  const conversationId =
+      uni.$UIKitNIM.V2NIMConversationIdUtil.p2pConversationId(
+          friend.accountId || ''
+      )
+  await uni.$UIKitStore.uiStore.selectConversation(conversationId)
+  customRedirectTo({
+    url: '/pages/Chat/index',
   })
 }
 

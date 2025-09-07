@@ -22,7 +22,7 @@
       }
     },
     {
-      "path": "pages/Login/index",
+      "path": "pages/Login/login-form",
       "style": {
         "navigationStyle": "custom"
       }
@@ -54,6 +54,21 @@
     },
     {
       "path": "pages/Other/scan",
+      "style": {
+        "navigationStyle": "custom"
+      }
+    }, {
+      "path": "pages/Other/video-call",
+      "style": {
+        "navigationStyle": "custom"
+      }
+    }, {
+      "path": "pages/Other/team-video-call",
+      "style": {
+        "navigationStyle": "custom"
+      }
+    },{
+      "path": "pages/Other/select-call-user",
       "style": {
         "navigationStyle": "custom"
       }
@@ -231,6 +246,17 @@
     },
     {
       "path": "pages/User/my-detail/change-name",
+      "style": {
+        "navigationStyle": "custom"
+      }
+    },{
+      "path": "pages/User/my-detail/change-mobile",
+      "style": {
+        "navigationStyle": "custom"
+      }
+    },
+    {
+      "path": "pages/User/my-detail/my-qrcode",
       "style": {
         "navigationStyle": "custom"
       }

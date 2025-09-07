@@ -1,115 +1,132 @@
 <template>
   <Tooltip
-    v-if="!props.msg.isSelf"
-    :placement="placement"
-    ref="tooltipRef"
-    color="white"
+      v-if="!props.msg.isSelf"
+      :placement="placement"
+      ref="tooltipRef"
+      color="white"
   >
     <template #content>
       <div class="msg-action-groups" v-if="!isUnknownMsg">
         <div
-          class="msg-action-btn"
-          v-if="
+            class="msg-action-btn"
+            v-if="
             props.msg.messageType ===
             V2NIMConst.V2NIMMessageType.V2NIM_MESSAGE_TYPE_TEXT
           "
-          @tap="handleCopy"
+            @tap="handleCopy"
         >
           <Icon
-            :size="18"
-            color="#656A72"
-            class="msg-action-btn-icon"
-            type="icon-fuzhi1"
+              :size="18"
+              color="#656A72"
+              class="msg-action-btn-icon"
+              type="icon-fuzhi1"
           ></Icon>
           <text class="msg-action-btn-text">{{ t('copyText') }}</text>
         </div>
         <div
-          v-if="
+            v-if="
             props.msg.messageType !==
             V2NIMConst.V2NIMMessageType.V2NIM_MESSAGE_TYPE_CALL
           "
-          class="msg-action-btn"
-          @tap="handleReplyMsg"
+            class="msg-action-btn"
+            @tap="handleReplyMsg"
         >
           <Icon
-            :size="18"
-            color="#656A72"
-            class="msg-action-btn-icon"
-            type="icon-huifu"
+              :size="18"
+              color="#656A72"
+              class="msg-action-btn-icon"
+              type="icon-huifu"
           ></Icon>
           <text class="msg-action-btn-text">{{ t('replyText') }}</text>
         </div>
         <div
-          v-if="
+            v-if="
             props.msg.messageType !==
               V2NIMConst.V2NIMMessageType.V2NIM_MESSAGE_TYPE_AUDIO &&
             props.msg.messageType !==
               V2NIMConst.V2NIMMessageType.V2NIM_MESSAGE_TYPE_CALL
           "
-          class="msg-action-btn"
-          @tap="handleForwardMsg"
+            class="msg-action-btn"
+            @tap="handleForwardMsg"
         >
           <Icon
-            :size="18"
-            color="#656A72"
-            class="msg-action-btn-icon"
-            type="icon-zhuanfa"
+              :size="18"
+              color="#656A72"
+              class="msg-action-btn-icon"
+              type="icon-zhuanfa"
           ></Icon>
           <text class="msg-action-btn-text">{{ t('forwardText') }}</text>
         </div>
         <div
-          class="msg-action-btn"
-          v-if="
+            class="msg-action-btn"
+            v-if="
             props.msg.messageType !==
             V2NIMConst.V2NIMMessageType.V2NIM_MESSAGE_TYPE_CALL
           "
-          @tap="handlePinMsg"
+            @tap="handlePinMsg"
         >
           <Icon
-            :size="18"
-            color="#656A72"
-            class="msg-action-btn-icon"
-            type="icon-pin"
+              :size="18"
+              color="#656A72"
+              class="msg-action-btn-icon"
+              type="icon-pin"
           ></Icon>
           <!-- pinState 为 0 或者 undefined，显示“标记”，其他显示“取消标记” -->
           <text class="msg-action-btn-text">{{
-            props.msg.pinState ? t('unpinText') : t('pinText')
-          }}</text>
+              props.msg.pinState ? t('unpinText') : t('pinText')
+            }}
+          </text>
         </div>
         <div class="msg-action-btn" @tap="handleDeleteMsg">
           <Icon
-            :size="18"
-            color="#656A72"
-            class="msg-action-btn-icon"
-            type="icon-shanchu"
+              :size="18"
+              color="#656A72"
+              class="msg-action-btn-icon"
+              type="icon-shanchu"
           ></Icon>
           <text class="msg-action-btn-text">{{ t('deleteText') }}</text>
         </div>
         <div
-          class="msg-action-btn"
-          v-if="
+            class="msg-action-btn"
+            v-if="
             props.msg.messageType !==
             V2NIMConst.V2NIMMessageType.V2NIM_MESSAGE_TYPE_CALL
           "
-          @tap="handleCollectionMsg"
+            @tap="handleCollectionMsg"
         >
           <Icon
-            :size="18"
-            color="#656A72"
-            class="msg-action-btn-icon"
-            type="icon-collection"
+              :size="18"
+              color="#656A72"
+              class="msg-action-btn-icon"
+              type="icon-collection"
           ></Icon>
           <text class="msg-action-btn-text">{{ t('collectionText') }}</text>
+        </div>
+        <div
+            v-if="
+            conversationType ===
+            V2NIMConst.V2NIMConversationType.V2NIM_CONVERSATION_TYPE_TEAM &&manager
+          "
+            class="msg-action-btn"
+            @tap="handleDeleteMsg"
+        >
+          <Icon
+              :size="18"
+              color="#656A72"
+              class="msg-action-btn-icon"
+              type="icon-shanchu"
+          ></Icon>
+          <text class="msg-action-btn-text">{{ t('recallText') }}</text>
         </div>
       </div>
       <!-- 未知消息体 -->
       <div class="msg-action-groups-unknown" v-else>
         <div class="msg-action-btn" @tap="handleDeleteMsg">
           <Icon
-            :size="18"
-            color="#656A72"
-            class="msg-action-btn-icon"
-            type="icon-shanchu"
+              :size="18"
+              color="#656A72"
+              class="msg-action-btn-icon"
+              type="icon-shanchu"
           ></Icon>
           <text class="msg-action-btn-text">{{ t('deleteText') }}</text>
         </div>
@@ -121,48 +138,48 @@
     <slot v-else></slot>
   </Tooltip>
   <div
-    v-else-if="
+      v-else-if="
       props.msg.sendingState ===
       V2NIMConst.V2NIMMessageSendingState.V2NIM_MESSAGE_SENDING_STATE_SENDING
     "
-    class="msg-status-wrapper"
+      class="msg-status-wrapper"
   >
     <Icon
-      :size="21"
-      color="#337EFF"
-      class="msg-status-icon icon-loading"
-      type="icon-a-Frame8"
+        :size="21"
+        color="#337EFF"
+        class="msg-status-icon icon-loading"
+        type="icon-a-Frame8"
     ></Icon>
     <Tooltip
-      :placement="placement"
-      ref="tooltipRef"
-      color="white"
-      :align="props.msg.isSelf"
+        :placement="placement"
+        ref="tooltipRef"
+        color="white"
+        :align="props.msg.isSelf"
     >
       <template #content>
         <div class="msg-action-groups">
           <div
-            class="msg-action-btn"
-            v-if="
+              class="msg-action-btn"
+              v-if="
               props.msg.messageType ===
               V2NIMConst.V2NIMMessageType.V2NIM_MESSAGE_TYPE_TEXT
             "
-            @tap="handleCopy"
+              @tap="handleCopy"
           >
             <Icon
-              :size="18"
-              color="#656A72"
-              class="msg-action-btn-icon"
-              type="icon-fuzhi1"
+                :size="18"
+                color="#656A72"
+                class="msg-action-btn-icon"
+                type="icon-fuzhi1"
             ></Icon>
             <text class="msg-action-btn-text">{{ t('copyText') }}</text>
           </div>
           <div class="msg-action-btn" @tap="handleDeleteMsg">
             <Icon
-              :size="18"
-              color="#656A72"
-              class="msg-action-btn-icon"
-              type="icon-shanchu"
+                :size="18"
+                color="#656A72"
+                class="msg-action-btn-icon"
+                type="icon-shanchu"
             ></Icon>
             <text class="msg-action-btn-text">{{ t('deleteText') }}</text>
           </div>
@@ -175,29 +192,29 @@
     </Tooltip>
   </div>
   <div
-    v-else-if="
+      v-else-if="
       props.msg.sendingState ===
         V2NIMConst.V2NIMMessageSendingState
           .V2NIM_MESSAGE_SENDING_STATE_FAILED ||
       props.msg.messageStatus.errorCode === 102426 ||
       props.msg.messageStatus.errorCode === 104404
     "
-    class="msg-failed-wrapper"
+      class="msg-failed-wrapper"
   >
     <div class="msg-failed">
       <div class="msg-status-wrapper" @tap="handleResendMsg">
         <div class="icon-fail">!</div>
       </div>
       <Tooltip
-        :placement="placement"
-        ref="tooltipRef"
-        color="white"
-        :align="props.msg.isSelf"
+          :placement="placement"
+          ref="tooltipRef"
+          color="white"
+          :align="props.msg.isSelf"
       >
         <template #content>
           <div
-            class="msg-action-groups"
-            :style="{
+              class="msg-action-groups"
+              :style="{
               width:
                 props.msg.messageType ===
                 V2NIMConst.V2NIMMessageType.V2NIM_MESSAGE_TYPE_TEXT
@@ -206,27 +223,27 @@
             }"
           >
             <div
-              class="msg-action-btn"
-              v-if="
+                class="msg-action-btn"
+                v-if="
                 props.msg.messageType ===
                 V2NIMConst.V2NIMMessageType.V2NIM_MESSAGE_TYPE_TEXT
               "
-              @tap="handleCopy"
+                @tap="handleCopy"
             >
               <Icon
-                :size="18"
-                color="#656A72"
-                class="msg-action-btn-icon"
-                type="icon-fuzhi1"
+                  :size="18"
+                  color="#656A72"
+                  class="msg-action-btn-icon"
+                  type="icon-fuzhi1"
               ></Icon>
               <text class="msg-action-btn-text">{{ t('copyText') }}</text>
             </div>
             <div class="msg-action-btn" @tap="handleDeleteMsg">
               <Icon
-                :size="18"
-                color="#656A72"
-                class="msg-action-btn-icon"
-                type="icon-shanchu"
+                  :size="18"
+                  color="#656A72"
+                  class="msg-action-btn-icon"
+                  type="icon-shanchu"
               ></Icon>
               <text class="msg-action-btn-text">{{ t('deleteText') }}</text>
             </div>
@@ -239,137 +256,138 @@
       </Tooltip>
     </div>
     <div
-      class="in-blacklist"
-      v-if="props.msg.messageStatus.errorCode === 102426"
+        class="in-blacklist"
+        v-if="props.msg.messageStatus.errorCode === 102426"
     >
       {{ t('sendFailWithInBlackText') }}
     </div>
     <div
-      class="friend-delete"
-      v-else-if="props.msg.messageStatus.errorCode === 104404"
+        class="friend-delete"
+        v-else-if="props.msg.messageStatus.errorCode === 104404"
     >
       {{ t('sendFailWithDeleteText') }}
       <span @tap="addFriend" class="friend-verification">{{
-        t('friendVerificationText')
-      }}</span>
+          t('friendVerificationText')
+        }}</span>
     </div>
   </div>
   <Tooltip
-    v-else-if="tooltipVisible"
-    :placement="placement"
-    ref="tooltipRef"
-    color="white"
-    :align="props.msg.isSelf"
+      v-else-if="tooltipVisible"
+      :placement="placement"
+      ref="tooltipRef"
+      color="white"
+      :align="props.msg.isSelf"
   >
     <template #content>
       <div class="msg-action-groups" v-if="!isUnknownMsg">
         <div
-          class="msg-action-btn"
-          v-if="
+            class="msg-action-btn"
+            v-if="
             props.msg.messageType ===
             V2NIMConst.V2NIMMessageType.V2NIM_MESSAGE_TYPE_TEXT
           "
-          @tap="handleCopy"
+            @tap="handleCopy"
         >
           <Icon
-            :size="18"
-            color="#656A72"
-            class="msg-action-btn-icon"
-            type="icon-fuzhi1"
+              :size="18"
+              color="#656A72"
+              class="msg-action-btn-icon"
+              type="icon-fuzhi1"
           ></Icon>
           <text class="msg-action-btn-text">{{ t('copyText') }}</text>
         </div>
         <div
-          v-if="
+            v-if="
             props.msg.messageType !==
             V2NIMConst.V2NIMMessageType.V2NIM_MESSAGE_TYPE_CALL
           "
-          class="msg-action-btn"
-          @tap="handleReplyMsg"
+            class="msg-action-btn"
+            @tap="handleReplyMsg"
         >
           <Icon
-            :size="18"
-            color="#656A72"
-            class="msg-action-btn-icon"
-            type="icon-huifu"
+              :size="18"
+              color="#656A72"
+              class="msg-action-btn-icon"
+              type="icon-huifu"
           ></Icon>
           <text class="msg-action-btn-text">{{ t('replyText') }}</text>
         </div>
         <div
-          v-if="
+            v-if="
             props.msg.messageType !==
               V2NIMConst.V2NIMMessageType.V2NIM_MESSAGE_TYPE_AUDIO &&
             props.msg.messageType !==
               V2NIMConst.V2NIMMessageType.V2NIM_MESSAGE_TYPE_CALL
           "
-          class="msg-action-btn"
-          @tap="handleForwardMsg"
+            class="msg-action-btn"
+            @tap="handleForwardMsg"
         >
           <Icon
-            :size="18"
-            color="#656A72"
-            class="msg-action-btn-icon"
-            type="icon-zhuanfa"
+              :size="18"
+              color="#656A72"
+              class="msg-action-btn-icon"
+              type="icon-zhuanfa"
           ></Icon>
           <text class="msg-action-btn-text">{{ t('forwardText') }}</text>
         </div>
         <div
-          class="msg-action-btn"
-          v-if="
+            class="msg-action-btn"
+            v-if="
             props.msg.messageType !==
             V2NIMConst.V2NIMMessageType.V2NIM_MESSAGE_TYPE_CALL
           "
-          @tap="handlePinMsg"
+            @tap="handlePinMsg"
         >
           <Icon
-            :size="18"
-            color="#656A72"
-            class="msg-action-btn-icon"
-            type="icon-pin"
+              :size="18"
+              color="#656A72"
+              class="msg-action-btn-icon"
+              type="icon-pin"
           ></Icon>
           <!-- pinState 为 0 或者 undefined，显示“标记”，其他显示“取消标记” -->
           <text class="msg-action-btn-text">{{
-            props.msg.pinState ? t('unpinText') : t('pinText')
-          }}</text>
+              props.msg.pinState ? t('unpinText') : t('pinText')
+            }}
+          </text>
         </div>
         <div class="msg-action-btn" @tap="handleDeleteMsg">
           <Icon
-            :size="18"
-            color="#656A72"
-            class="msg-action-btn-icon"
-            type="icon-shanchu"
+              :size="18"
+              color="#656A72"
+              class="msg-action-btn-icon"
+              type="icon-shanchu"
           ></Icon>
           <text class="msg-action-btn-text">{{ t('deleteText') }}</text>
         </div>
         <div
-          v-if="
+            v-if="
             props.msg.messageType !==
             V2NIMConst.V2NIMMessageType.V2NIM_MESSAGE_TYPE_CALL
           "
-          class="msg-action-btn"
-          @tap="handleRecallMsg"
+            class="msg-action-btn"
+            @tap="handleRecallMsg"
         >
           <Icon
-            :size="18"
-            color="#656A72"
-            class="msg-action-btn-icon"
-            type="icon-chehui"
+              :size="18"
+              color="#656A72"
+              class="msg-action-btn-icon"
+              type="icon-chehui"
           ></Icon>
           <text class="msg-action-btn-text">{{ t('recallText') }}</text>
         </div>
         <div
-          class="msg-action-btn"
-          v-if="
+            class="msg-action-btn"
+            v-if="
             props.msg.messageType !==
             V2NIMConst.V2NIMMessageType.V2NIM_MESSAGE_TYPE_CALL
           "
-          @tap="handleCollectionMsg"
+            @tap="handleCollectionMsg"
         >
           <Icon
-            :size="18"
-            color="#656A72"
-            class="msg-action-btn-icon"
-            type="icon-collection"
+              :size="18"
+              color="#656A72"
+              class="msg-action-btn-icon"
+              type="icon-collection"
           ></Icon>
           <text class="msg-action-btn-text">{{ t('collectionText') }}</text>
         </div>
@@ -378,10 +396,10 @@
       <div class="msg-action-groups-unknown" v-else>
         <div class="msg-action-btn" @tap="handleDeleteMsg">
           <Icon
-            :size="18"
-            color="#656A72"
-            class="msg-action-btn-icon"
-            type="icon-shanchu"
+              :size="18"
+              color="#656A72"
+              class="msg-action-btn-icon"
+              type="icon-shanchu"
           ></Icon>
           <text class="msg-action-btn-text">{{ t('deleteText') }}</text>
         </div>
@@ -402,51 +420,56 @@
 
 <script lang="ts" setup>
 /** 消息操作组件 */
-import { onMounted, onUnmounted, ref } from 'vue'
+import {onMounted, onUnmounted, ref} from 'vue'
 // @ts-ignore
 import Tooltip from '../../../components/Tooltip.vue'
 import Icon from '../../../components/Icon.vue'
-import { customNavigateTo } from '../../../utils/customNavigate'
-import { events } from '../../../utils/constants'
-import { autorun } from 'mobx'
-import { V2NIMMessageForUI } from '@xkit-yx/im-store-v2/dist/types/types'
+import {customNavigateTo} from '../../../utils/customNavigate'
+import {events} from '../../../utils/constants'
+import {autorun} from 'mobx'
+import {V2NIMMessageForUI} from '@xkit-yx/im-store-v2/dist/types/types'
 //@ts-ignore
-import { V2NIMConst } from '../../../utils/nim'
-import { msgRecallTime } from '../../../utils/constants'
-import { t } from '../../../utils/i18n'
-import { V2NIMMessage } from 'nim-web-sdk-ng/dist/esm/nim/src/V2NIMMessageService'
+import {V2NIMConst} from '../../../utils/nim'
+import {msgRecallTime} from '../../../utils/constants'
+import {t} from '../../../utils/i18n'
+import {V2NIMMessage} from 'nim-web-sdk-ng/dist/esm/nim/src/V2NIMMessageService'
+
 const tooltipRef = ref(null)
 
 const props = withDefaults(
-  defineProps<{
-    msg: V2NIMMessageForUI
-    tooltipVisible?: boolean
-    bgVisible?: boolean
-    placement?: string
-  }>(),
-  {}
+    defineProps<{
+      msg: V2NIMMessageForUI
+      tooltipVisible?: boolean
+      bgVisible?: boolean
+      placement?: string
+      manager:boolean
+    }>(),
+    {}
 )
 /**会话类型 */
 const conversationType =
-  uni.$UIKitNIM.V2NIMConversationIdUtil.parseConversationType(
-    props.msg.conversationId
-  ) as unknown as V2NIMConst.V2NIMConversationType
+    uni.$UIKitNIM.V2NIMConversationIdUtil.parseConversationType(
+        props.msg.conversationId
+    ) as unknown as V2NIMConst.V2NIMConversationType
 
 onMounted(() => {
   /** 当前版本仅支持文本、图片、文件、语音、视频 话单消息，其他消息类型统一为未知消息 */
+  console.log(props.msg);
   isUnknownMsg.value = !(
-    props.msg.messageType ==
+      props.msg.messageType ==
       V2NIMConst.V2NIMMessageType.V2NIM_MESSAGE_TYPE_TEXT ||
-    props.msg.messageType ==
+      props.msg.messageType ==
       V2NIMConst.V2NIMMessageType.V2NIM_MESSAGE_TYPE_IMAGE ||
-    props.msg.messageType ==
+      props.msg.messageType ==
       V2NIMConst.V2NIMMessageType.V2NIM_MESSAGE_TYPE_FILE ||
-    props.msg.messageType ==
+      props.msg.messageType ==
       V2NIMConst.V2NIMMessageType.V2NIM_MESSAGE_TYPE_AUDIO ||
-    props.msg.messageType ==
+      props.msg.messageType ==
       V2NIMConst.V2NIMMessageType.V2NIM_MESSAGE_TYPE_VIDEO ||
-    props.msg.messageType == V2NIMConst.V2NIMMessageType.V2NIM_MESSAGE_TYPE_CALL
+      props.msg.messageType == V2NIMConst.V2NIMMessageType.V2NIM_MESSAGE_TYPE_CALL
   )
+
+
 })
 
 /** 是否是好友 */
@@ -500,10 +523,10 @@ const handleResendMsg = async () => {
   try {
     if (_msg.threadReply) {
       const beReplyMsg =
-        await uni.$UIKitNIM.V2NIMMessageService.getMessageListByRefers([
-          //@ts-ignore
-          _msg.threadReply,
-        ])
+          await uni.$UIKitNIM.V2NIMMessageService.getMessageListByRefers([
+            //@ts-ignore
+            _msg.threadReply,
+          ])
       if (beReplyMsg.length > 0) {
         //@ts-ignore
         uni.$UIKitStore.msgStore.replyMsgActive(beReplyMsg[0])
@@ -589,15 +612,15 @@ const handlePinMsg = () => {
 
 /**是否是云端会话 */
 const enableV2CloudConversation =
-  uni.$UIKitStore?.sdkOptions?.enableV2CloudConversation
+    uni.$UIKitStore?.sdkOptions?.enableV2CloudConversation
 /** 收藏消息 */
 const handleCollectionMsg = () => {
   const _msg = props.msg
 
   const conversation = enableV2CloudConversation
-    ? uni.$UIKitStore.conversationStore?.conversations.get(_msg.conversationId)
-    : uni.$UIKitStore.localConversationStore?.conversations.get(
-        _msg.conversationId
+      ? uni.$UIKitStore.conversationStore?.conversations.get(_msg.conversationId)
+      : uni.$UIKitStore.localConversationStore?.conversations.get(
+          _msg.conversationId
       )
   const collectionDataObj = {
     //@ts-expect-error
@@ -607,10 +630,10 @@ const handleCollectionMsg = () => {
     senderName: uni.$UIKitStore.uiStore.getAppellation({
       account: _msg.senderId,
       teamId:
-        conversationType ===
-        V2NIMConst.V2NIMConversationType.V2NIM_CONVERSATION_TYPE_TEAM
-          ? _msg.receiverId
-          : '',
+          conversationType ===
+          V2NIMConst.V2NIMConversationType.V2NIM_CONVERSATION_TYPE_TEAM
+              ? _msg.receiverId
+              : '',
     }),
   }
   const addCollectionParams = {
@@ -620,28 +643,28 @@ const handleCollectionMsg = () => {
   }
 
   uni.$UIKitStore.msgStore
-    .addCollectionActive(addCollectionParams)
-    .then(() => {
-      uni.showToast({
-        title: t('addCollectionSuccessText'),
-        icon: 'none',
+      .addCollectionActive(addCollectionParams)
+      .then(() => {
+        uni.showToast({
+          title: t('addCollectionSuccessText'),
+          icon: 'none',
+        })
       })
-    })
-    .catch((err: any) => {
-      if (err?.code && typeof t(`${err.code}`) !== 'undefined') {
-        uni.showToast({
-          title: t(`${err.code}`),
-          icon: 'error',
-          duration: 1000,
-        })
-      } else {
-        uni.showToast({
-          title: t('addCollectionFailedText'),
-          icon: 'error',
-          duration: 1000,
-        })
-      }
-    })
+      .catch((err: any) => {
+        if (err?.code && typeof t(`${err.code}`) !== 'undefined') {
+          uni.showToast({
+            title: t(`${err.code}`),
+            icon: 'error',
+            duration: 1000,
+          })
+        } else {
+          uni.showToast({
+            title: t('addCollectionFailedText'),
+            icon: 'error',
+            duration: 1000,
+          })
+        }
+      })
   closeTooltip()
 }
 
@@ -649,15 +672,20 @@ const handleCollectionMsg = () => {
 const handleReplyMsg = async () => {
   const _msg = props.msg
 
-  uni.$UIKitStore.msgStore.replyMsgActive(_msg)
-  closeTooltip()
-  uni.$emit(events.REPLY_MSG, props.msg)
+  try {
+    closeTooltip()
+    uni.$emit(events.REPLY_MSG, props.msg)
+    uni.$UIKitStore.msgStore.replyMsgActive(_msg)
+    console.log("handleReplyMsg", '====')
+  } catch (e) {
+    console.log(e, 'e=======');
+  }
 
   // 在群里回复其他人的消息，也是@被回复人
   if (
-    conversationType ===
+      conversationType ===
       V2NIMConst.V2NIMConversationType.V2NIM_CONVERSATION_TYPE_TEAM &&
-    !props.msg.isSelf
+      !props.msg.isSelf
   ) {
     uni.$emit(events.AIT_TEAM_MEMBER, {
       accountId: props.msg.senderId,
@@ -717,19 +745,19 @@ const handleDeleteMsg = () => {
     success(data) {
       if (data.confirm) {
         uni.$UIKitStore.msgStore
-          .deleteMsgActive([_msg])
-          .then(() => {
-            uni.showToast({
-              title: t('deleteMsgSuccessText'),
-              icon: 'none',
+            .deleteMsgActive([_msg])
+            .then(() => {
+              uni.showToast({
+                title: t('deleteMsgSuccessText'),
+                icon: 'none',
+              })
             })
-          })
-          .catch((error: any) => {
-            uni.showToast({
-              title: t('deleteMsgFailText'),
-              icon: 'error',
+            .catch((error: any) => {
+              uni.showToast({
+                title: t('deleteMsgFailText'),
+                icon: 'error',
+              })
             })
-          })
       }
     },
     complete() {
@@ -748,12 +776,12 @@ const addFriend = () => {
 /** 监听好友列表 */
 const friendsWatch = autorun(() => {
   const _isFriend = uni.$UIKitStore.uiStore.friends
-    .filter(
-      (item) =>
-        !uni.$UIKitStore.relationStore.blacklist.includes(item.accountId)
-    )
-    .map((item) => item.accountId)
-    .some((item: any) => item.account === props.msg.receiverId)
+      .filter(
+          (item) =>
+              !uni.$UIKitStore.relationStore.blacklist.includes(item.accountId)
+      )
+      .map((item) => item.accountId)
+      .some((item: any) => item.account === props.msg.receiverId)
   isFriend.value = _isFriend
 })
 
@@ -779,7 +807,7 @@ onUnmounted(() => {
 
   &-out {
     border-radius: 9px 0 9px 9px;
-    background-color:#F4F4F4;
+    background-color: #F4F4F4;
     margin-right: 8px;
   }
 }
@@ -798,6 +826,7 @@ onUnmounted(() => {
   align-items: center;
   margin-top: 10px;
   width: 56px;
+
   &-icon {
     color: #656a72;
     font-size: 18px;
@@ -844,6 +873,7 @@ onUnmounted(() => {
   align-items: center;
   margin-right: 8px;
   box-sizing: border-box;
+
   .msg-bg-out {
     margin-right: 0;
     flex: 1;

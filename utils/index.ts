@@ -139,6 +139,7 @@ export const startCall = (options: {
   remoteShowName: string
 }) => {
   try {
+    console.log( uni.$UIKitCallKit);
     // @ts-ignore
     uni.$UIKitCallKit.toCallPage(
       {

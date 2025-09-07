@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import {onBeforeMount, ref} from "vue";
+import {onBeforeMount, onUnmounted, ref} from "vue";
 import AssetsImage from "@/components/AssetsImage.vue";
 import {customNavigateTo, customSwitchTab} from "@/utils/customNavigate";
 import {V2NIMConst} from "@/utils/nim";
-
+import { autorun } from 'mobx'
 const props = withDefaults(
     defineProps<{
       conversationType: V2NIMConst.V2NIMConversationType
@@ -21,12 +21,36 @@ onBeforeMount(() => {
   // #ifdef APP-PLUS
   appStatusHeight.value = plus.navigator.getStatusbarHeight();
   // #endif
-  uni.setNavigationBarColor({
-    backgroundColor:'#DBB077'
-  })
+
 
 })
 
+onUnmounted(()=>{
+   statusWatch();
+})
+
+const status=ref(false);
+
+/** 监听会话方在线离线状态 */
+const statusWatch = autorun(() => {
+  if (
+      props.conversationType ===
+      V2NIMConst.V2NIMConversationType.V2NIM_CONVERSATION_TYPE_P2P
+  ) {
+    const stateMap = uni.$UIKitStore?.subscriptionStore.stateMap
+
+    if (
+        stateMap.get(props.to) &&
+        uni.$UIKitStore.localOptions.loginStateVisible
+    ) {
+      status.value =
+          stateMap.get(props.to)?.statusType ===
+          V2NIMConst.V2NIMUserStatusType.V2NIM_USER_STATUS_TYPE_LOGIN
+    } else {
+      status.value = false
+    }
+  }
+})
 
 const backToConversation = () => {
   customSwitchTab({
@@ -60,7 +84,8 @@ function toMore() {
     <div :style="{height:appStatusHeight+'px'}" class="status-bar"></div>
     <div class="row">
       <AssetsImage path="/static/back.png" width="21px" height="21px" @tap="backToConversation"></AssetsImage>
-      <span>{{ props.title }}</span>
+      <span>{{ props.title }}</span><span v-if=" props.conversationType ===
+      V2NIMConst.V2NIMConversationType.V2NIM_CONVERSATION_TYPE_P2P">{{status?'(在线)':'(离线)'}}</span>
       <AssetsImage path="/static/more.png" width="19px" height="5px" @tap="toMore" v-if="hideMenu"></AssetsImage>
     </div>
   </div>

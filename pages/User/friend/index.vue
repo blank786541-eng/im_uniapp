@@ -1,6 +1,6 @@
 <template>
   <div class="wrapper">
-    <default-header :title="t('FriendPageText')" ></default-header>
+    <default-header :title="t('FriendPageText')"></default-header>
     <div class="flex-box " style="margin-top: 20px">
       <UserCard
           :account="userInfo && userInfo.accountId"
@@ -11,7 +11,7 @@
       <div class="row ">
         <span class="label">昵称</span>
         <div class="container-box"></div>
-        <span class="value">{{ userInfo.name }}</span>
+        <span class="value">{{ userInfo.name || userInfo.accountId }}</span>
       </div>
       <div class="row">
         <span class="label">性别</span>
@@ -26,13 +26,14 @@
         </div>
         <AssetsImage path="/static/right.png" width="6px" height="12px"></AssetsImage>
       </div>
-      <div class="row ">
+      <div class="row " @tap="copyAccount" v-if="relation || manager">
         <span class="label">账号</span>
         <div class="container-box"></div>
         <span class="value">{{ userInfo.accountId }}</span>
+        <AssetsImage path="/static/copy.png" width="16px" height="16px"></AssetsImage>
       </div>
       <div class="row">
-        <span class="label">性别</span>
+        <span class="label">手机号</span>
         <div class="container-box"></div>
         <div class="value">{{
             userInfo.mobile
@@ -42,102 +43,26 @@
       <div class="row">
         <span class="label">个性签名</span>
         <div class="container-box"></div>
-        <div class="value">个性签名</div>
+        <div class="value">{{ userInfo.sign }}</div>
       </div>
-      <div class="row">
-        <span class="label">二维码</span>
-        <div class="container-box"></div>
-        <AssetsImage path="/static/erweima.png" width="15px" height="15px" style="margin-right: 6px"></AssetsImage>
-      </div>
-      <div class="row">
-        <span class="label">支付密码</span>
-        <div class="container-box"></div>
-        <div class="value">修改</div>
-      </div>
+
     </div>
 
     <div>
-      <div class="userInfo-item-wrapper default-wrapper">
+      <div class="userInfo-item-wrapper default-wrapper" v-if="relation || manager">
         <div class="userInfo-item">
           <div class="item-left">{{ t('addBlacklist') }}</div>
-          <switch :checked="isInBlacklist" @change="handleSwitchChange" />
+          <switch :checked="isInBlacklist" @change="handleSwitchChange"/>
         </div>
       </div>
-      <div class="button" @click="gotoChat">{{ t('chatWithFriendText') }}</div>
+
+      <div class="button" @click="gotoChat" v-if="relation || manager">{{ t('chatWithFriendText') }}</div>
       <div class="box-shadow"></div>
-      <div class="button button-red" @click="deleteFriend">
+      <div class="button button-red" @click="deleteFriend" v-if="relation || manager">
         {{ t('deleteFriendText') }}
       </div>
     </div>
-    <!--    <UserCard-->
-    <!--      :account="userInfo && userInfo.accountId"-->
-    <!--      :nick="userInfo && userInfo.name"-->
-    <!--    ></UserCard>-->
-    <!--    <template v-if="relation === 'stranger'">-->
-    <!--      <div class="userInfo-item-wrapper">-->
-    <!--        <div class="userInfo-item">-->
-    <!--          <div class="item-left">{{ t('addBlacklist') }}</div>-->
-    <!--          <switch-->
-    <!--            :checked="isInBlacklist"-->
-    <!--            @change="(checked:boolean) => handleSwitchChange(checked)"-->
-    <!--          />-->
-    <!--        </div>-->
-    <!--      </div>-->
 
-    <!--      <div class="button" :style="{ marginTop: '10px' }" @click="addFriend">-->
-    <!--        {{ t('addFriendText') }}-->
-    <!--      </div>-->
-    <!--    </template>-->
-    <!--    <template v-else>-->
-    <!--      <div class="userInfo-item-wrapper">-->
-    <!--        <div class="userInfo-item" @tap="handleAliasClick">-->
-    <!--          <div class="item-left">{{ t('remarkText') }}</div>-->
-    <!--          <div class="item-right">-->
-    <!--            <Icon iconClassName="more-icon" color="#999" type="icon-jiantou" />-->
-    <!--          </div>-->
-    <!--        </div>-->
-    <!--        <div class="userInfo-item">-->
-    <!--          <div class="item-left">{{ t('genderText') }}</div>-->
-    <!--          <div class="item-right">-->
-    <!--            {{-->
-    <!--              userInfo && userInfo.gender === 0-->
-    <!--                ? t('unknow')-->
-    <!--                : userInfo && userInfo.gender === 1-->
-    <!--                ? t('man')-->
-    <!--                : t('woman')-->
-    <!--            }}-->
-    <!--          </div>-->
-    <!--        </div>-->
-    <!--        <div class="box-shadow"></div>-->
-    <!--        <div class="userInfo-item">-->
-    <!--          <div class="item-left">{{ t('birthText') }}</div>-->
-    <!--          <div class="item-right">-->
-    <!--            {{ (userInfo && userInfo.birthday) || t('unknow') }}-->
-    <!--          </div>-->
-    <!--        </div>-->
-    <!--        <div class="box-shadow"></div>-->
-    <!--        <div class="userInfo-item">-->
-    <!--          <div class="item-left">{{ t('mobile') }}</div>-->
-    <!--          <div class="item-right">-->
-    <!--            {{ (userInfo && userInfo.mobile) || t('unknow') }}-->
-    <!--          </div>-->
-    <!--        </div>-->
-    <!--        <div class="box-shadow"></div>-->
-    <!--        <div class="userInfo-item">-->
-    <!--          <div class="item-left">{{ t('email') }}</div>-->
-    <!--          <div class="item-right">-->
-    <!--            {{ (userInfo && userInfo.email) || t('unknow') }}-->
-    <!--          </div>-->
-    <!--        </div>-->
-    <!--        <div class="userInfo-item">-->
-    <!--          <div class="item-left">{{ t('sign') }}</div>-->
-    <!--          <div class="item-right">-->
-    <!--            {{ (userInfo && userInfo.sign) || t('unknow') }}-->
-    <!--          </div>-->
-    <!--        </div>-->
-    <!--      </div>-->
-
-    <!--    </template>-->
   </div>
 </template>
 
@@ -158,6 +83,8 @@ import {V2NIMConst} from '../../../utils/nim'
 import Icon from '../../../components/Icon.vue'
 import AssetsImage from "@/components/AssetsImage.vue";
 import DefaultHeader from "@/components/defaultHeader.vue";
+import {V2NIMTeam} from "nim-web-sdk-ng/dist/esm/nim/src/V2NIMTeamService";
+import {V2NIMTeamType} from "nim-web-sdk-ng/dist/v2/NIM_UNIAPP_SDK/V2NIMTeamService";
 
 /**是否是云端会话 */
 const enableV2CloudConversation =
@@ -166,11 +93,12 @@ const enableV2CloudConversation =
 // 用户信息
 const userInfo = ref<V2NIMUser>()
 // 关系
-const relation = ref<Relation>('stranger')
+const relation = ref<boolean>(false)
 // 是否在黑名单
 const isInBlacklist = ref(false)
 
 let account = ''
+let conversationId = ref("")
 
 // 跳转至备注页面
 const handleAliasClick = () => {
@@ -182,11 +110,14 @@ let friendWatch = () => {
 }
 let relationWatch = () => {
 }
-
+const manager = ref(false);
 onLoad((props) => {
   account = props ? props.account : ''
   uni.$UIKitStore.userStore.getUserListFromCloudActive([account])
 
+  if (props.conversationId) {
+    conversationId.value = props.conversationId;
+  }
   // 监听好友个人信息
   friendWatch = autorun(() => {
     userInfo.value = uni.$UIKitStore.uiStore.getFriendWithUserNameCard(account)
@@ -196,7 +127,17 @@ onLoad((props) => {
   relationWatch = autorun(() => {
     const {relation: _relation, isInBlacklist: _isInBlacklist} =
         uni.$UIKitStore.uiStore.getRelation(account)
-    relation.value = _relation
+    relation.value = _relation == 'friend'
+    if (conversationId.value) {
+      // const team:V2NIMTeam= await uni.$UIKitStore.teamStore.getTeamActive(conversationId.value);
+      const teamMember = uni.$UIKitStore.teamMemberStore.getTeamMember(conversationId.value, [
+        account,
+      ])[0]
+      manager.value = teamMember.memberRole == V2NIMConst.V2NIMTeamMemberRole.V2NIM_TEAM_MEMBER_ROLE_MANAGER ||
+          teamMember.memberRole == V2NIMConst.V2NIMTeamMemberRole.V2NIM_TEAM_MEMBER_ROLE_OWNER;
+
+    }
+
     isInBlacklist.value = _isInBlacklist
   })
 })
@@ -204,6 +145,7 @@ onLoad((props) => {
 // 拉黑
 const handleSwitchChange = async (e: any) => {
   const isAdd = e.detail.value
+
   try {
     if (isAdd) {
       await uni.$UIKitStore.relationStore.addUserToBlockListActive(account)
@@ -216,7 +158,8 @@ const handleSwitchChange = async (e: any) => {
       icon: 'error',
     })
   }
-}
+}// 禁言
+
 
 // 删除好友
 const deleteFriend = () => {
@@ -295,6 +238,25 @@ const gotoChat = async () => {
     url: '/pages/Chat/index',
   })
 }
+const copyAccount = () => {
+  uni.setClipboardData({
+    data: userInfo.value?.accountId,
+    showToast: false,
+    success: () => {
+      uni.showToast({
+        title: t('copySuccessText'),
+        icon: 'none',
+      })
+    },
+    fail: () => {
+      uni.showToast({
+        title: t('copyFailText'),
+        icon: 'none',
+      })
+    },
+  })
+}
+
 
 onUnmounted(() => {
   friendWatch()
@@ -328,13 +290,12 @@ page {
     font-size: 14px;
 
     letter-spacing: -0.3px;
+
     .userInfo-item {
       display: flex;
 
       align-items: center;
       justify-content: space-between;
-
-
 
 
       .item-right {

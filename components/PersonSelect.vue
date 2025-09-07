@@ -17,7 +17,9 @@
                 !selectAccount.includes(item.accountId))
             "
           />
+
           <Avatar class="user-avatar" size="36" :account="item.accountId" />
+
           <div class="user-name">
             <Appellation :account="item.accountId" :teamId="item.teamId" />
           </div>
@@ -55,7 +57,7 @@
       {{ btnText || t('okText') }}
     </div>
   </div>
-  <Empty v-else :text="t('noFriendText')"></Empty>
+  <Empty v-else text="暂无数据"></Empty>
 </template>
 
 <script lang="ts" setup>
@@ -65,6 +67,7 @@ import Empty from './Empty.vue'
 import { t } from '../utils/i18n'
 import { events } from '../utils/constants'
 import { ref, onMounted } from 'vue'
+import {V2NIMConst} from "@/utils/nim";
 
 export type PersonSelectItem = {
   accountId: string

@@ -3,6 +3,8 @@ import {getUniPlatform} from "@/utils";
 import {onMounted, ref} from "vue";
 
 import {  onReady } from '@dcloudio/uni-app'
+import Cshaptx4869Scancode
+  from "@/uni_modules/cshaptx4869-scancode/components/cshaptx4869-scancode/cshaptx4869-scancode.vue";
 
 onReady(()=>{
   scanCode();

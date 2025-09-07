@@ -1,32 +1,33 @@
 <template>
   <div
-    :class="!msg.isSelf || mode === 'audio-in' ? 'audio-in' : 'audio-out'"
-    :style="{ width: audioContainerWidth + 'px' }"
-    @tap="handlePlayAudio"
+      :class="!msg.isSelf || mode === 'audio-in' ? 'audio-in' : 'audio-out'"
+      :style="{ width: audioContainerWidth + 'px' }"
+      @tap="handlePlayAudio"
   >
-    <div class="audio-dur">{{ duration }}s</div>
+    <div class="audio-dur">{{ !duration?"":duration+"s" }}</div>
     <div class="audio-icon-wrapper">
-      <Icon :size="24" :key="audioIconType" :type="audioIconType" />
+      <Icon :size="24" :key="audioIconType" :type="audioIconType"/>
     </div>
   </div>
 </template>
 
 <script lang="ts" setup>
 /** 音频消息组件 */
-import { ref, onUnmounted, computed, watch, withDefaults } from 'vue'
+import {ref, onUnmounted, computed, watch, withDefaults} from 'vue'
 import Icon from '../../../components/Icon.vue'
-import { events } from '../../../utils/constants'
-import { V2NIMMessageForUI } from '@xkit-yx/im-store-v2/dist/types/types'
-import { V2NIMMessageAudioAttachment } from 'nim-web-sdk-ng/dist/v2/NIM_UNIAPP_SDK/V2NIMMessageService'
-import { onHide, onUnload } from '@dcloudio/uni-app'
-import { isHarmonyOs } from '../../../utils'
+import {events} from '../../../utils/constants'
+import {V2NIMMessageForUI} from '@xkit-yx/im-store-v2/dist/types/types'
+import {V2NIMMessageAudioAttachment} from 'nim-web-sdk-ng/dist/v2/NIM_UNIAPP_SDK/V2NIMMessageService'
+import {onHide, onUnload} from '@dcloudio/uni-app'
+import {isHarmonyOs} from '../../../utils'
+
 const props = withDefaults(
-  defineProps<{
-    msg: V2NIMMessageForUI
-    mode?: 'audio-in' | 'audio-out'
-    broadcastNewAudioSrc?: string
-  }>(),
-  {}
+    defineProps<{
+      msg: V2NIMMessageForUI
+      mode?: 'audio-in' | 'audio-out'
+      broadcastNewAudioSrc?: string
+    }>(),
+    {}
 )
 
 const audioIconType = ref('icon-yuyin3')
@@ -37,7 +38,12 @@ const emits = defineEmits(['getGlobalAudioContext'])
 
 /** 格式化音频时长 */
 const formatDuration = (duration: number) => {
-  return Math.round(duration / 1000) || 1
+  let time = duration;
+  if (duration < 1000) {
+    time = duration * 1000;
+  }
+
+  return Math.round(time / 1000) || ""
 }
 
 /** 音频消息宽度 */
@@ -51,7 +57,7 @@ const audioContainerWidth = computed(() => {
 /** 音频时长 */
 const duration = computed(() => {
   return formatDuration(
-    (props.msg.attachment as V2NIMMessageAudioAttachment)?.duration
+      (props.msg.attachment as V2NIMMessageAudioAttachment)?.duration
   )
 })
 
@@ -70,14 +76,14 @@ const handlePlayAudio = () => {
 
 /** 监听当前的音频播放 是不是当前点击url，如果不是，就停止 */
 watch(
-  () => props.broadcastNewAudioSrc,
-  (newSrc: string) => {
-    //@ts-ignore
-    if (newSrc !== props.msg?.attachment?.url && isAudioPlaying.value) {
-      stopAudio()
-      isAudioPlaying.value = false
+    () => props.broadcastNewAudioSrc,
+    (newSrc: string) => {
+      //@ts-ignore
+      if (newSrc !== props.msg?.attachment?.url && isAudioPlaying.value) {
+        stopAudio()
+        isAudioPlaying.value = false
+      }
     }
-  }
 )
 
 /** 播放 */
@@ -161,6 +167,7 @@ function onAudioError(error: any) {
   animationFlag.value = false
   console.warn('audio played error', error)
 }
+
 /**获取音频实例 */
 const getAudio = () => {
   return audioMap.get('audio')
@@ -218,6 +225,7 @@ onUnload(() => {
   height: 24px;
   line-height: 24px;
 }
+
 .audio-in,
 .audio-out {
   width: 50px;
@@ -229,6 +237,7 @@ onUnload(() => {
 
 .audio-in {
   flex-direction: row-reverse;
+
   .audio-icon-wrapper {
     transform: rotate(180deg);
   }

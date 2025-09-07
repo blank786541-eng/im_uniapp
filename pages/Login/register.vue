@@ -5,6 +5,7 @@ import LabelInput from "@/pages/Login/components/label-input.vue";
 import {reactive, ref} from "vue";
 import {httpRequest} from '@/utils/request'
 import DefaultHeader from "@/components/defaultHeader.vue";
+import AssetsImage from "@/components/AssetsImage.vue";
 
 const mobileInputRule = {
   reg: /^[a-zA-Z0-9]{6,}$/,
@@ -22,12 +23,39 @@ const query = reactive({
   account: "",
   password: "",
   confirmPassword: "",
-  verificationCode: "1234"
+  invitationCode: ""
 })
 const privateChecked = ref(true);
 
-async function submitLoginForm(){
+async function submitLoginForm() {
+
+  console.log(query, privateChecked)
   if (privateChecked.value) return;
+
+  if (!query.account) {
+    uni.showToast({
+      icon: 'error',
+
+      title: "账号不能为空"
+    })
+    return;
+  }
+  if (!query.password) {
+    uni.showToast({
+      icon: 'error',
+
+      title: "密码不能为空"
+    })
+    return;
+  }
+  if (!query.confirmPassword) {
+    uni.showToast({
+      icon: 'error',
+
+      title: "确认不能为空"
+    })
+    return;
+  }
 
   if (query.password != query.confirmPassword) {
     uni.showToast({
@@ -38,17 +66,17 @@ async function submitLoginForm(){
     return;
   }
 
-  const res=await httpRequest({
+  const res = await httpRequest({
     url: "im/api/register",
     data: query,
     method: "POST",
   })
 
-  if(res){
+  if (res) {
     uni.showToast({
-      title:"注册成功",
-      duration:1000,
-      success:()=>{
+      title: "注册成功",
+      duration: 1000,
+      success: () => {
         uni.navigateBack();
       }
     })
@@ -64,8 +92,8 @@ function getValue(value, key) {
 </script>
 
 <template>
-  <div>
-<!--    <div class="navigation-bar"></div>-->
+  <div class="container">
+    <!--    <div class="navigation-bar"></div>-->
     <default-header title="注册"></default-header>
     <div class="container-box">
       <div class="flex-center">
@@ -95,6 +123,13 @@ function getValue(value, key) {
                        :value="query.confirmPassword"
                        :rule="smsCodeInputRule"
                        label="确认密码" placeholder="确认密码"></label-input>
+          <div style="margin-top: 18px">
+            <label-input icon="/static/account.png"
+                         label-key="invitationCode"
+                         @update-model-value="getValue"
+                         :value="query.invitationCode"
+                         label="邀请码" placeholder="请输入邀请人账号"></label-input>
+          </div>
         </div>
       </div>
 
@@ -102,29 +137,54 @@ function getValue(value, key) {
     <button
         :class="privateChecked ? 'login-btn-disabled' : 'login-btn'"
         @tap="submitLoginForm"
+
     >
       注册
     </button>
+    <div style="height:50px"></div>
+ 
   </div>
 </template>
 
 <style scoped lang="scss">
+page {
+  height: 100%;
+}
+
 .logo {
   width: 128px;
   height: 128px;
 }
 
 .form-login {
-  margin-top: 47px;
-
+  margin-top: 21px;
+  border-radius: 8px;
+  background-color: #fff;
+  padding: 14px;
+  box-shadow: 0px 4px 10px -2px #D3B996;
+  position: relative;
+  z-index: 2;
 }
+
 
 .container-box {
   padding: 0 32px;
+  flex:1;
 }
 
 .navigation-bar {
   height: 80px;
 }
+
+.container {
+  background-image: url("/static/bg.png");
+  background-size: 100% 100%;
+  position: relative;
+  background-repeat: repeat;
+  display: flex;
+  flex-direction: column;
+
+}
+
 
 </style>

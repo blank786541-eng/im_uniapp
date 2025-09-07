@@ -6,18 +6,21 @@ import {isWxApp, stopAllAudio} from "@/utils";
 import {V2NIMMessage} from "nim-web-sdk-ng/dist/esm/nim/src/V2NIMMessageService";
 import {t} from "@/utils/i18n";
 import {handleNoPermission} from "@/utils/permission";
-import {V2NIMConst} from "@/utils/nim";
-import {V2NIMMessageForUI} from "@xkit-yx/im-store-v2/dist/types/types";
 import {events} from "@/utils/constants";
+import {customNavigateTo} from "@/utils/customNavigate";
+import {V2NIMConst} from "nim-web-sdk-ng/dist/esm/nim";
+
 const props = withDefaults(
     defineProps<{
-      mute:boolean,
-      show:boolean,
-      conversationId:string
+      mute: boolean,
+      show: boolean,
+      conversationId: string,
+      otherAccountId:string,
+      conversationType: V2NIMConst.V2NIMConversationType
     }>(),
     {
-      mute:false,
-      show:false
+      mute: false,
+      show: false
     }
 )
 const list = [
@@ -30,6 +33,10 @@ const list = [
     text: '视频',
     key: 'video'
   }, {
+    img: '/static/video.png',
+    text: '音频聊天',
+    key: 'voice-call'
+  },  {
     img: '/static/red.png',
     text: '红包',
     key: 'red'
@@ -41,26 +48,50 @@ const list = [
 ]
 
 
-function selectAction(item:any,event:any){
-  console.log(item,event);
-  if(item.key=='photo'){
+async function selectAction(item: any, event: any) {
+  console.log(item, event);
+  if (item.key == 'photo') {
     handleSendImageMsg();
-  }else if(item.key=='video'){
-    handleSendVideoMsg('camera', event)
-  }else if(item.key=='file'){
+  } else if (item.key == 'video') {
+
+    handleSendVideoMsg('', event)
+  } else if (item.key == 'file') {
     handleSendFileMsg();
-  }else{
+  } else if (item.key == "red") {
     uni.showToast({
-      title:'开发中',
-      icon:'warning'
+      title: '开发中',
+      icon: 'warning'
     })
+  } else {
+
+    if(props.conversationType== V2NIMConst.V2NIMConversationType.V2NIM_CONVERSATION_TYPE_P2P){
+      customNavigateTo({
+        url: `/pages/Other/video-call?uid=${props.otherAccountId}&type=1` ,
+      })
+    }else{
+      // uni.setStorageSync('inviteUsers',["778899","123456"])
+      // const userInfo=uni.$UIKitStore.userStore.myUserInfo;
+      customNavigateTo({
+        url: `/pages/Other/select-call-user?teamId=${props.otherAccountId}` ,
+      })
+
+    }
+
+
+
+
+
   }
 }
+
 const handleSendImageMsg = () => {
   if (props.mute) return
   stopAllAudio()
+
   uni.chooseImage({
     count: 1,
+    mediaType: ['image'],
+    sourceType: ['album'],
     sizeType: ['compressed'],
     success: (res) => {
       const imgMsg = uni.$UIKitNIM.V2NIMMessageCreator.createImageMessage(
@@ -70,7 +101,7 @@ const handleSendImageMsg = () => {
       uni.$UIKitStore.msgStore
           .sendMessageActive({
             msg: imgMsg as unknown as V2NIMMessage,
-            conversationId:props.conversationId,
+            conversationId: props.conversationId,
             progress: () => true,
             sendBefore: () => {
               uni.$emit(events.ON_SCROLL_BOTTOM)
@@ -104,8 +135,9 @@ const handleSendVideoMsg = (type: string, event: any) => {
     return
   }
 
+
   uni.chooseVideo({
-    sourceType: [type],
+    sourceType: ['album'],
     compressed: true,
     maxDuration: 60,
     success: (res) => {
@@ -116,7 +148,7 @@ const handleSendVideoMsg = (type: string, event: any) => {
       uni.$UIKitStore.msgStore
           .sendMessageActive({
             msg: videoMsg as unknown as V2NIMMessage,
-            conversationId:props.conversationId,
+            conversationId: props.conversationId,
             progress: () => true,
             sendBefore: () => {
               uni.$emit(events.ON_SCROLL_BOTTOM)
@@ -137,12 +169,14 @@ const handleSendVideoMsg = (type: string, event: any) => {
     complete: handleNoPermission,
   })
 }
-
 /** 发送文件消息 */
 const handleSendFileMsg = () => {
+
+
   uni.chooseFile({
     count: 1,
-    type: 'all',
+    type: 'file',
+    sourceType: [],
     success: (res) => {
       const filePath = res?.tempFilePaths?.[0]
       // @ts-ignore
@@ -154,7 +188,7 @@ const handleSendFileMsg = () => {
         )
         uni.$UIKitStore.msgStore.sendMessageActive({
           msg: fileMsg as unknown as V2NIMMessage,
-          conversationId:props.conversationId,
+          conversationId: props.conversationId,
           sendBefore: () => {
             uni.$emit(events.ON_SCROLL_BOTTOM)
           },
@@ -162,32 +196,86 @@ const handleSendFileMsg = () => {
       }
     },
     fail: () => {
-      uni.showToast({
-        title: t('sendFileFailedText'),
-        icon: 'none',
-      })
+
     },
   })
+}
+
+
+function openWindow(type: string) {
+  // 在iOS H5环境中使用input元素
+  const input = document.createElement('input');
+  input.type = "file";
+  input.accept = '*';
+  console.log(type);
+  input.multiple = true;
+
+  // input.webkitdirectory=true;
+  input.onchange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      // 处理选择的视频文件
+      const fileReader = new FileReader();
+      fileReader.onload = (e) => {
+        const tempFilePath = e.target.result;
+        // 调用成功回调
+        typeof success === 'function' && success({
+          tempFilePath: tempFilePath,
+          file: file
+        });
+      };
+      fileReader.readAsDataURL(file);
+    }
+  };
+
+  input.click();
+}
+
+// 当选择文件完成时触发
+function onFileSelected(fileInfo) {
+  console.log('选择的文件：', fileInfo)
+}
+
+// 当文件发生变化时触发
+function onFilesChanged(fileList) {
+  console.log('文件列表：', fileList)
+}
+
+function disabledMenu(e) {
+  e.stopPropagation();
+  e.preventDefault();
 }
 </script>
 
 <template>
-  <div class="message-action-box" :style="{height:show?'160px':'0px'}">
-    <div v-for="(item, index) in list" :key="index" class="action-name" @tap="selectAction(item,$event)">
-       <AssetsImage :path="item.img" width="46px" height="46px"></AssetsImage>
-        <div style="margin-top: 11px">{{ item.text}}</div>
+  <div class="message-action-box" :style="{height:show?'250px':'0px',paddingTop:show?'20px':'0'}">
+    <div v-for="(item, index) in list" :key="index"
+         @contextmenu="disabledMenu"
+         class="action-name">
+      <div @tap="selectAction(item,$event)">
+        <AssetsImage :path="item.img" width="46px" height="46px"></AssetsImage>
+        <div style="margin-top: 11px">{{ item.text }}</div>
+      </div>
+      <!--      <div v-else>-->
+      <!--        <file-selector></file-selector>-->
+      <!--      </div>-->
     </div>
+
+
   </div>
 </template>
 
 <style scoped lang="scss">
 .message-action-box {
   display: flex;
-  padding-top: 20px;
   transition: all 200ms;
+  box-sizing: border-box;
+  flex-wrap: wrap;
 }
+
 .action-name {
-  flex:1;
+  width: 25%;
+  margin-bottom: 15px;
   text-align: center;
   font-weight: 400;
   font-size: 12px;

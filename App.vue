@@ -8,6 +8,7 @@ import NIM from "nim-web-sdk-ng/dist/v2/NIM_UNIAPP_SDK";
 import {V2NIMConst} from "nim-web-sdk-ng/dist/esm/nim";
 
 import {
+  customNavigateTo,
   customRedirectTo,
   customReLaunch,
   customSwitchTab,
@@ -19,6 +20,11 @@ import {isWxApp} from "./utils";
 import {setLanguage} from "./utils/i18n";
 import config from './config'
 import {initNim, initPlugin, onImHideApp, onImShowApp} from "@/utils/imUtils";
+import {
+  V2NIMSignallingEvent,
+  V2NIMSignallingEventType, V2NIMSignallingRoomInfo
+} from "nim-web-sdk-ng/dist/v2/NIM_UNIAPP_SDK/V2NIMSignallingService";
+import {addCallListeners, CallEventType} from "@/pages/Other/help/call";
 // // #ifdef APP-PLUS
 // /** 推送插件 */
 // const nimPushPlugin = uni.requireNativePlugin("NIMUniPlugin-PluginModule");
@@ -51,11 +57,11 @@ export default {
     }
     const opts = uni.getStorageSync(STORAGE_KEY);
     const autoLogin = uni.getStorageSync("autoLogin");
-    if (opts && opts.account && opts.token && autoLogin) {
+    if (opts && opts.account && opts.token) {
       initNim(opts)
     } else {
       customRedirectTo({
-        url: isWxApp ? "/pages/index/index" : "/pages/Login/index",
+        url: isWxApp ? "/pages/index/index" : "/pages/Login/login-form",
       });
     }
 
@@ -77,6 +83,62 @@ export default {
     //   }
     // });
     // // #endif
+
+    uni.$UIKitNIM.V2NIMSignallingService.on("onSyncRoomInfoList",(rooms:V2NIMSignallingRoomInfo[])=>{
+      for(let i=0;i<rooms.length;i++){
+        uni.$UIKitNIM.V2NIMSignallingService.leaveRoom(rooms[i].channelInfo.channelId);
+      }
+    });
+    uni.$UIKitNIM.V2NIMSignallingService.on("onOnlineEvent", (data:V2NIMSignallingEvent) => {
+      console.warn(data,'onOnlineEvent=====')
+      const create=data.inviterAccountId;
+      if(data.eventType==3){
+        if(data.serverExtension=="teamcall"){
+          customNavigateTo({
+            url: `/pages/Other/team-video-call?uid=${data.inviterAccountId}&channelName=${data.channelInfo.channelName}&roomId=${data.channelInfo.channelId}&requestId=${data.requestId}&type=${data.channelInfo.channelType}`,
+          })
+        }else{
+          customNavigateTo({
+            url: `/pages/Other/video-call?uid=${data.inviterAccountId}&audioRoomId=${data.channelInfo.channelName}&roomId=${data.channelInfo.channelId}&requestId=${data.requestId}&type=${data.channelInfo.channelType}`,
+          })
+        }
+
+      }else  if (data.eventType == 6) {
+
+
+        uni.$emit('on-invite',data)
+      } else if (data.eventType ==5) {
+
+        const msg=data.operatorAccountId==create?"已取消":'对方已拒绝';
+        uni.showToast({
+          title: msg,
+          icon: "none",
+          duration: 1000,
+          success: () => {
+            uni.$emit('on-invite',data)
+          }
+        })
+      } else if (data.eventType ==4) {
+        const msg=data.operatorAccountId!=create?"已取消":'对方已取消';
+        uni.showToast({
+          title: msg,
+          icon: "none",
+          duration: 1000,
+          success: () => {
+            uni.$emit('on-invite',data)
+          }
+        })
+      }else if (data.eventType == 7) {
+        uni.showToast({
+          title: "对方已挂断",
+          icon: "none",
+          duration: 1000,
+          success: () => {
+            uni.$emit('on-invite',data)
+          }
+        })
+      }
+    })
     onImShowApp()
   },
   onHide() {

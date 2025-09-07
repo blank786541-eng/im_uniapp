@@ -1,6 +1,5 @@
 <template>
-  <div>
-    <div class="navigation-bar"></div>
+  <div class="container">
     <div class="container-box">
       <div class="flex-center">
         <image src="/static/logo.png" class="logo"></image>
@@ -24,14 +23,16 @@
                        @update-model-value="getValue"
                        :rule="smsCodeInputRule"></label-input>
         </div>
+        <div class="flex-box flex-space-between" style="margin-top: 9px;">
+          <FormRadio label="记住密码" :onchange="radioChange"></FormRadio>
+          <div>
+            <span class="forget">忘记密码?</span>
+          </div>
+        </div>
       </div>
 
-<!--      <div class="flex-box flex-space-between" style="margin-top: 9px;">-->
-<!--        <FormRadio label="记住密码" :onchange="radioChange"></FormRadio>-->
-<!--        <div>-->
-<!--          <span class="forget">忘记密码?</span>-->
-<!--        </div>-->
-<!--      </div>-->
+
+
     </div>
     <button
         :class="privateChecked ? 'login-btn-disabled' : 'login-btn'"
@@ -39,9 +40,10 @@
     >
       {{ i18n.loginBtnTitle }}
     </button>
-    <div class="primary-text" @click="customNavigateTo({url:'/pages/Login/register'})">
+    <div class="register-text" @tap="customNavigateTo({url:'/pages/Login/register'})">
       没有账号？立即注册
     </div>
+
   </div>
 </template>
 
@@ -56,7 +58,8 @@ import {customNavigateTo, customRedirectTo} from "@/utils/customNavigate";
 import {initNim} from "@/utils/imUtils";
 import {validValue} from "@/utils/utils";
 import {httpRequest} from "@/utils/request";
-
+import AssetsImage from "@/components/AssetsImage.vue";
+import config from "@/utils/config";
 const mobileInputRule = {
   reg: /^[a-zA-Z0-9]{6,}$/,
   message: i18n.accountError,
@@ -80,7 +83,7 @@ const pwdEtx = ref("");
 const loginForm = reactive({
   account: '',
   token: '',
-  appkey: "7767647313060a0e18b3197510aed6ad",
+  appkey: config.appKey,
 })
 
 
@@ -127,7 +130,7 @@ $primary-color: $uni-color-primary;
   background: $uni-color-primary;
   border-radius: 8px;
   color: #fff;
-  margin-top: 78px;
+  margin-top: 57px;
 }
 
 .login-btn-disabled {
@@ -136,7 +139,7 @@ $primary-color: $uni-color-primary;
   width: 90%;
   border-radius: 8px;
   color: #fff;
-  margin-top: 78px;
+  margin-top: 57px;
 }
 
 .logo {
@@ -145,12 +148,18 @@ $primary-color: $uni-color-primary;
 }
 
 .form-login {
-  margin-top: 47px;
-
+  margin-top: 21px;
+  border-radius: 8px;
+  background-color: #fff;
+  padding: 14px;
+  box-shadow: 0px 4px 10px -2px #D3B996;
+  position: relative;
+  z-index: 100;
 }
 
 .container-box {
-  padding: 0 32px;
+  padding: 0 16px;
+  margin-top: 24px;
 }
 
 .login-account {
@@ -183,5 +192,34 @@ $primary-color: $uni-color-primary;
   color: #f56c6c;
   font-size: 12px;
   margin-top: 5px;
+}
+page{
+  height:100%;
+  width: 100%;
+}
+.container{
+  background-image: url("/static/bg.png");
+  background-repeat: no-repeat;
+  background-size: cover;
+  height:100%;
+  position: relative;
+}
+.bottom{
+  position: absolute;
+  bottom: 0;
+  right:-10px;
+}
+
+.register-text{
+  font-weight: 400;
+  font-style: Regular;
+  font-size: 14px;
+  letter-spacing: 0;
+  vertical-align: middle;
+  color: #0067FF;
+  margin-top: 16px;
+  text-align: center;
+  position: relative;
+  z-index: 1000;
 }
 </style>

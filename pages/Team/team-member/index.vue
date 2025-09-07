@@ -50,7 +50,19 @@
         <div
           v-if="isShowRemoveBtn(item)"
           class="btn-remove"
+          style="margin-right: 10px"
           @tap="
+            () => {
+              handleSwitchBanned(item)
+            }
+          "
+        >
+          {{item.chatBanned?'解除禁言':'禁言'}}
+        </div>
+        <div
+            v-if="isShowRemoveBtn(item)"
+            class="btn-remove"
+            @tap="
             () => {
               removeTeamMember(item.accountId)
             }
@@ -85,13 +97,28 @@ import { isDiscussionFunc } from '../../../utils'
 const groupMembers = ref<V2NIMTeamMember[]>([])
 const team = ref<V2NIMTeam>()
 let teamId = ''
-
+const chatBanned=ref(false);
+const hasPermission=ref(false);
 /** 是否是讨论组 */
 const isDiscussion = computed(() => {
   let serverExtension = team.value?.serverExtension
   return isDiscussionFunc(serverExtension)
 })
 
+
+const handleSwitchBanned = async (item:V2NIMTeamMember) => {
+
+
+  try {
+
+    await uni.$UIKitNIM.V2NIMTeamService.setTeamMemberChatBannedStatus(item.teamId,item.teamType,item.accountId, !item.chatBanned)
+  } catch (error) {
+    uni.showToast({
+      title: error.message,
+      icon: 'error',
+    })
+  }
+}
 // 跳转到添加群成员页面
 const goAddMember = () => {
   customNavigateTo({
@@ -201,7 +228,6 @@ let groupMembersWatch = () => {}
 
 onLoad((props) => {
   teamId = props ? props.teamId : ''
-
   groupMembersWatch = autorun(() => {
     team.value = uni.$UIKitStore.teamStore.teams.get(teamId)
 
@@ -282,7 +308,7 @@ onUnmounted(() => {
   .group-member {
     display: flex;
     align-items: center;
-    width: 70%;
+    flex:1;
   }
 
   .user-name {
@@ -300,6 +326,8 @@ onUnmounted(() => {
     border: 1px solid #e6605c;
     cursor: pointer;
     font-size: 14px;
+    flex-shrink: 0;
   }
+
 }
 </style>

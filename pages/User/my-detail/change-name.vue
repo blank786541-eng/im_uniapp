@@ -30,8 +30,8 @@ onLoad((options) => {
 
 <template>
   <div>
-    <default-header title="设置昵称">
-      <div class="save" @tap="save">保存设置</div>
+    <default-header title="设置昵称" :show-action="true" :tap-action="save">
+
     </default-header>
     <div class="input-container">
       <input class="input" placeholder="请输入昵称" :value="name" placeholder-class="set_placeholder" @input="update"/>

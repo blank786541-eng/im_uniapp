@@ -1,7 +1,8 @@
 <template>
-  <view :class="className" :style="iconStyle">
+  <view :class="className" :style="iconStyle" >
     <!-- #ifdef APP-PLUS -->
     <image
+        @longpress="handleContextMenu"
       :src="iconUrl"
       :style="{
         width: (width || size) + 'px',
@@ -12,6 +13,7 @@
     <!-- #endif -->
     <!-- #ifndef APP-PLUS -->
     <img
+        @longpress="handleContextMenu"
       :src="iconUrl"
       :style="{
         width: (width || size) + 'px',
@@ -25,6 +27,7 @@
 
 <script lang="ts" setup>
 import { computed, withDefaults } from 'vue'
+import {handleContextMenu} from "@/utils/utils";
 const props = withDefaults(
   defineProps<{
     type: string
@@ -362,12 +365,21 @@ const className = `${props.iconClassName || ''} icon-wrapper`
 
 <style scoped lang="scss">
 .icon-wrapper {
-  display: inline-block;
+  //display: inline-block;
   line-height: 0;
+  user-select: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  -webkit-touch-callout: none;
 }
 
 .icon {
   display: inline-block;
   vertical-align: middle;
+  user-select: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
 }
 </style>

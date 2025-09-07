@@ -9,7 +9,7 @@
     ]"
     @touchstart="handleTouchStart"
     @touchmove="handleTouchMove"
-    @click="handleConversationItemClick()"
+    @tap="handleConversationItemClick"
   >
     <div class="conversation-item-content">
       <div class="conversation-item-left">
@@ -324,7 +324,7 @@ $cellHeight: 72px;
 .conversation-item-container {
   position: relative;
   transition: transform 0.3s;
-  padding: 10px 20px;
+  padding: 0 20px;
 
   &.show-action-list {
     transform: translateX(-200px);

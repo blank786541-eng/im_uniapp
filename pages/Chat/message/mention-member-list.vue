@@ -173,6 +173,8 @@ const sortGroupMembers = (members: V2NIMTeamMember[], teamId: string) => {
  * 群成员点击函数
  */
 const handleItemClick = (member: V2NIMTeamMember | MentionedMember) => {
+
+
   const _member: MentionedMember =
     member.accountId === AT_ALL_ACCOUNT
       ? (member as MentionedMember)

@@ -6,9 +6,13 @@
     "@xkit-yx/im-store-v2": "^0.8.3",
     "@xkit-yx/utils": "^0.7.2",
     "dayjs": "^1.11.7",
+    "html2canvas": "^1.4.1",
     "mobx": "^6.6.1",
+    "nertc-web-sdk": "^5.8.28",
     "nim-web-sdk-ng": "^10.9.30",
     "pinyin": "^3.0.0",
+    "uqrcodejs": "^4.0.7",
+    "vconsole": "^3.15.1",
     "vue": "3.2.47",
     "vue-qrcode-reader": "^5.7.3"
   },

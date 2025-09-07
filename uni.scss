@@ -156,7 +156,9 @@ $uni-font-size-paragraph: 15px;
   background: $uni-color-primary;
   border-radius: 8px;
   color: #fff;
-  margin-top: 78px;
+  margin-top:41px;
+  z-index: 2;
+  flex-shrink: 0;
 }
 
 .login-btn-disabled {
@@ -166,7 +168,10 @@ $uni-font-size-paragraph: 15px;
   width: 90%;
   border-radius: 8px;
   color: #fff;
-  margin-top: 78px;
+  margin-top: 41px;
+  position: relative;
+  z-index: 2;
+  flex-shrink: 0;
 }
 
 .uni-switch-input {
@@ -181,3 +186,19 @@ $uni-font-size-paragraph: 15px;
   width: 42px !important;
   height: 21px !important;
 }
+.uni-textarea-wrapper{
+  min-height:40px !important;
+  max-height:80px !important;
+  overflow-x: hidden;
+  background:#fff;
+  box-sizing: border-box;
+
+}
+.uni-textarea-textarea {
+  padding:10px !important;
+  box-sizing: border-box;
+}
+uni-textarea{
+  width: 100% !important;
+}
+

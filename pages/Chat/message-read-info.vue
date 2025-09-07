@@ -119,11 +119,13 @@ onLoad((props) => {
     const msg = uni.$UIKitStore.msgStore.getMsg(conversationId, [
       messageClientId,
     ])
+
     if (msg.length) {
       // 获取当前消息的已读未读详情
       uni.$UIKitStore.msgStore
-        .getTeamMessageReceiptDetailsActive(msg[0])
+        .getTeamMessageReceiptDetailsActive(Object.assign({},msg[0],{senderId:msg[0].senderId}))
         .then((res) => {
+          console.log(res,'msg=====');
           readCount.value = res?.readReceipt.readCount
           unReadCount.value = res?.readReceipt.unreadCount
           readList.value = res?.readAccountList

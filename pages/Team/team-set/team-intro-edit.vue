@@ -9,6 +9,7 @@
         :maxlength="100"
         @input="handleInput"
         @clear="clearInput"
+        type="textarea"
        class="input"
       />
       <div class="input-length">{{ inputLengthTips }}</div>
@@ -120,7 +121,9 @@ page {
   padding: 0 16px 5px;
   position: relative;
   margin: 10px 20px;
-
+  height:50px;
+  display: flex;
+  align-items: center;
   .input-length {
     position: absolute;
     right: 25px;

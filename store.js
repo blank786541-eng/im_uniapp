@@ -1,5 +1,6 @@
 import { makeAutoObservable } from 'mobx'
 import { logDebug, EventTracking } from '@xkit-yx/utils'
+import {customNavigateTo} from "./utils/customNavigate";
 
 /******************************************************************************
 Copyright (c) Microsoft Corporation.
@@ -393,7 +394,7 @@ var ConnectStore = /** @class */ (function () {
     })
     // 获取 AI 机器人
     if (this.localOptions.aiVisible) {
-      this.rootStore.aiUserStore.getAIUserListActive()
+      // this.rootStore.aiUserStore.getAIUserListActive()
     }
   }
   return ConnectStore
@@ -3245,6 +3246,7 @@ var MsgStore = /** @class */ (function () {
     ;(_a = this.logger) === null || _a === void 0
       ? void 0
       : _a.log('_onReceiveMessages: ', data)
+
     data.forEach(function (item) {
       _this.addMsg(item.conversationId, [item])
     })
@@ -7743,11 +7745,11 @@ var scripts = {
   clean: 'rm -rf ./dist',
   emitTypes:
     'tsc --emitDeclarationOnly --declaration --declarationDir temp/types',
-  'build:esm': 'npm run emitTypes && rollup --config ./build/esm.config.js',
+  'build:esm': 'npm run emitTypes && rollup --config ./build/esm.config.ts',
   build:
-    'npm run clean && npm run emitTypes && node script/copyPlugin.js && rollup --config ./build/v1.config.js && rollup --config ./build/v2.config.js && rollup --config ./build/esm.config.js',
+    'npm run clean && npm run emitTypes && node script/copyPlugin.js && rollup --config ./build/v1.config.ts && rollup --config ./build/v2.config.ts && rollup --config ./build/esm.config.ts',
   analyze:
-    'npm run clean && npx rollup --config ./build/analyze.config.js && ls -lhR dist | grep ".js"',
+    'npm run clean && npx rollup --config ./build/analyze.config.ts && ls -lhR dist | grep ".js"',
   'pages:build':
     'cd pages/ && npm install && npm run build && cp -rf dist/ ../dist/',
   api: 'npm run translate && node script/buildApi.js',

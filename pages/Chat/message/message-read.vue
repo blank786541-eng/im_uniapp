@@ -1,72 +1,57 @@
 <template>
-<!--  <div-->
-<!--    v-if="-->
-<!--      props.msg.sendingState ==-->
-<!--      V2NIMConst.V2NIMMessageSendingState.V2NIM_MESSAGE_SENDING_STATE_SUCCEEDED-->
-<!--    "-->
-<!--    class="msg-read-wrapper"-->
-<!--  >-->
-<!--    <div-->
-<!--      v-if="-->
-<!--        conversationType ===-->
-<!--          V2NIMConst.V2NIMConversationType.V2NIM_CONVERSATION_TYPE_P2P &&-->
-<!--        p2pMsgReceiptVisible-->
-<!--      "-->
-<!--    >-->
-<!--      <div v-if="p2pMsgRotateDeg == 360" class="icon-read-wrapper">-->
-<!--        <Icon type="icon-read" :size="18"></Icon>-->
-<!--      </div>-->
-<!--      <div v-else class="sector">-->
-<!--        <span-->
-<!--          class="cover-1"-->
-<!--          :style="`transform: rotate(${p2pMsgRotateDeg}deg)`"-->
-<!--        ></span>-->
-<!--        <span-->
-<!--          :class="p2pMsgRotateDeg >= 180 ? 'cover-2 cover-3' : 'cover-2'"-->
-<!--        ></span>-->
-<!--      </div>-->
-<!--    </div>-->
-<!--    <div-->
-<!--      v-if="-->
-<!--        conversationType ===-->
-<!--          V2NIMConst.V2NIMConversationType.V2NIM_CONVERSATION_TYPE_TEAM &&-->
-<!--        teamManagerVisible-->
-<!--      "-->
-<!--    >-->
-<!--      <div class="icon-read-wrapper" v-if="teamMsgRotateDeg == 360">-->
-<!--        <Icon type="icon-read" :size="18"></Icon>-->
-<!--      </div>-->
-<!--      <div v-else class="sector" @click="jumpToTeamMsgReadInfo">-->
-<!--        <span-->
-<!--          class="cover-1"-->
-<!--          :style="`transform: rotate(${teamMsgRotateDeg}deg)`"-->
-<!--        ></span>-->
-<!--        <span-->
-<!--          :class="teamMsgRotateDeg >= 180 ? 'cover-2 cover-3' : 'cover-2'"-->
-<!--        ></span>-->
-<!--      </div>-->
-<!--    </div>-->
-<!--  </div>-->
+  <div
+      v-if="
+      props.msg.sendingState ==
+      V2NIMConst.V2NIMMessageSendingState.V2NIM_MESSAGE_SENDING_STATE_SUCCEEDED
+    "
+      class="msg-read-wrapper"
+  >
+    <div
+        v-if="
+        conversationType ===
+          V2NIMConst.V2NIMConversationType.V2NIM_CONVERSATION_TYPE_P2P &&
+        p2pMsgReceiptVisible
+      "
+    >
+      <div class="icon-read-wrapper">
+<!--        <Icon type="icon-read" :size="10"></Icon>-->
+        <span class="font-14 default-text" style="font-size: 10px;text-align: right">{{p2pMsgRotateDeg?'已读':'未读'}}</span>
+      </div>
+
+    </div>
+    <div
+        v-if="
+        conversationType ===
+          V2NIMConst.V2NIMConversationType.V2NIM_CONVERSATION_TYPE_TEAM &&
+        teamManagerVisible
+      "
+    >
+      <div class="icon-read-wrapper" @tap="jumpToTeamMsgReadInfo">
+        <span class="font-14 default-text" style="font-size: 12px;text-align: right">{{ readCount }}人已读</span>
+      </div>
+
+    </div>
+  </div>
   <div></div>
 </template>
 
 <script lang="ts" setup>
 /** 消息已读未读组件 */
 
-import { computed, ref, onMounted, onUnmounted } from 'vue'
-import { V2NIMMessageForUI } from '@xkit-yx/im-store-v2/dist/types/types'
+import {computed, ref, onMounted, onUnmounted} from 'vue'
+import {V2NIMMessageForUI} from '@xkit-yx/im-store-v2/dist/types/types'
 import Icon from '../../../components/Icon.vue'
-import { V2NIMConst } from '../../../utils/nim'
+import {V2NIMConst} from '../../../utils/nim'
 
-import { customNavigateTo } from '../../../utils/customNavigate'
-import { t } from '../../../utils/i18n'
-import { autorun } from 'mobx'
+import {customNavigateTo} from '../../../utils/customNavigate'
+import {t} from '../../../utils/i18n'
+import {autorun} from 'mobx'
 
 const props = withDefaults(
-  defineProps<{
-    msg: V2NIMMessageForUI
-  }>(),
-  {}
+    defineProps<{
+      msg: V2NIMMessageForUI
+    }>(),
+    {}
 )
 
 /** 是否需要显示群组消息已读未读，默认 false */
@@ -77,47 +62,67 @@ const p2pMsgReceiptVisible = uni.$UIKitStore.localOptions.p2pMsgReceiptVisible
 
 /** 会话类型 */
 const conversationType =
-  uni.$UIKitNIM.V2NIMConversationIdUtil.parseConversationType(
-    props.msg.conversationId
-  ) as unknown as V2NIMConst.V2NIMConversationType
+    uni.$UIKitNIM.V2NIMConversationIdUtil.parseConversationType(
+        props.msg.conversationId
+    ) as unknown as V2NIMConst.V2NIMConversationType
 
 /** 单聊消息已读未读，用于UI变更 */
 const p2pMsgRotateDeg = ref(0)
 
 /**是否是云端会话 */
 const enableV2CloudConversation =
-  uni.$UIKitStore?.sdkOptions?.enableV2CloudConversation
+    uni.$UIKitStore?.sdkOptions?.enableV2CloudConversation
 
 /** 设置单聊消息已读未读 */
 const setP2pMsgRotateDeg = () => {
   /**如果是单聊 */
   if (
-    conversationType ===
-    V2NIMConst.V2NIMConversationType.V2NIM_CONVERSATION_TYPE_P2P
+      conversationType ===
+      V2NIMConst.V2NIMConversationType.V2NIM_CONVERSATION_TYPE_P2P
   ) {
     const conversation = enableV2CloudConversation
-      ? uni.$UIKitStore.conversationStore?.conversations.get(
-          props.msg.conversationId
+        ? uni.$UIKitStore.conversationStore?.conversations.get(
+            props.msg.conversationId
         )
-      : uni.$UIKitStore.localConversationStore?.conversations.get(
-          props.msg.conversationId
+        : uni.$UIKitStore.localConversationStore?.conversations.get(
+            props.msg.conversationId
         )
-
+    console.log( props?.msg?.createTime <= (conversation?.msgReceiptTime || 0));
+    console.log("conversation?.msgReceiptTime");
     p2pMsgRotateDeg.value =
-      props?.msg?.createTime <= (conversation?.msgReceiptTime || 0) ? 360 : 0
+        props?.msg?.createTime <= (conversation?.msgReceiptTime || 0) ? 360 : 0
   }
 }
 
 /** 监听单聊消息已读未读 */
 const p2pMsgReadWatch = autorun(() => {
   setP2pMsgRotateDeg()
+  getReads();
 })
+
+
+const readCount = ref(0);
+
+function getReads() {
+  if (conversationType ===
+      V2NIMConst.V2NIMConversationType.V2NIM_CONVERSATION_TYPE_P2P) {
+
+    return;
+  }
+
+  uni.$UIKitStore.msgStore
+      .getTeamMessageReceiptDetailsActive(props.msg)
+      .then((res) => {
+
+        readCount.value = res.readAccountList.length;
+      })
+}
 
 /** 跳转到已读未读详情 */
 const jumpToTeamMsgReadInfo = () => {
   if (
-    uni.$UIKitStore.connectStore.connectStatus !==
-    V2NIMConst.V2NIMConnectStatus.V2NIM_CONNECT_STATUS_CONNECTED
+      uni.$UIKitStore.connectStore.connectStatus !==
+      V2NIMConst.V2NIMConnectStatus.V2NIM_CONNECT_STATUS_CONNECTED
   ) {
     uni.showToast({
       title: t('offlineText'),
@@ -133,19 +138,6 @@ const jumpToTeamMsgReadInfo = () => {
   }
 }
 
-/** 群消息已读未读，用于UI变更 */
-const teamMsgRotateDeg = computed(() => {
-  if (
-    conversationType ===
-    V2NIMConst.V2NIMConversationType.V2NIM_CONVERSATION_TYPE_TEAM
-  ) {
-    const percentage =
-      (props?.msg?.yxRead || 0) /
-        ((props?.msg?.yxUnread || 0) + (props?.msg?.yxRead || 0)) || 0
-    return percentage * 360
-  }
-  return 0
-})
 
 onMounted(() => {
   setP2pMsgRotateDeg()
@@ -159,10 +151,12 @@ onUnmounted(() => {
 <style scoped lang="scss">
 .msg-read-wrapper {
   align-self: flex-end;
+  text-align: right;
 }
+
 .icon-read-wrapper {
-  margin: 0px 10px 5px 0;
 }
+
 .sector {
   display: inline-block;
   position: relative;
@@ -172,7 +166,6 @@ onUnmounted(() => {
   height: 14px;
   background-color: #eeeeee;
   border-radius: 50%;
-  margin: 0px 10px 0 0;
 
   .cover-1,
   .cover-2 {

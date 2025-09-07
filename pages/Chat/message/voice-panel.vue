@@ -1,45 +1,147 @@
 <template>
-  <div class="voice-panel-wrapper">
-    <div class="audio-remind-text">{{ t('audioRemindText') }}</div>
-    <div class="voice-panel">
-      <div
-        class="voice-panel-circel"
-        @touchstart="onStartRecord"
-        @touchend="onStopRecord"
-      >
-        <div class="img-mask"></div>
-        <Icon :width="24" :height="30" type="audio-btn"></Icon>
+  <div class="voice-panel-wrapper" >
+    <div v-if="!recorderOver">
+      <div class="audio-remind-text">{{ t('audioRemindText') }}</div>
+      <div class="voice-panel">
+        <div class="voice-panel-circel" @touchstart="handleContextMenu" @longpress="onStartRecord"
+          @touchend="onStopRecord" @contextmenu="handleContextMenu">
+          <!--          @touchstart="handleContextMenu"-->
+          <div class="img-mask"></div>
+          <Icon :width="24" :height="30" type="audio-btn"></Icon>
+        </div>
+        <div :style="{ display: recordState == 'stop' ? 'none' : 'block' }" class="big-circle"></div>
+        <div :style="{ display: recordState == 'stop' ? 'none' : 'block' }" class="small-circle"></div>
       </div>
-      <div
-        :style="{ display: recordState == 'stop' ? 'none' : 'block' }"
-        class="big-circle"
-      ></div>
-      <div
-        :style="{ display: recordState == 'stop' ? 'none' : 'block' }"
-        class="small-circle"
-      ></div>
+      <div class="audio-btn-text">{{ t('audioBtnText') }}</div>
     </div>
-    <div class="audio-btn-text">{{ t('audioBtnText') }}</div>
+    <div v-else>
+
+        <div class="flex-center" style="margin-top: 30px;">
+           <div class="audio-box">
+             <MessageAudio
+              :msg="msg"
+              :broadcastNewAudioSrc="broadcastNewAudioSrc"
+          />
+        </div>
+
+      </div>
+       <div class="btn-group ">
+            <div class="send" style="background-color:#b3b7bc" @tap="close">重录</div>
+           <div class="send" style="background-color:#337eff;margin-left: 19px;" @tap="handlerSuccess">发送</div>
+        </div>
+    </div>
   </div>
 </template>
 
 <script lang="ts" setup>
 /**语音消息面板组件 */
 
-import { ref } from 'vue'
+import { getRecorderManager } from '../../../uni_modules/jz-h5RecorderManager/js/index.js'
+import mumuRecorder from "@/uni_modules/mumu-recorder/components/mumu-recorder/mumu-recorder.vue";
+import {onMounted, onUnmounted, reactive, ref} from 'vue'
 import Icon from '../../../components/Icon.vue'
 import { t } from '../../../utils/i18n'
 import { isWxApp, stopAllAudio } from '../../../utils'
-
+import { handleContextMenu } from "@/utils/utils";
+import { V2NIMMessageForUI } from '@xkit-yx/im-store-v2/dist/types/types.js';
+import MessageAudio from './message-audio.vue';
 const $emit = defineEmits(['handleSendAudioMsg'])
+/**录音状态 */
+const recordState = ref('stop')
+const recorderOver = ref(false);
+onUnmounted(() => {
+  uni.$off('closeRecord')
+})
 
+
+const recorderManager = getRecorderManager({
+
+});
+
+const msg=reactive({
+  attachment:{
+    duration:1,
+    url:""
+  },
+  isSelf:false
+});
+uni.$on('closeRecord', () => {
+  onStopRecord();
+})
+
+
+onMounted(() => {
+  recorderManager.onStop((res:any) => {
+
+    if (res.duration < 1) {
+      return;
+    }
+      console.log(res,'rfes======');
+    msg.attachment.duration=res.duration;
+    msg.attachment.url=res.tempFilePath;
+
+      recorderOver.value = true;
+  })
+})
+function close(){
+
+  recorderOver.value=false;
+}
+//#ifdef H5
+function handlerError(code) {
+  switch (code) {
+    case '101':
+      uni.showModal({
+        content: '当前浏览器版本较低，请更换浏览器使用，推荐在微信中打开。'
+      })
+      break;
+    case '201':
+      uni.showModal({
+        content: '麦克风权限被拒绝，请刷新页面后授权麦克风权限。'
+      })
+      break
+    default:
+      uni.showModal({
+        content: '未知错误，请刷新页面重试'
+      })
+      break
+  }
+}
+
+function handlerSuccess() {
+
+  $emit('handleSendAudioMsg', msg.attachment.url,  msg.attachment.duration)
+}
+const onStartRecord = (e: Event) => {
+  recorderOver.value = false;
+
+  // recorder.value.start()
+  recordState.value = 'recording'
+  console.log("onStartRecord",)
+  recorderManager.start({
+    duration: 60000, // 录音时长60秒
+    sampleRate: 44100, // 采样率
+    numberOfChannels: 1, // 声道数
+    encodeBitRate: 192000, // 编码码率
+    format: 'mp3' // 录音格式
+  })
+  handleContextMenu(e);
+
+}
+const onStopRecord = (res) => {
+  recordState.value = 'stop'
+
+  recorderManager.stop()
+}
+//#endif
+
+
+//#ifdef APP-PLUS
 /**录音实例 */
 const recorderManager = uni.getRecorderManager()
 
 let startRecordStamp = 0
 
-/**录音状态 */
-const recordState = ref('stop')
 
 /**开始录音 */
 const onStartRecord = () => {
@@ -107,9 +209,17 @@ recorderManager.onError((res) => {
     }
   }
 })
+//#endif
 </script>
 
 <style scoped lang="scss">
+page {
+  user-select: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+}
+
 .voice-panel-wrapper {
   position: relative;
   width: 100%;
@@ -119,6 +229,7 @@ recorderManager.onError((res) => {
   display: flex;
   flex-direction: column;
   align-items: center;
+
 }
 
 .voice-panel {
@@ -138,7 +249,7 @@ recorderManager.onError((res) => {
 }
 
 .voice-panel-circel {
-  z-index: 3;
+  z-index: 100;
   width: 100px;
   height: 100px;
   border-radius: 50%;
@@ -150,6 +261,7 @@ recorderManager.onError((res) => {
   display: flex;
   align-items: center;
   justify-content: center;
+
 }
 
 .big-circle {
@@ -164,6 +276,7 @@ recorderManager.onError((res) => {
   background: #cce6f8 38.14%;
   animation: circleSmall 1.5s ease-out;
   animation-iteration-count: infinite;
+
 }
 
 .small-circle {
@@ -224,5 +337,25 @@ recorderManager.onError((res) => {
   transform: translateX(-50%);
   color: #666;
   font-size: 14px;
+}
+.audio-box{
+  background-color: #FDF2E3;
+  width: 100px;
+  padding:8px 0;
+  border-radius: 12px;
+  display: flex;
+  justify-content: center;
+}
+.send{
+  padding:6px 12px;
+  color:#fff;
+  border-radius: 6px;
+  font-size: 14px;
+
+}
+.btn-group{
+  display: flex;
+  justify-content:center;
+  margin-top: 30px;
 }
 </style>

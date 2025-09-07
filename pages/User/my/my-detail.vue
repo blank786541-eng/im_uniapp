@@ -1,6 +1,6 @@
 <template>
   <div>
-    <default-header :title="t('FriendPageText')" ></default-header>
+    <default-header title="个人信息" ></default-header>
     <div class="wrapper">
 
       <div class="flex-box " style="margin-top: 20px">
@@ -17,26 +17,33 @@
           <span class="value">{{ userInfo.name }}</span>
           <AssetsImage path="/static/right.png" width="6px" height="12px"></AssetsImage>
         </div>
-        <div class="row">
-          <span class="label">性别</span>
-          <div class="container-box"></div>
-          <div class="value">{{
-              userInfo && userInfo.gender === 0
-                  ? t('unknow')
-                  : userInfo && userInfo.gender === 1
-                      ? t('男')
-                      : t('女')
-            }}
-          </div>
-          <AssetsImage path="/static/right.png" width="6px" height="12px"></AssetsImage>
-        </div>
+          <picker
+              @change="onChangeGender"
+              :value="userInfo && userInfo.gender === 1 ? 0 : 1"
+              :range="[t('man'), t('woman')]"
+          >
+           <div class="row">
+                       <span class="label">性别</span>
+                       <div class="container-box"></div>
+                       <div class="value">{{
+                           userInfo && userInfo.gender === 0
+                               ? t('unknow')
+                               : userInfo && userInfo.gender === 1
+                                   ? t('男')
+                                   : t('女')
+                         }}
+                       </div>
+                       <AssetsImage path="/static/right.png" width="6px" height="12px"></AssetsImage>
+           </div>
+          </picker>
+
         <div class="row " @tap="copyAccount">
           <span class="label">账号</span>
           <div class="container-box"></div>
           <span class="value">{{ userInfo.accountId }}</span>
           <AssetsImage path="/static/copy.png" width="16px" height="16px"></AssetsImage>
         </div>
-              <div class="row">
+              <div class="row" @tap="goToPage(`/pages/User/my-detail/change-mobile?mobile=`+(userInfo.mobile  || ''))">
                 <span class="label">手机号</span>
                 <div class="container-box"></div>
                 <div class="value">{{
@@ -51,7 +58,7 @@
           <div class="value">{{ userInfo.sign }}</div>
           <AssetsImage path="/static/right.png" width="6px" height="12px"></AssetsImage>
         </div>
-              <div class="row">
+              <div class="row" @tap="goToPage('/pages/User/my-detail/my-qrcode')">
                 <span class="label">二维码</span>
                 <div class="container-box"></div>
                 <AssetsImage path="/static/erweima.png" width="15px" height="15px" style="margin-right: 6px"></AssetsImage>
@@ -157,6 +164,8 @@ import Icon from '../../../components/Icon.vue'
 import AssetsImage from "@/components/AssetsImage.vue";
 import DefaultHeader from "@/components/defaultHeader.vue";
 import { onShow, onUnload} from '@dcloudio/uni-app'
+import {update} from "immutable";
+import {updateImInfo} from "@/utils/request";
 /**是否是云端会话 */
 const enableV2CloudConversation =
     uni.$UIKitStore?.sdkOptions?.enableV2CloudConversation
@@ -170,7 +179,21 @@ const isInBlacklist = ref(false)
 
 let account = ''
 
-
+const onChangeGender = (e: any) => {
+  const gender = e.detail.value == 0 ? 1 : 2
+  userInfo.value.gender = gender
+  updateImInfo({
+    gender
+  })
+  // uni.$UIKitStore.userStore
+  //     .updateSelfUserProfileActive({ ...userInfo.value, gender })
+  //     .catch(() => {
+  //       uni.showToast({
+  //         title: t('updateText') + t('genderText') + t('failText'),
+  //         icon: 'error',
+  //       })
+  //     })
+}
 const uninstallMyUserInfoWatch = autorun(() => {
   userInfo.value = uni.$UIKitStore.userStore.myUserInfo
 })

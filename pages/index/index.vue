@@ -21,7 +21,7 @@
 import { customRedirectTo } from '../../utils/customNavigate'
 
 const onLogin = () => {
-  customRedirectTo({ url: '/pages/Login/index' })
+  customRedirectTo({ url: '/pages/Login/login-form' })
 }
 </script>
 

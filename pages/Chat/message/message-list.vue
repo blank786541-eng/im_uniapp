@@ -5,6 +5,7 @@
       scroll-y="true"
       :scroll-top="scrollTop"
       class="message-scroll-list"
+      @scroll="closeMore"
     >
       <div v-show="!noMore" @click="onLoadMore" class="view-more-text">
         {{ t('viewMoreText') }}
@@ -13,6 +14,7 @@
       <div v-for="(item, index) in finalMsgs" :key="item.renderKey">
         <MessageItem
           :msg="item"
+          :manager="manager"
           :index="index"
           :key="item.renderKey"
           :reply-msgs-map="replyMsgsMap"
@@ -36,7 +38,13 @@ import { V2NIMMessageForUI } from '@xkit-yx/im-store-v2/dist/types/types'
 import { V2NIMConst } from '../../../utils/nim'
 import { V2NIMTeam } from 'nim-web-sdk-ng/dist/esm/nim/src/V2NIMTeamService'
 import { autorun } from 'mobx'
-
+function  closeMore(e){
+  // uni.$emit('closeMore');
+  console.log(e.detail.deltaY)
+  if(e.detail.deltaY > 0){
+    uni.$emit('closeMore');
+  }
+}
 const props = withDefaults(
   defineProps<{
     msgs: V2NIMMessageForUI[]
@@ -53,12 +61,21 @@ const props = withDefaults(
 
 /** 群信息监听 */
 let teamWatch = () => {}
-
+const manager=ref(false);
 onBeforeMount(() => {
   let team: V2NIMTeam | undefined = undefined
   /** 群监听 */
   teamWatch = autorun(() => {
     team = uni.$UIKitStore.teamStore.teams.get(props.to) as unknown as V2NIMTeam
+    const teamMember = uni.$UIKitStore.teamMemberStore.getTeamMember(team.teamId, [
+      uni.$UIKitStore.userStore.myUserInfo.accountId,
+    ])[0]
+
+    if(teamMember){
+      manager.value = teamMember.memberRole == V2NIMConst.V2NIMTeamMemberRole.V2NIM_TEAM_MEMBER_ROLE_MANAGER ||
+          teamMember.memberRole == V2NIMConst.V2NIMTeamMemberRole.V2NIM_TEAM_MEMBER_ROLE_OWNER;
+    }
+
   })
 
   if (
@@ -167,6 +184,11 @@ const handleTapMessageList = () => {
     uni.$emit(events.CLOSE_PANEL)
   }, 300)
 }
+
+
+// uni.$UIKitNIM.V2NIMLocalConversationService.on('onConversationChanged',(v)=>{
+//     console.log("onConversationChanged=====",v)
+// })
 
 onUnmounted(() => {
   uni.$off(events.ON_SCROLL_BOTTOM)

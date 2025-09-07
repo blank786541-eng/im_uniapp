@@ -420,7 +420,7 @@ onUnmounted(() => {
 }
 
 .conversation-list-wrapper {
-  height: calc(100% - 60px - var(--status-bar-height));
+  height: calc(100% - 130px - var(--status-bar-height));
   box-sizing: border-box;
   width: 100%;
   overflow-y: auto;

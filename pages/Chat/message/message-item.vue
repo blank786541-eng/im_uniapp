@@ -1,6 +1,13 @@
 <template>
-  <div
-    :class="`msg-item-wrapper ${
+  <div>
+    <div v-if="conversationType ===
+            V2NIMConst.V2NIMConversationType.V2NIM_CONVERSATION_TYPE_TEAM && props.msg.recallType === 'beReCallMsg' &&
+        !props.msg.isSelf">
+
+    </div>
+    <div
+
+        :class="`msg-item-wrapper ${
       props.msg.pinState &&
       !(
         props.msg.messageType ===
@@ -11,406 +18,424 @@
         ? 'msg-pin'
         : ''
     }`"
-    :id="MSG_ID_FLAG + props.msg.messageClientId"
-    :key="props.msg.createTime"
-  >
-    <!-- 消息时间 -->
-    <div
-      class="msg-time"
-      v-if="
+        :id="MSG_ID_FLAG + props.msg.messageClientId"
+        :key="props.msg.createTime"
+    >
+      <!-- 消息时间 -->
+      <div
+          class="msg-time"
+          v-if="
         props.msg.messageType ===
           V2NIMConst.V2NIMMessageType.V2NIM_MESSAGE_TYPE_CUSTOM &&
         props.msg.timeValue !== undefined
       "
-    >
-      {{ props.msg.timeValue }}
-    </div>
-    <!-- 撤回消息 可重新编辑 -->
-    <div
-      class="msg-common"
-      :style="{
+      >
+        {{ props.msg.timeValue }}
+      </div>
+      <!-- 撤回消息 可重新编辑 -->
+      <div
+          class="msg-common"
+          :style="{
         flexDirection: !props.msg.isSelf ? 'row' : 'row-reverse',
       }"
-      v-else-if="
+          v-else-if="
         props.msg.messageType ===
           V2NIMConst.V2NIMMessageType.V2NIM_MESSAGE_TYPE_CUSTOM &&
         props.msg.recallType === 'reCallMsg' &&
         props.msg.canEdit
       "
-    >
-      <Avatar
-        :account="props.msg.senderId"
-        :teamId="
+      >
+        <Avatar
+            :account="props.msg.senderId"
+            :teamId="
           conversationType ===
           V2NIMConst.V2NIMConversationType.V2NIM_CONVERSATION_TYPE_TEAM
             ? to
             : ''
         "
-        :goto-user-card="true"
-        width="35px"
-        height="35px"
-      />
-      <MessageBubble :msg="props.msg" :bg-visible="true">
-        {{ t('recall2') }}
-        <text
-          class="msg-recall-btn"
-          @tap="
+            :goto-user-card="true"
+            width="35px"
+            height="35px"
+        />
+        <MessageBubble :msg="props.msg" :bg-visible="true" :manager="manager">
+          {{ t('recall2') }}
+          <text
+              class="msg-recall-btn"
+              @tap="
             () => {
               handleReeditMsg(props.msg)
             }
           "
-        >
-          {{ t('reeditText') }}
-        </text>
-      </MessageBubble>
-    </div>
-    <!-- 撤回消息 不可重新编辑 主动撤回 -->
-    <div
-      class="msg-common"
-      :style="{ flexDirection: !props.msg.isSelf ? 'row' : 'row-reverse' }"
-      v-else-if="
+          >
+            {{ t('reeditText') }}
+          </text>
+        </MessageBubble>
+      </div>
+      <!-- 撤回消息 不可重新编辑 主动撤回 -->
+      <div
+          class="msg-common"
+          :style="{ flexDirection: !props.msg.isSelf ? 'row' : 'row-reverse' }"
+          v-else-if="
         props.msg.messageType ===
           V2NIMConst.V2NIMMessageType.V2NIM_MESSAGE_TYPE_CUSTOM &&
         props.msg.recallType === 'reCallMsg' &&
         !props.msg.canEdit
       "
-    >
-      <Avatar
-        :account="props.msg.senderId"
-        :teamId="
+      >
+        <Avatar
+            :account="props.msg.senderId"
+            :teamId="
           conversationType ===
           V2NIMConst.V2NIMConversationType.V2NIM_CONVERSATION_TYPE_TEAM
             ? to
             : ''
         "
-        :goto-user-card="true"
-        width="35px"
-        height="35px"
-      />
-      <MessageBubble :msg="props.msg" :bg-visible="true">
-        <div class="recall-text">{{ t('you') + t('recall') }}</div>
-      </MessageBubble>
-    </div>
-    <!-- 撤回消息 对方撤回-->
-    <div
-      class="msg-common"
-      :style="{ flexDirection: !props.msg.isSelf ? 'row' : 'row-reverse' }"
-      v-else-if="
+            :goto-user-card="true"
+            width="35px"
+            height="35px"
+        />
+        <MessageBubble :msg="props.msg" :bg-visible="true"  :manager="manager">
+          <div class="recall-text">{{ t('you') + t('recall') }}</div>
+        </MessageBubble>
+      </div>
+      <!-- 撤回消息 对方撤回-->
+      <div
+          class="msg-common"
+          :style="{ flexDirection: !props.msg.isSelf ? 'row' : 'row-reverse' }"
+          v-else-if="
         props.msg.messageType ===
           V2NIMConst.V2NIMMessageType.V2NIM_MESSAGE_TYPE_CUSTOM &&
         props.msg.recallType === 'beReCallMsg'
       "
-    >
-      <Avatar
-        :account="props.msg.senderId"
-        :teamId="
+      >
+        <Avatar
+            :account="props.msg.senderId"
+            :teamId="
           conversationType ===
           V2NIMConst.V2NIMConversationType.V2NIM_CONVERSATION_TYPE_TEAM
             ? to
             : ''
         "
-        :goto-user-card="true"
-        width="35px"
-        height="35px"
-      />
-      <div class="msg-content">
-        <div class="msg-name" v-if="!props.msg.isSelf">
-          {{ appellation }}
-        </div>
-        <div :class="props.msg.isSelf ? 'self-msg-recall' : 'msg-recall'">
-          <text class="msg-recall2">
-            {{ !props.msg.isSelf ? t('recall2') : `${t('you') + t('recall')}` }}
-          </text>
+            :goto-user-card="true"
+            width="35px"
+            height="35px"
+        />
+        <div class="msg-content">
+          <div class="msg-name" v-if="!props.msg.isSelf">
+            {{ appellation }}
+          </div>
+          <div :class="props.msg.isSelf ? 'self-msg-recall' : 'msg-recall'">
+            <text class="msg-recall2">
+              {{ !props.msg.isSelf ? t('recall2') : `${t('you') + t('recall')}` }}
+            </text>
+          </div>
         </div>
       </div>
-    </div>
-    <!-- 文本消息-->
-    <div
-      class="msg-common"
-      v-else-if="
+      <!-- 文本消息-->
+      <div
+          class="msg-common"
+          v-else-if="
         props.msg.messageType ===
         V2NIMConst.V2NIMMessageType.V2NIM_MESSAGE_TYPE_TEXT
       "
-      :style="{ flexDirection: !props.msg.isSelf ? 'row' : 'row-reverse' }"
-    >
-      <Avatar
-        :account="props.msg.senderId"
-        :teamId="
+          :style="{ flexDirection: !props.msg.isSelf ? 'row' : 'row-reverse' }"
+      >
+        <Avatar
+            :account="props.msg.senderId"
+            :teamId="
           conversationType ===
           V2NIMConst.V2NIMConversationType.V2NIM_CONVERSATION_TYPE_TEAM
             ? to
             : ''
         "
-        :goto-user-card="true"
-        width="35px"
-        height="35px"
-      />
-      <div class="msg-content">
-        <div class="msg-name" v-if="!props.msg.isSelf">
-          {{ appellation }}
+            :goto-user-card="true"
+            width="35px"
+            height="35px"
+        />
+        <div class="msg-content">
+          <div class="msg-name" v-if="!props.msg.isSelf">
+            {{ appellation }}
+          </div>
+          <MessageBubble
+              :manager="manager"
+              :msg="props.msg"
+              :tooltip-visible="true"
+              :bg-visible="true"
+          >
+            <ReplyMessage v-if="!!replyMsg" :replyMsg="replyMsg"></ReplyMessage>
+
+            <MessageText :msg="props.msg"></MessageText>
+            <MessageIsRead v-if="props.msg?.isSelf" :msg="props.msg"></MessageIsRead>
+          </MessageBubble>
         </div>
-        <MessageBubble
-          :msg="props.msg"
-          :tooltip-visible="true"
-          :bg-visible="true"
-        >
-          <ReplyMessage v-if="!!replyMsg" :replyMsg="replyMsg"></ReplyMessage>
-          <MessageText :msg="props.msg"></MessageText>
-        </MessageBubble>
+
       </div>
-<!--      <MessageIsRead v-if="props.msg?.isSelf" :msg="props.msg"></MessageIsRead>-->
-    </div>
-    <!-- 图片消息-->
-    <div
-      class="msg-common"
-      v-else-if="
+      <!-- 图片消息-->
+      <div
+          class="msg-common"
+          v-else-if="
         props.msg.messageType ===
         V2NIMConst.V2NIMMessageType.V2NIM_MESSAGE_TYPE_IMAGE
       "
-      :style="{ flexDirection: !props.msg.isSelf ? 'row' : 'row-reverse' }"
-    >
-      <Avatar
-        :account="props.msg.senderId"
-        :teamId="
+          :style="{ flexDirection: !props.msg.isSelf ? 'row' : 'row-reverse' }"
+      >
+        <Avatar
+            :account="props.msg.senderId"
+            :teamId="
           conversationType ===
           V2NIMConst.V2NIMConversationType.V2NIM_CONVERSATION_TYPE_TEAM
             ? to
             : ''
         "
-        :goto-user-card="true"
-        width="35px"
-        height="35px"
-      />
-      <div class="msg-content">
-        <div class="msg-name" v-if="!props.msg.isSelf">
-          {{ appellation }}
-        </div>
-        <MessageBubble
-          :msg="props.msg"
-          :tooltip-visible="true"
-          :bg-visible="true"
-          style="cursor: pointer"
-        >
-          <div
-            @tap="
+            :goto-user-card="true"
+            width="35px"
+            height="35px"
+        />
+
+        <div style="text-align: right">
+          <div class="msg-content">
+            <div class="msg-name" v-if="!props.msg.isSelf">
+              {{ appellation }}
+            </div>
+            <MessageBubble
+                :manager="manager"
+                :msg="props.msg"
+                :tooltip-visible="true"
+                :bg-visible="true"
+                style="cursor: pointer"
+            >
+              <div
+                  @tap="
               () => {
                 //@ts-ignore
                 handleImageTouch(props.msg.attachment?.url)
               }
             "
-          >
-            <image
-              class="msg-image"
-              :lazy-load="true"
-              mode="aspectFill"
-              :src="imageUrl"
-            ></image>
+              >
+                <image
+                    class="msg-image"
+                    :lazy-load="true"
+                    mode="aspectFill"
+                    :src="imageUrl"
+                ></image>
+              </div>
+            </MessageBubble>
           </div>
-        </MessageBubble>
+          <MessageIsRead v-if="props.msg?.isSelf" :msg="props.msg"></MessageIsRead>
+        </div>
       </div>
-<!--      <MessageIsRead v-if="props.msg?.isSelf" :msg="props.msg"></MessageIsRead>-->
-    </div>
-    <!-- 视频消息-->
-    <div
-      class="msg-common"
-      v-else-if="
+      <!-- 视频消息-->
+      <div
+          class="msg-common"
+          v-else-if="
         props.msg.messageType ===
         V2NIMConst.V2NIMMessageType.V2NIM_MESSAGE_TYPE_VIDEO
       "
-      :style="{ flexDirection: !props.msg.isSelf ? 'row' : 'row-reverse' }"
-    >
-      <Avatar
-        :account="props.msg.senderId"
-        :teamId="
+          :style="{ flexDirection: !props.msg.isSelf ? 'row' : 'row-reverse' }"
+      >
+        <Avatar
+            :account="props.msg.senderId"
+            :teamId="
           conversationType ===
           V2NIMConst.V2NIMConversationType.V2NIM_CONVERSATION_TYPE_TEAM
             ? to
             : ''
         "
-        :goto-user-card="true"
-        width="35px"
-        height="35px"
-      />
-      <div class="msg-content">
-        <div class="msg-name" v-if="!props.msg.isSelf">
-          {{ appellation }}
-        </div>
-        <MessageBubble
-          :msg="props.msg"
-          :tooltip-visible="true"
-          :bg-visible="true"
-          style="cursor: pointer"
-        >
-          <div
-            class="video-msg-wrapper"
-            @tap="() => handleVideoTouch(props.msg)"
-          >
-            <div class="video-play-button">
-              <div class="video-play-icon"></div>
+            :goto-user-card="true"
+            width="35px"
+            height="35px"
+        />
+        <div style="text-align: right">
+          <div class="msg-content">
+            <div class="msg-name" v-if="!props.msg.isSelf">
+              {{ appellation }}
             </div>
-            <image
-              class="msg-image"
-              :lazy-load="true"
-              mode="aspectFill"
-              :src="videoFirstFrameDataUrl"
-            ></image>
+            <MessageBubble
+                :manager="manager"
+                :msg="props.msg"
+                :tooltip-visible="true"
+                :bg-visible="true"
+                style="cursor: pointer"
+            >
+              <div
+                  class="video-msg-wrapper"
+                  @tap="() => handleVideoTouch(props.msg)"
+              >
+                <div class="video-play-button">
+                  <div class="video-play-icon"></div>
+                </div>
+                <image
+                    class="msg-image"
+                    :lazy-load="true"
+                    mode="aspectFill"
+                    :src="videoFirstFrameDataUrl"
+                ></image>
+              </div>
+            </MessageBubble>
           </div>
-        </MessageBubble>
+          <MessageIsRead v-if="props.msg?.isSelf" :msg="props.msg"></MessageIsRead>
+        </div>
+
       </div>
-<!--      <MessageIsRead v-if="props.msg?.isSelf" :msg="props.msg"></MessageIsRead>-->
-    </div>
-    <!-- 音视频消息-->
-    <div
-      class="msg-common"
-      v-else-if="
+      <!-- 音视频消息-->
+      <div
+          class="msg-common"
+          v-else-if="
         props.msg.messageType ===
         V2NIMConst.V2NIMMessageType.V2NIM_MESSAGE_TYPE_CALL
       "
-      :style="{ flexDirection: !props.msg.isSelf ? 'row' : 'row-reverse' }"
-    >
-      <Avatar
-        :account="props.msg.senderId"
-        :teamId="
+          :style="{ flexDirection: !props.msg.isSelf ? 'row' : 'row-reverse' }"
+      >
+        <Avatar
+            :account="props.msg.senderId"
+            :teamId="
           conversationType ===
           V2NIMConst.V2NIMConversationType.V2NIM_CONVERSATION_TYPE_TEAM
             ? to
             : ''
         "
-        :goto-user-card="true"
-        width="35px"
-        height="35px"
-      />
-      <div class="msg-content">
-        <div class="msg-name" v-if="!props.msg.isSelf">
-          {{ appellation }}
+            :goto-user-card="true"
+            width="35px"
+            height="35px"
+        />
+        <div class="msg-content">
+          <div class="msg-name" v-if="!props.msg.isSelf">
+            {{ appellation }}
+          </div>
+          <MessageBubble
+              :manager="manager"
+              :msg="props.msg"
+              :tooltip-visible="true"
+              :bg-visible="true"
+          >
+            <MessageG2 :msg="props.msg"/>
+          </MessageBubble>
         </div>
-        <MessageBubble
-          :msg="props.msg"
-          :tooltip-visible="true"
-          :bg-visible="true"
-        >
-          <MessageG2 :msg="props.msg" />
-        </MessageBubble>
       </div>
-    </div>
-    <!-- 文件消息-->
-    <div
-      class="msg-common"
-      v-else-if="
+      <!-- 文件消息-->
+      <div
+          class="msg-common"
+          v-else-if="
         props.msg.messageType ===
         V2NIMConst.V2NIMMessageType.V2NIM_MESSAGE_TYPE_FILE
       "
-      :style="{ flexDirection: !props.msg.isSelf ? 'row' : 'row-reverse' }"
-    >
-      <Avatar
-        :account="props.msg.senderId"
-        :teamId="
+          :style="{ flexDirection: !props.msg.isSelf ? 'row' : 'row-reverse' }"
+      >
+        <Avatar
+            :account="props.msg.senderId"
+            :teamId="
           conversationType ===
           V2NIMConst.V2NIMConversationType.V2NIM_CONVERSATION_TYPE_TEAM
             ? to
             : ''
         "
-        :goto-user-card="true"
-        width="35px"
-        height="35px"
-      />
-      <div class="msg-content">
-        <div class="msg-name" v-if="!props.msg.isSelf">
-          {{ appellation }}
+            :goto-user-card="true"
+            width="35px"
+            height="35px"
+        />
+        <div style="text-align: right">
+          <div class="msg-content">
+            <div class="msg-name" v-if="!props.msg.isSelf">
+              {{ appellation }}
+            </div>
+            <MessageBubble
+                :manager="manager"
+                :msg="props.msg"
+                :tooltip-visible="true"
+                :bg-visible="false"
+            >
+              <MessageFile :msg="props.msg"/>
+            </MessageBubble>
+          </div>
+          <MessageIsRead v-if="props.msg?.isSelf" :msg="props.msg"></MessageIsRead>
         </div>
-        <MessageBubble
-          :msg="props.msg"
-          :tooltip-visible="true"
-          :bg-visible="false"
-        >
-          <MessageFile :msg="props.msg" />
-        </MessageBubble>
+
       </div>
-      <MessageIsRead v-if="props.msg?.isSelf" :msg="props.msg"></MessageIsRead>
-    </div>
-    <!-- 语音消息-->
-    <div
-      class="msg-common"
-      v-else-if="
+      <!-- 语音消息-->
+      <div
+          class="msg-common"
+          v-else-if="
         props.msg.messageType ===
         V2NIMConst.V2NIMMessageType.V2NIM_MESSAGE_TYPE_AUDIO
       "
-      :style="{
+          :style="{
         flexDirection: !props.msg.isSelf ? 'row' : 'row-reverse',
       }"
-    >
-      <Avatar
-        :account="props.msg.senderId"
-        :teamId="
+      >
+        <Avatar
+            :account="props.msg.senderId"
+            :teamId="
           conversationType ===
           V2NIMConst.V2NIMConversationType.V2NIM_CONVERSATION_TYPE_TEAM
             ? to
             : ''
         "
-        :goto-user-card="true"
-        width="35px"
-        height="35px"
-      />
-      <div class="msg-content">
-        <div class="msg-name" v-if="!props.msg.isSelf">
-          {{ appellation }}
+            :goto-user-card="true"
+            width="35px"
+            height="35px"
+        />
+        <div class="msg-content">
+          <div class="msg-name" v-if="!props.msg.isSelf">
+            {{ appellation }}
+          </div>
+          <MessageBubble
+              :manager="manager"
+              :msg="props.msg"
+              :tooltip-visible="true"
+              :bg-visible="true"
+              style="cursor: pointer"
+          >
+            <MessageAudio
+                :msg="props.msg"
+                :broadcastNewAudioSrc="broadcastNewAudioSrc"
+            />
+          </MessageBubble>
         </div>
-        <MessageBubble
-          :msg="props.msg"
-          :tooltip-visible="true"
-          :bg-visible="true"
-          style="cursor: pointer"
-        >
-          <MessageAudio
-            :msg="props.msg"
-            :broadcastNewAudioSrc="broadcastNewAudioSrc"
-          />
-        </MessageBubble>
+        <MessageIsRead v-if="props.msg?.isSelf" :msg="props.msg"></MessageIsRead>
       </div>
-      <MessageIsRead v-if="props.msg?.isSelf" :msg="props.msg"></MessageIsRead>
-    </div>
-    <!-- 通知消息-->
-    <MessageNotification
-      v-else-if="
+      <!-- 通知消息-->
+      <MessageNotification
+          v-else-if="
         props.msg.messageType ===
         V2NIMConst.V2NIMMessageType.V2NIM_MESSAGE_TYPE_NOTIFICATION
       "
-      :msg="props.msg"
-    />
-    <div
-      class="msg-common"
-      :style="{ flexDirection: !props.msg.isSelf ? 'row' : 'row-reverse' }"
-      v-else
-    >
-      <Avatar
-        :account="props.msg.senderId"
-        :teamId="
+          :msg="props.msg"
+      />
+      <div
+          class="msg-common"
+          :style="{ flexDirection: !props.msg.isSelf ? 'row' : 'row-reverse' }"
+          v-else
+      >
+        <Avatar
+            :account="props.msg.senderId"
+            :teamId="
           conversationType ===
           V2NIMConst.V2NIMConversationType.V2NIM_CONVERSATION_TYPE_TEAM
             ? to
             : ''
         "
-        :goto-user-card="true"
-        width="35px"
-        height="35px"
-      />
-      <div class="msg-content">
-        <div class="msg-name" v-if="!props.msg.isSelf">
-          {{ appellation }}
+            :goto-user-card="true"
+            width="35px"
+            height="35px"
+        />
+        <div class="msg-content">
+          <div class="msg-name" v-if="!props.msg.isSelf">
+            {{ appellation }}
+          </div>
+          <MessageBubble
+              :msg="props.msg"
+              :manager="manager"
+              :tooltip-visible="true"
+              :bg-visible="true"
+          >
+            {{ props.msg.text }}
+          </MessageBubble>
         </div>
-        <MessageBubble
-          :msg="props.msg"
-          :tooltip-visible="true"
-          :bg-visible="true"
-        >
-          [{{ t('unknowMsgText') }}]
-        </MessageBubble>
       </div>
-    </div>
-    <!-- 消息标记 不展示 pinState 为 0 、时间消息以及撤回消息的标记样式 -->
-    <div
-      class="msg-pin-tip"
-      v-if="
+      <!-- 消息标记 不展示 pinState 为 0 、时间消息以及撤回消息的标记样式 -->
+      <div
+          class="msg-pin-tip"
+          v-if="
         props.msg.pinState &&
         !(
           props.msg.messageType ===
@@ -419,32 +444,33 @@
         ) &&
         !props.msg.recallType
       "
-      :style="{ justifyContent: !props.msg.isSelf ? 'flex-start' : 'flex-end' }"
-    >
-      <Icon :size="11" type="icon-green-pin"></Icon>&nbsp;<span
-        v-if="props.msg.operatorId === accountId"
-        >{{ `${t('you')}` }}</span
+          :style="{ justifyContent: !props.msg.isSelf ? 'flex-start' : 'flex-end' }"
       >
-      <Appellation
-        v-else
-        :account="props.msg.operatorId"
-        :teamId="
+        <Icon :size="11" type="icon-green-pin"></Icon>&nbsp;<span
+          v-if="props.msg.operatorId === accountId"
+      >{{ `${t('you')}` }}</span
+      >
+        <Appellation
+            v-else
+            :account="props.msg.operatorId"
+            :teamId="
           conversationType ===
           V2NIMConst.V2NIMConversationType.V2NIM_CONVERSATION_TYPE_TEAM
             ? to
             : ''
         "
-        color="#3EAF96"
-        fontSize="11"
-      ></Appellation
-      >&nbsp;{{ `${t('pinThisText')}` }}
+            color="#3EAF96"
+            fontSize="11"
+        ></Appellation
+        >&nbsp;{{ `${t('pinThisText')}` }}
+      </div>
     </div>
   </div>
 </template>
 
 <script lang="ts" setup>
 /** 消息组件 */
-import { ref, computed, onUnmounted } from 'vue'
+import {ref, computed, onUnmounted, onMounted, watch} from 'vue'
 import Avatar from '../../../components/Avatar.vue'
 import MessageBubble from './message-bubble.vue'
 import ReplyMessage from './message-reply.vue'
@@ -453,27 +479,35 @@ import MessageText from './message-text.vue'
 import MessageAudio from './message-audio.vue'
 import MessageNotification from './message-notification.vue'
 import MessageG2 from './message-g2.vue'
-import { customNavigateTo } from '../../../utils/customNavigate'
+import {customNavigateTo} from '../../../utils/customNavigate'
 import MessageIsRead from './message-read.vue'
 import Icon from '../../../components/Icon.vue'
 import Appellation from '../../../components/Appellation.vue'
-import { events, MSG_ID_FLAG } from '../../../utils/constants'
-import { autorun } from 'mobx'
-import { stopAllAudio } from '../../../utils'
-import { t } from '../../../utils/i18n'
-import { V2NIMMessageForUI } from '@xkit-yx/im-store-v2/dist/types/types'
-import { V2NIMConst } from '../../../utils/nim'
+import {events, MSG_ID_FLAG} from '../../../utils/constants'
+import {autorun} from 'mobx'
+import {stopAllAudio} from '../../../utils'
+import {t} from '../../../utils/i18n'
+import {V2NIMMessageForUI} from '@xkit-yx/im-store-v2/dist/types/types'
+import {V2NIMConst} from '../../../utils/nim'
+import TeamMessageRead from "@/pages/Chat/message/team-message-read.vue";
 
+
+
+
+onMounted(() => {
+
+})
 const props = withDefaults(
-  defineProps<{
-    msg: V2NIMMessageForUI & { timeValue?: number }
-    index: number
-    replyMsgsMap?: {
-      [key: string]: V2NIMMessageForUI
-    }
-    broadcastNewAudioSrc: string
-  }>(),
-  {}
+    defineProps<{
+      msg: V2NIMMessageForUI & { timeValue?: number }
+      index: number
+      replyMsgsMap?: {
+        [key: string]: V2NIMMessageForUI
+      }
+      broadcastNewAudioSrc: string,
+      manager:boolean
+    }>(),
+    {}
 )
 
 /** 回复消息 */
@@ -488,12 +522,12 @@ const accountId = uni.$UIKitStore?.userStore?.myUserInfo.accountId
 
 /** 会话类型 */
 const conversationType =
-  uni.$UIKitNIM.V2NIMConversationIdUtil.parseConversationType(
-    props.msg.conversationId
-  ) as unknown as V2NIMConst.V2NIMConversationType
+    uni.$UIKitNIM.V2NIMConversationIdUtil.parseConversationType(
+        props.msg.conversationId
+    ) as unknown as V2NIMConst.V2NIMConversationType
 /** 会话对象 */
 const to = uni.$UIKitNIM.V2NIMConversationIdUtil.parseConversationTargetId(
-  props.msg.conversationId
+    props.msg.conversationId
 )
 
 /** 获取视频首帧 */
@@ -551,10 +585,10 @@ const appellationWatch = autorun(() => {
   appellation.value = uni.$UIKitStore.uiStore.getAppellation({
     account: props.msg.senderId,
     teamId:
-      conversationType ===
-      V2NIMConst.V2NIMConversationType.V2NIM_CONVERSATION_TYPE_TEAM
-        ? to
-        : '',
+        conversationType ===
+        V2NIMConst.V2NIMConversationType.V2NIM_CONVERSATION_TYPE_TEAM
+            ? to
+            : '',
   })
 })
 
@@ -573,14 +607,17 @@ onUnmounted(() => {
   display: flex;
   align-items: flex-start;
   font-size: 16px;
+
   message-is-read {
     align-self: flex-end;
   }
 }
+
 .msg-pin {
   opacity: 1;
   background: #fffbea;
 }
+
 .msg-pin-tip {
   font-size: 11px;
   font-weight: normal;

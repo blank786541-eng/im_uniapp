@@ -102,21 +102,21 @@ const handleAvatarClick = () => {
     if (props.isRedirect) {
       if (props.account === uni.$UIKitStore?.userStore?.myUserInfo.accountId) {
         customRedirectTo({
-          url: `/pages/User/my-detail/index`,
+          url: `/pages/User/my/my-detail`,
         })
       } else {
         customRedirectTo({
-          url: `/pages/User/friend/index?account=${props.account}`,
+          url: `/pages/User/friend/index?account=${props.account}&conversationId=${props.teamId}`,
         })
       }
     } else {
       if (props.account === uni.$UIKitStore?.userStore?.myUserInfo.accountId) {
         customNavigateTo({
-          url: `/pages/User/my-detail/index`,
+          url: `/pages/User/my/my-detail`,
         })
       } else {
         customNavigateTo({
-          url: `/pages/User/friend/index?account=${props.account}`,
+          url: `/pages/User/friend/index?account=${props.account}&conversationId=${props.teamId}`,
         })
       }
     }

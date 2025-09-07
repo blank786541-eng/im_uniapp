@@ -18,6 +18,7 @@ function initPlugin() {
     nimCallKit = (uni.$UIKitCallKit =
         uni.requireNativePlugin("netease-CallKit"));
 // #endif
+
 }
 
 function initNim(opts: { account: string; token: string; appkey: string }) {
@@ -26,6 +27,8 @@ function initNim(opts: { account: string; token: string; appkey: string }) {
         key: STORAGE_KEY,
         data: opts,
     });
+    console.warn(opts.appkey,'appkey=====')
+
     uni.showLoading();
     /** 是否开启云端会话（此处为了方便demo切换云端/本地会话，将其存到本地，实际需根据业务情况设置）*/
     const enableV2CloudConversation =
@@ -269,6 +272,7 @@ function initNim(opts: { account: string; token: string; appkey: string }) {
         // #endif
         // 判断时手动点击唤起 还是 点击推送通知栏唤起,点击通知栏唤起直接跳转到聊天页面
         if (!startByNotificationId) {
+
             uni.showToast({
                 title: "登录成功",
                 icon: 'success',
@@ -293,15 +297,23 @@ function initNim(opts: { account: string; token: string; appkey: string }) {
             }
         }
     }).catch((e) => {
+
         if (e.code == 102302) {
             uni.showToast({
                 title: "密码错误",
                 icon: "error",
+                duration:800,
+                success:()=>{
+
+                }
             })
         } else if (e.code == 102422) {
             uni.showToast({
                 title: e.message,
                 icon: "error",
+            })
+            uni.navigateTo({
+                url: `/pages/Login/login-form`,
             })
         }
 
@@ -354,7 +366,7 @@ function logout() {
     uni.$UIKitNIM.V2NIMLoginService.logout().then(() => {
         uni.$UIKitStore.destroy();
         customReLaunch({
-            url: "/pages/Login/index",
+            url: "/pages/Login/login-form",
         });
     });
 }

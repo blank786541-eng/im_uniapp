@@ -9,12 +9,19 @@ const props = withDefaults(
       showBack: boolean,
       showAction:boolean,
       tapAction:Function,
+      backgroundColor:string,
+      titleColor:string,
+      backIcon:string
     }>(),
     {
       title: '',
       showBack: true,
       showAction:false,
       tapAction:()=>{},
+      backgroundColor:"#fff",
+      titleColor:"#000",
+      backIcon:"back-b",
+
     }
 )
 
@@ -32,9 +39,9 @@ function backToConversation() {
 </script>
 
 <template>
-  <div class="default-header">
-    <div :style="{height:appStatusHeight}" class="header"></div>
-    <AssetsImage path="/static/back-b.png" width="21px" height="21px" @tap="backToConversation" class="back"
+  <div class="default-header" :style="{backgroundColor: backgroundColor,color:titleColor}">
+    <div :style="{height:appStatusHeight}" class="header" ></div>
+    <AssetsImage :path="`/static/${backIcon}.png`" width="21px" height="21px" @tap="backToConversation" class="back"
                  v-if="showBack"></AssetsImage>
     {{ props.title }}
     <div class="action" v-if="showAction">

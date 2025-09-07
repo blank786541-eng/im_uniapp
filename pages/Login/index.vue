@@ -26,7 +26,7 @@ onUnload(() => {
 @import '../styles/common.scss';
 
 page {
-  height: 100vh;
+  height: 100%;
   overflow: hidden;
 }
 </style>
