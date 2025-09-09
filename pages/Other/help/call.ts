@@ -197,12 +197,12 @@ export function addCallListeners(client: Client, callback: (event: CallEventType
 }
 
 
-export async function createTeamRoom(client: Client): {
+export async function createTeamRoom(client: Client): Promise<{
     roomInfo: V2NIMSignallingChannelInfo,
     channelName: string,
     requestId: string,
     streamId: string,
-} {
+}> {
     const requestId = `${Date.now()}${Math.random().toString(7)}`;
     const channelName = `${Date.now()}${Math.random().toString(36)}`;
     const uid = randomNumbers();
@@ -292,7 +292,7 @@ export async function createCallMessage(client: Client, channel: string, convers
 
 // 音频文件需放在static目录
 
-const audioMap = [<{
+let audioMap = [<{
     key: 'call' | 'jieting' | 'jujue',
     value: InnerAudioContext
 }>{
@@ -329,6 +329,21 @@ export function destoryAudio() {
         item.value.stop();
 
     })
+    audioMap = [<{
+        key: 'call' | 'jieting' | 'jujue',
+        value: InnerAudioContext
+    }>{
+        key: 'call',
+        value: uni.createInnerAudioContext()
+    }, {
+        key: 'jieting',
+        value: uni.createInnerAudioContext()
+    }, {
+        key: 'jujue',
+        value: uni.createInnerAudioContext()
+    },
+
+    ]
 }
 
 export function stopMusic(key: 'call' | 'jieting' | 'jujue') {

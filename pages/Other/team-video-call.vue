@@ -7,16 +7,13 @@
           <div style="width: 10px"></div>
           <span>{{ item.name || item.accountId }}</span>
           <div style="width: 10px"></div>
-          <AssetsImage :path="isSilence?'/static/video_close.png':'/static/audio1.png'" width="20px" height="20px"/>
+          <AssetsImage :path="isSilence?'/static/video_close.png':'/static/audio1.png'" width="20px" height="20px"
+                       v-if="creater" @tap="muteUserAudio(item)"/>
           <div style="width: 10px"></div>
-          <AssetsImage path="/static/cancel.png" width="16px" height="16px"/>
+          <AssetsImage path="/static/cancel.png" width="16px" height="16px" @tap="nickUser(item.accountId)"
+                       v-if="creater"/>
         </div>
-        <!--        <div class="flex-box user-item " @tap="toAddUser">-->
-        <!--          <div>-->
-        <!--            <AssetsImage path="/static/add-white.png" width="32px" height="32px"></AssetsImage>-->
-        <!--          </div>-->
 
-        <!--        </div>-->
       </div>
       <div style="flex:1" class="flex-center flex-direction-column">
         <avatar :account="query.uid" v-if="!creater"></avatar>
@@ -90,7 +87,7 @@ let changeName: string = "";
 let requestId: string = "";
 let client: Client;
 let localStream: Stream;
-let remoteStreams: Stream = [];
+let remoteStreams: Stream[] = [];
 let localUid;
 let joinRoomInfo: V2NIMSignallingRoomInfo;
 const creater = ref(false);
@@ -98,6 +95,7 @@ let query = reactive({
   uid: "",
   roomId: null,
   requestId: "",
+  channelName: "",
   type: 1,
 })
 const connect = ref(false);
@@ -144,9 +142,13 @@ async function muteAudio() {
   closeVolume.value = !closeVolume.value;
   if (closeVolume.value) {
 
-    await (remoteStreams as Stream).stop("audio");
+    remoteStreams.forEach((stream) => {
+      stream.muteAudio()
+    })
   } else {
-    await (remoteStreams as Stream).resume("audio");
+    remoteStreams.forEach((stream) => {
+      stream.unmuteAudio()
+    })
   }
 
 }
@@ -316,10 +318,10 @@ async function getUsers() {
 
   userInfos.value = await uni.$UIKitStore.userStore.getUserListFromCloudActive(ids)
 
-  let findIndex=userInfos.value.findIndex((item)=>item.accountId==uni.$UIKitStore.userStore.myUserInfo.accountId);
+  let findIndex = userInfos.value.findIndex((item) => item.accountId == uni.$UIKitStore.userStore.myUserInfo.accountId);
 
-  if(findIndex>-1){
-     userInfos.value.splice(findIndex,1);
+  if (findIndex > -1) {
+    userInfos.value.splice(findIndex, 1);
   }
 
 }
@@ -368,8 +370,8 @@ async function destroy() {
       if (data.members.length == 0) {
         uni.$emit('open-team-call', {
           teamId: null,
-          requestId: obj.requestId,
-          channelName: obj.channelName,
+          requestId: null,
+          channelName: null,
           channelId: roomsInfo.channelId,
           inviterAccountId: uni.$UIKitStore.userStore.myUserInfo.accountId
         })
@@ -423,8 +425,12 @@ onUnmounted(() => {
         }).then(res => {
       localStream.destroy();
     })
-    remoteStreams.stop();
-    remoteStreams.destroy();
+    remoteStreams.forEach((remoteStream) => {
+      remoteStream.stop()
+    });
+    remoteStreams.forEach((remoteStream) => {
+      remoteStream.destroy()
+    });
 
   }
   removeListeners(client)
@@ -492,11 +498,12 @@ uni.$on('on-invite', (data: V2NIMSignallingEvent) => {
   // }
 })
 
-function toAddUser() {
-  const teamId = uni.getStorageSync('callTeamId')
-  customNavigateTo({
-    url: `/pages/Other/select-call-user?teamId=${teamId}&type=add`,
-  })
+function nickUser(accountId: string) {
+  uni.$UIKitNIM.V2NIMSignallingService.sendControl(query.roomId, accountId, 'kickByCreate');
+}
+
+function muteUserAudio(item) {
+  uni.$UIKitNIM.V2NIMSignallingService.sendControl(query.roomId, item.accountId, 'muteUser');
 }
 </script>
 <style scoped lang="scss">

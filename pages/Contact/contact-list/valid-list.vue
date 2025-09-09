@@ -287,6 +287,9 @@ const validMsgWatch = autorun(() => {
 onUnmounted(() => {
   validMsgWatch()
 })
+onMounted(() => {
+  uni.$UIKitStore.sysMsgStore.setAllApplyMsgRead();
+})
 </script>
 
 <style lang="scss" scoped>
