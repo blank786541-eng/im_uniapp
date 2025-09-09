@@ -5,7 +5,7 @@ import {onUnmounted, reactive, ref} from "vue";
 import {
   addCallListeners,
   CallEventType,
-  destoryAudio,
+  destoryAudio, formatterTime,
   playMusic,
   randomNumbers,
   removeListeners, stopMusic
@@ -23,6 +23,8 @@ import {
 import {V2NIMConst} from "@/utils/nim";
 import {Stream} from "nertc-web-sdk/types/stream";
 import config from "@/utils/config";
+import {V2NIMMessage} from "nim-web-sdk-ng/dist/esm/nim/src/V2NIMMessageService";
+import {events} from "@/utils/constants";
 
 let client: Client;
 const connect = ref(false);  //双方的链接状态
@@ -86,7 +88,7 @@ onLoad(async (options) => {
     createRoom();
   }
 
-  playMusic('/static/call-music.mp3','call')
+  playMusic('/static/call-music.mp3', 'call')
 })
 
 
@@ -101,10 +103,10 @@ onUnmounted(async () => {
     })
     (params.remoteStreams as Stream).destroy();
   }
-  destoryAudio();
-
   removeListeners(client)
   uni.$off('on-invite')
+  destoryAudio();
+
 })
 
 function removeStream(stream, userId) {
@@ -132,12 +134,20 @@ async function addStream(stream, userId) {
 }
 
 
-
-
 async function destory() {
-  playMusic('/static/call-stop.mp3','jieting')
+  playMusic('/static/call-stop.mp3', 'jieting')
+  const id=uni.$UIKitNIM.V2NIMConversationIdUtil.p2pConversationId(
+      query.uid
+  )
   if (connect.value) {
+    createCallMessage({
+      channelInfo: {
+        channelId: query.roomId,
+      },
+      operatorAccountId: uni.$UIKitStore.userStore.myUserInfo.accountId,
+    },1,id || uni.getStorageSync('currentConversation'))
     close();
+
     return;
   }
 
@@ -147,13 +157,34 @@ async function destory() {
       inviteeAccountId: query.uid,
       channelId: room.roomInfo.channelInfo.channelId
     })
+    // createCallMessage({
+    //   channelInfo: {
+    //     channelId: query.roomId,
+    //   },
+    //   operatorAccountId: uni.$UIKitStore.userStore.myUserInfo.accountId,
+    // },2,id)
   } else {
     await uni.$UIKitNIM.V2NIMSignallingService.rejectInvite({
       channelId: query.roomId,
       inviterAccountId: query.uid,
       requestId: query.requestId
     });
+    createCallMessage({
+      channelInfo: {
+        channelId: query.roomId,
+      },
+      operatorAccountId: uni.$UIKitStore.userStore.myUserInfo.accountId,
+    },3,id)
+  // |1|query.uid
+
+
+    console.log(`${id}`,'uni.$UIKitStore.userStore.myUserInfo.accountId|1|query.uid')
   }
+  if (timer) {
+    clearInterval(timer);
+    timer = null;
+  }
+  uni.navigateBack();
 }
 
 async function close() {
@@ -164,33 +195,29 @@ async function close() {
 
     await client.leave();
   }
-
+  if (timer) {
+    clearInterval(timer);
+    timer = null;
+  }
   uni.navigateBack();
 }
 
+const time=ref('');
 
 function getLocalAudioStats() {
-
   timer = setInterval(async () => {
-    const localVideoStats = await client.getLocalAudioStats();
-    for (var i in localVideoStats) {
-      let mediaType = (i === 0 ? "video" : "screen")
-      console.log(`===== localVideoStats ${mediaType} =====`);
-      console.log(`${mediaType} CaptureFrameRate: ${localVideoStats[i].CaptureFrameRate}`);
-      console.log(`${mediaType} CaptureResolutionHeight: ${localVideoStats[i].CaptureResolutionHeight}`);
-      console.log(`${mediaType} CaptureResolutionWidth: ${localVideoStats[i].CaptureResolutionWidth}`);
-      console.log(`${mediaType} EncodeDelay: ${localVideoStats[i].EncodeDelay}`);
-      console.log(`${mediaType} MuteState: ${localVideoStats[i].MuteState}`);
-      console.log(`${mediaType} SendBitrate: ${localVideoStats[i].SendBitrate}`);
-      console.log(`${mediaType} SendFrameRate: ${localVideoStats[i].SendFrameRate}`);
-      console.log(`${mediaType} SendResolutionHeight: ${localVideoStats[i].SendResolutionHeight}`);
-      console.log(`${mediaType} SendResolutionWidth: ${localVideoStats[i].SendResolutionWidth}`);
-      console.log(`${mediaType} TargetSendBitrate: ${localVideoStats[i].TargetSendBitrate}`);
-      console.log(`${mediaType} TotalDuration: ${localVideoStats[i].TotalDuration}`);
-      console.log(`${mediaType} TotalFreezeTime: ${localVideoStats[i].TotalFreezeTime}`);
-    }
-  }, 1000)
+    // 加入房间之后调用
+    let sessionStats = await client.getSessionStats()
+    console.log(`===== sessionStats =====`)
+    console.log(`Duration: ${sessionStats.Duration}`)
 
+    time.value=formatterTime(sessionStats.Duration)
+    console.log(`RecvBitrate: ${sessionStats.RecvBitrate}`)
+    console.log(`RecvBytes: ${sessionStats.RecvBytes}`)
+    console.log(`SendBitrate: ${sessionStats.SendBitrate}`)
+    console.log(`SendBytes: ${sessionStats.SendBytes}`)
+    console.log(`UserCount: ${sessionStats.UserCount}`)
+  }, 1000)
 }
 
 
@@ -199,11 +226,19 @@ const closeVolume = ref(false);
 async function muteAudio() {
   closeVolume.value = !closeVolume.value;
   if (closeVolume.value) {
+    params.remoteStreams.forEach((remoteStream: Stream) => {
+      remoteStream
+          .stop("audio")
 
-    await (params.remoteStreams as Stream).stop("audio");
+    });
   } else {
-    await (params.remoteStreams as Stream).resume("audio");
+    params.remoteStreams.forEach((remoteStream: Stream) => {
+      remoteStream
+          .resume()
+      ;
+    });
   }
+
 
 }
 
@@ -314,7 +349,8 @@ async function createRoom() {
     channelName: query.roomId,
     calleeAccountId: query.uid,
     requestId: requestId,
-    channelType:  V2NIMConst.V2NIMSignallingChannelType.V2NIM_SIGNALLING_CHANNEL_TYPE_AUDIO
+    serverExtension: uni.getStorageSync('currentConversation'),
+    channelType: V2NIMConst.V2NIMSignallingChannelType.V2NIM_SIGNALLING_CHANNEL_TYPE_AUDIO
   })
   if (room.callStatus != 200) {
     uni.showToast({
@@ -358,7 +394,7 @@ async function joinRoom() {
     channelName: query.audioRoomId,
     uid: randomNumbers()
   })
-  playMusic('/static/call-stop.mp3','jieting')
+  playMusic('/static/call-stop.mp3', 'jieting')
   addCallListeners(client, (type: CallEventType, data) => {
 
 
@@ -392,15 +428,18 @@ async function joinRoom() {
 
 uni.$on('on-invite', (data: V2NIMSignallingEvent) => {
   const type = data.eventType;
+  const otherid=uni.$UIKitNIM.V2NIMConversationIdUtil.p2pConversationId(
+      query.uid
+  )
   if (type == 6) {
     userIsJoin.value = true;
     stopMusic('call');
-    playMusic('/static/call-stop.mp3','jieting')
+    playMusic('/static/call-stop.mp3', 'jieting')
     initLocalStream();
     addCallListeners(client, (type: CallEventType, data) => {
       if (type == CallEventType.PeerOnline) {
         connect.value = true;
-      }else if (type == CallEventType.PeerLeave) {
+      } else if (type == CallEventType.PeerLeave) {
 
       } else if (type == CallEventType.StreamAdded) {
         addStream(data.stream, data.uid)
@@ -426,11 +465,83 @@ uni.$on('on-invite', (data: V2NIMSignallingEvent) => {
       }
     })
 
-  } else if (type == 4 || type == 5 || type == 7) {
-    close();
-    playMusic('jujue');
+  } else if (type == 4) {
+
+    uni.showToast({
+      title: "已取消",
+      icon: "none",
+      duration: 1000,
+      success: () => {
+
+        playMusic('jujue');
+        createCallMessage(data,2,otherid)
+        close();
+      }
+    })
+
+
+  } else if (type == 5) {
+    const msg = data.operatorAccountId == data.inviterAccountId ? "已取消" : '对方已拒绝';
+    uni.showToast({
+      title: msg,
+      icon: "none",
+      duration: 1000,
+      success: () => {
+
+        playMusic('jujue');
+
+        const id=data.operatorAccountId == data.inviterAccountId?uni.getStorageSync('currentConversation'):otherid
+        createCallMessage(data,2,id)
+
+        close();
+      }
+    })
+  } else if (type == 7) {
+    uni.showToast({
+      title: "对方已挂断",
+      icon: "none",
+      duration: 1000,
+      success: () => {
+        createCallMessage(data,2,uni.getStorageSync('currentConversation'))
+
+        playMusic('jujue',);
+
+        close();
+      }
+    })
+
   }
 })
+
+function createCallMessage(data,type,conversationID) {
+
+  console.warn(data, 'data====');
+  const msg = uni.$UIKitNIM.V2NIMMessageCreator.createCallMessage(1, data.channelInfo.channelId, type || 1, [{
+    accountId: query.uid,
+    /**
+     * 通话时长
+     */
+    duration: 0
+  }, {
+    accountId: uni.$UIKitStore.userStore.myUserInfo.accountId,
+    /**
+     * 通话时长
+     */
+    duration: 0
+  }])
+
+
+
+  uni.$UIKitStore.msgStore
+      .sendMessageActive({
+        msg: msg as unknown as V2NIMMessage,
+        conversationId: conversationID ,
+        conversationType: V2NIMConst.V2NIMConversationType.V2NIM_CONVERSATION_TYPE_P2P,
+        sendBefore: () => {
+          uni.$emit(events.CLOSE_AIT_POPUP)
+        },
+      })
+}
 
 </script>
 
@@ -447,7 +558,7 @@ uni.$on('on-invite', (data: V2NIMSignallingEvent) => {
         {{ createUser ? '等待对方接听。。。' : "邀请你语音通话" }}
       </div>
       <div class="default-text font-14" style="color:#fff;margin-top: 6px;" v-else>
-        正在通话中
+        正在通话中&nbsp;&nbsp;&nbsp;{{time}}
       </div>
     </div>
     <div class="call-action" v-if="!connect">

@@ -61,6 +61,7 @@ onLoad((props) => {
         stateMap.get(item.accountId) &&
         uni.$UIKitStore.localOptions.loginStateVisible
     ) {
+
       login =
           stateMap.get(item.accountId)?.statusType ===
           V2NIMConst.V2NIMUserStatusType.V2NIM_USER_STATUS_TYPE_LOGIN
@@ -68,6 +69,8 @@ onLoad((props) => {
     } else {
       login = false
     }
+
+
     return {
       accountId: item.accountId,
 

@@ -1,5 +1,5 @@
 <template>
-  <div class="g2-message-wrapper" @click="handleCall">
+  <div class="g2-message-wrapper" >
     <Icon :type="iconType" :size="28"></Icon>
     <div class="g2-message-status">{{ status }}</div>
     <div v-if="duration" class="g2-message-duration">{{ duration }}</div>
@@ -14,6 +14,7 @@ import { t } from '../../../utils/i18n'
 import { convertSecondsToTime, startCall, isApp } from '../../../utils'
 import { g2StatusMap } from '../../../utils/constants'
 import { V2NIMMessageForUI } from '@xkit-yx/im-store-v2/dist/types/types'
+import {onMounted} from "vue";
 
 const props = withDefaults(defineProps<{ msg: V2NIMMessageForUI }>(), {})
 
@@ -28,6 +29,10 @@ const status = g2StatusMap[props.msg.attachment?.status]
 const iconType =
   //@ts-expect-error
   props.msg.attachment?.type == 1 ? 'icon-yuyin8' : 'icon-shipin8'
+
+onMounted(()=>{
+  console.log(props.msg,'-------');
+})
 
 /** 发起呼叫 */
 const handleCall = () => {

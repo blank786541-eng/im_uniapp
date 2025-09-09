@@ -91,52 +91,21 @@ export default {
     });
     uni.$UIKitNIM.V2NIMSignallingService.on("onOnlineEvent", (data:V2NIMSignallingEvent) => {
       console.warn(data,'onOnlineEvent=====')
-      const create=data.inviterAccountId;
       if(data.eventType==3){
         if(data.serverExtension=="teamcall"){
           customNavigateTo({
             url: `/pages/Other/team-video-call?uid=${data.inviterAccountId}&channelName=${data.channelInfo.channelName}&roomId=${data.channelInfo.channelId}&requestId=${data.requestId}&type=${data.channelInfo.channelType}`,
           })
         }else{
+          uni.setStorageSync('currentConversation',data.serverExtension);
           customNavigateTo({
             url: `/pages/Other/video-call?uid=${data.inviterAccountId}&audioRoomId=${data.channelInfo.channelName}&roomId=${data.channelInfo.channelId}&requestId=${data.requestId}&type=${data.channelInfo.channelType}`,
           })
         }
 
-      }else  if (data.eventType == 6) {
-
+      }else {
 
         uni.$emit('on-invite',data)
-      } else if (data.eventType ==5) {
-
-        const msg=data.operatorAccountId==create?"已取消":'对方已拒绝';
-        uni.showToast({
-          title: msg,
-          icon: "none",
-          duration: 1000,
-          success: () => {
-            uni.$emit('on-invite',data)
-          }
-        })
-      } else if (data.eventType ==4) {
-        const msg=data.operatorAccountId!=create?"已取消":'对方已取消';
-        uni.showToast({
-          title: msg,
-          icon: "none",
-          duration: 1000,
-          success: () => {
-            uni.$emit('on-invite',data)
-          }
-        })
-      }else if (data.eventType == 7) {
-        uni.showToast({
-          title: "对方已挂断",
-          icon: "none",
-          duration: 1000,
-          success: () => {
-            uni.$emit('on-invite',data)
-          }
-        })
       }
     })
     onImShowApp()

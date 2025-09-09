@@ -63,7 +63,7 @@ async function selectAction(item: any, event: any) {
       icon: 'warning'
     })
   } else {
-
+    uni.setStorageSync('currentConversation',props.conversationId)
     if(props.conversationType== V2NIMConst.V2NIMConversationType.V2NIM_CONVERSATION_TYPE_P2P){
       customNavigateTo({
         url: `/pages/Other/video-call?uid=${props.otherAccountId}&type=1` ,
@@ -71,6 +71,7 @@ async function selectAction(item: any, event: any) {
     }else{
       // uni.setStorageSync('inviteUsers',["778899","123456"])
       // const userInfo=uni.$UIKitStore.userStore.myUserInfo;
+      uni.setStorageSync('callTeamId',props.otherAccountId)
       customNavigateTo({
         url: `/pages/Other/select-call-user?teamId=${props.otherAccountId}` ,
       })

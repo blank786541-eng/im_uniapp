@@ -33,6 +33,22 @@ export function getExtentionData(data: string): { channelName: string, uid: stri
     return result;
 }
 
+
+export function getParamsValues(value: string): {
+    name: string,
+    accountId: string
+} {
+    const arr = value.split('&');
+    let obj = {}
+
+    arr.forEach(item => {
+        let value = item.split("=");
+        obj[value[0]] = value[1];
+    })
+
+    return obj;
+}
+
 export function removeListeners(client: Client) {
     client.off(CallEventType.StreamRemove);
     client.off(CallEventType.StreamAdded);
@@ -60,7 +76,7 @@ export function addCallListeners(client: Client, callback: (event: CallEventType
     });
     client.on("peer-leave", (evt) => {
         console.warn(`${evt.uid} 离开房间`);
-        console.warn(`${evt.uid} 离开房间`);
+        console.warn(`${evt.reason} 离开房间`);
         // this.remoteStreams = this.remoteStreams.filter(
         //     (item) => !!item.getId() && item.getId() !== evt.uid
         // );
@@ -238,23 +254,19 @@ export function randomNumbers() {
 }
 
 
-export function startCount(callback: Function) {
-    let time = 0;
+export function formatterTime(times: number | any) {
     let timeFormat = "";
-    let timer = setInterval(() => {
-        time += 1;
-
-        if (time < 10) {
-            timeFormat = "00:0" + time;
-        } else if (time > 10) {
-            timeFormat = "00:" + time;
-        } else {
-            const hour = Math.floor((time / 60)) < 10 ? '0' + Math.floor((time / 60)) : Math.floor((time / 60));
-            const min = time % 60 < 10 ? '0' + time % 60 : time % 60;
-            timeFormat = `${hour}:${min}`;
-        }
-        callback(time, timer);
-    }, 1000)
+    let time = Math.ceil(times);
+    if (time < 10) {
+        timeFormat = "00:0" + time;
+    } else if (time > 10) {
+        timeFormat = "00:" + time;
+    } else {
+        const hour = Math.floor((time / 60)) < 10 ? '0' + Math.floor((time / 60)) : Math.floor((time / 60));
+        const min = time % 60 < 10 ? '0' + time % 60 : time % 60;
+        timeFormat = `${hour}:${min}`;
+    }
+    return timeFormat;
 }
 
 
@@ -299,13 +311,15 @@ const audioMap = [<{
 // 播放控制
 export function playMusic(path: string, key: 'call' | 'jieting' | 'jujue',) {
     const audio: InnerAudioContext = audioMap.find((item) => item.key === key)?.value;
+    if (audio) {
+        audio.src = path;
+        if (key == 'call') {
+            audio.loop = true;
+        }
 
-    audio.src = path;
-    if (key == 'call') {
-        audio.loop = true;
+        audio.play();
     }
 
-    audio.play();
 
 }
 

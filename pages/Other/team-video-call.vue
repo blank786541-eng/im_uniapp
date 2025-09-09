@@ -1,20 +1,29 @@
 <template>
   <div class="call-wrapper">
     <div class="flex-box flex-direction-column" style="height:100%">
-      <div class="flex-box " style="flex-wrap: wrap;">
+      <div class="flex-box " style="flex-wrap: wrap;padding:10px">
         <div v-for="(item,index) in userInfos" :key="index" class="flex-box user-item ">
           <Avatar :account="item.accountId" width="30px" height="30px"></Avatar>
           <div style="width: 10px"></div>
           <span>{{ item.name || item.accountId }}</span>
-<!--          <div style="width: 10px"></div>-->
-<!--          <AssetsImage :path="isSilence?'/static/video_close.png':'/static/audio1.png'" width="20px" height="20px"/>-->
-<!--          <div style="width: 10px"></div>-->
-<!--          <AssetsImage path="/static/cancel.png" width="16px" height="16px"/>-->
+          <div style="width: 10px"></div>
+          <AssetsImage :path="isSilence?'/static/video_close.png':'/static/audio1.png'" width="20px" height="20px"/>
+          <div style="width: 10px"></div>
+          <AssetsImage path="/static/cancel.png" width="16px" height="16px"/>
         </div>
+        <!--        <div class="flex-box user-item " @tap="toAddUser">-->
+        <!--          <div>-->
+        <!--            <AssetsImage path="/static/add-white.png" width="32px" height="32px"></AssetsImage>-->
+        <!--          </div>-->
+
+        <!--        </div>-->
       </div>
       <div style="flex:1" class="flex-center flex-direction-column">
         <avatar :account="query.uid" v-if="!creater"></avatar>
-        <div class="default-text font-14" style="color:#fff">{{ creater ? '等待用户加入' : "邀请您加入群语音" }}</div>
+        <div class="default-text font-14" style="color:#fff;margin-top: 15px">{{
+            creater ? '等待用户加入' : "加入群语音"
+          }}
+        </div>
       </div>
       <div class="flex-box" style="margin-bottom: 60px;justify-content: space-around" v-if="!connect">
         <AssetsImage
@@ -57,7 +66,7 @@ import {onUnmounted, reactive, ref} from "vue";
 import {
   addCallListeners,
   CallEventType,
-  createTeamRoom, destory, destoryAudio,
+  createTeamRoom, destory, destoryAudio, getParamsValues,
   playMusic,
   randomNumbers,
   removeListeners, stopMusic
@@ -72,6 +81,7 @@ import {Stream} from "nertc-web-sdk/types/stream";
 import {V2NIMUser} from "nim-web-sdk-ng/dist/v2/NIM_UNIAPP_SDK/V2NIMUserService";
 import config from "@/utils/config";
 import {storeUtils} from "@xkit-yx/im-store-v2";
+import {customNavigateTo} from "@/utils/customNavigate";
 
 const isSilence = ref(false);
 const userInfos = ref<V2NIMUser[]>([]);
@@ -91,6 +101,7 @@ let query = reactive({
   type: 1,
 })
 const connect = ref(false);
+const accountName = `name=${uni.$UIKitStore.userStore.myUserInfo.name || uni.$UIKitStore.userStore.myUserInfo.accountId}&accountId=${uni.$UIKitStore.userStore.myUserInfo.accountId}`;
 onLoad(async (options) => {
   client = NERTC.createClient({
     appkey: config.appKey,
@@ -108,14 +119,22 @@ onLoad(async (options) => {
     addListeners();
     creater.value = true;
     query.roomId = roomsInfo.channelId
+    query.channelName = obj.channelName;
     console.warn(obj, 'obj======')
+    uni.$emit('open-team-call', {
+      teamId: options.teamId,
+      requestId: obj.requestId,
+      channelName: obj.channelName,
+      channelId: roomsInfo.channelId,
+      inviterAccountId: uni.$UIKitStore.userStore.myUserInfo.accountId
+    })
   } else {
     changeName = options.roomId;
     requestId = options.requestId;
     localUid = randomNumbers();
     query = options;
   }
-  playMusic('/static/call-music.mp3','call')
+  playMusic('/static/call-music.mp3', 'call')
 
 })
 
@@ -259,9 +278,12 @@ async function joinRoom() {
   stopMusic('call');
 
 
-  playMusic('/static/call-stop.mp3','jieting')
+  playMusic('/static/call-stop.mp3', 'jieting')
   console.log(query, 'joinRoom=====');
   try {
+    await uni.$UIKitNIM.V2NIMSignallingService.joinRoom({
+      channelId: query.roomId
+    })
     await uni.$UIKitNIM.V2NIMSignallingService.acceptInvite({
       channelId: query.roomId,
       inviterAccountId: query.uid,
@@ -281,16 +303,29 @@ async function joinRoom() {
   initLocalStream();
 
   addListeners();
-  joinRoomInfo = await uni.$UIKitNIM.V2NIMSignallingService.getRoomInfoByChannelName(query.channelName);
+
 
   console.log(joinRoomInfo, 'joinRoomInfo=====')
+  getUsers();
+}
+
+
+async function getUsers() {
+  joinRoomInfo = await uni.$UIKitNIM.V2NIMSignallingService.getRoomInfoByChannelName(query.channelName);
   let ids = joinRoomInfo.members.map((item) => item.accountId);
 
   userInfos.value = await uni.$UIKitStore.userStore.getUserListFromCloudActive(ids)
+
+  let findIndex=userInfos.value.findIndex((item)=>item.accountId==uni.$UIKitStore.userStore.myUserInfo.accountId);
+
+  if(findIndex>-1){
+     userInfos.value.splice(findIndex,1);
+  }
+
 }
 
 async function destroy() {
-  playMusic('/static/call-stop.mp3','jujue')
+  playMusic('/static/call-stop.mp3', 'jujue')
   if (!connect.value) {
     if (!creater.value) {
 
@@ -299,6 +334,7 @@ async function destroy() {
           channelId: query.roomId,
           inviterAccountId: query.uid,
           requestId: query.requestId,
+          serverExtension: accountName
         });
       } catch (e) {
         console.log(e.toString(), 'e.toString()', e.message.toString());
@@ -323,11 +359,21 @@ async function destroy() {
   } else {
 
 
-
-    let channelId:string=creater.value?roomsInfo.channelId:joinRoomInfo.channelInfo.channelId
+    let channelId: string = creater.value ? roomsInfo.channelId : joinRoomInfo.channelInfo.channelId
     console.warn(channelId, 'destroy=======');
     try {
       await uni.$UIKitNIM.V2NIMSignallingService.leaveRoom(channelId);
+      let data: V2NIMSignallingRoomInfo = await uni.$UIKitNIM.V2NIMSignallingService.getRoomInfoByChannelName(query.channelName);
+
+      if (data.members.length == 0) {
+        uni.$emit('open-team-call', {
+          teamId: null,
+          requestId: obj.requestId,
+          channelName: obj.channelName,
+          channelId: roomsInfo.channelId,
+          inviterAccountId: uni.$UIKitStore.userStore.myUserInfo.accountId
+        })
+      }
     } catch (e) {
       console.log(e.toString(), 'error======')
     }
@@ -388,18 +434,70 @@ uni.$on('on-invite', (data: V2NIMSignallingEvent) => {
 
   const type = data.eventType;
   if (type == 6) {
+    connect.value = true;
     stopMusic('call')
-    playMusic('/static/call-stop.mp3','jieting')
+    playMusic('/static/call-stop.mp3', 'jieting')
     addListeners();
     initLocalStream();
-  } else if (type == 4 || type == 5) {
-    destroy();
+  } else if (type == 5) {
+    if (creater.value) {
+      const obj = getParamsValues(data.serverExtension);
+
+      uni.showToast({
+        title: `${obj.name} 已拒绝加入`,
+        success: () => {
+          stopMusic('call')
+          playMusic('/static/call-stop.mp3', 'jieting')
+          let ids: Array = uni.getStorageSync('inviteUsers');
+          let index = ids.indexOf(obj.accountId);
+          if (index > -1) {
+            ids.splice(index, 1);
+            uni.setStorageSync('inviteUsers', ids);
+          }
+          getUsers();
+
+        }
+      })
+    } else {
+      destroy();
+    }
   } else if (type == 7) {
-    destroy();
+    const obj = getParamsValues(data.serverExtension);
+
+    uni.showToast({
+      title: `${obj.name} 已离开`,
+      success: () => {
+        stopMusic('call')
+        playMusic('/static/call-stop.mp3', 'jieting')
+        getUsers();
+      }
+    })
+  } else if (type == 4) {
+    uni.showToast({
+      title: "已取消",
+      icon: "none",
+      duration: 1000,
+      success: () => {
+
+        playMusic('jujue');
+        destroy();
+      }
+    })
+
   }
+  // } else if (type == 4 || type == 5) {
+  //   destroy();
+  // } else if (type == 7) {
+  //   destroy();
+  // }
 })
 
-
+function toAddUser() {
+  const teamId = uni.getStorageSync('callTeamId')
+  customNavigateTo({
+    url: `/pages/Other/select-call-user?teamId=${teamId}&type=add`,
+  })
+}
 </script>
 <style scoped lang="scss">
 .call-wrapper {
@@ -412,7 +510,6 @@ uni.$on('on-invite', (data: V2NIMSignallingEvent) => {
 
 .user-item {
   margin-top: 20px;
-  margin-right: 20px;
   color: #fff;
   font-size: 14px;
   align-items: center;
@@ -421,6 +518,7 @@ uni.$on('on-invite', (data: V2NIMSignallingEvent) => {
   padding: 10px;
   background-color: #1C1A21;
   border-radius: 10px;
+  margin-right: 10px
 }
 
 .call-action {

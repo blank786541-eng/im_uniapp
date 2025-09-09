@@ -15,10 +15,13 @@
     <!--      <NetworkAlert />-->
     <!--    </div>-->
     <MessageHeader :title="title" :conversation-type="conversationType" :to="to" @tap.stop="closeInput"></MessageHeader>
-    <div class="announcement" @tap.stop="closeInput" v-if="team">
+    <div class="announcement" @tap.stop="closeInput" v-if="team && !teamCallData.isCurrentTeam">
       <AssetsImage path="/static/gonggao.png" width="14px" height="14px" style="margin-right: 4px"></AssetsImage>
       <span style="flex:1">{{ team.announcement }}</span>
       <!--      <AssetsImage path="/static/cancel.png" width="14px" height="14px" @tap="close"></AssetsImage>-->
+    </div>
+    <div class="announcement" @tap.stop="joinTeamCall" v-else>
+      <span style="flex:1">正在群语音</span>
     </div>
     <div :class="isH5 ? 'msg-wrapper-h5' : 'msg-wrapper'" @tap.stop="closeInput">
       <MessageList
@@ -48,7 +51,7 @@ import {onShow, onHide} from '@dcloudio/uni-app'
 import {events} from '../../utils/constants'
 import {trackInit} from '../../utils/reporter'
 import {autorun} from 'mobx'
-import {ref, onMounted, onUnmounted} from 'vue'
+import {ref, onMounted, onUnmounted, reactive} from 'vue'
 import {getUniPlatform} from '../../utils'
 import {onLoad, onUnload} from '@dcloudio/uni-app'
 import {customNavigateTo, customSwitchTab} from '../../utils/customNavigate'
@@ -628,6 +631,13 @@ onMounted(() => {
 //   closeNotice.value = false
 // }
 //卸载相关事件监听
+
+
+function  joinTeamCall(){
+  customNavigateTo({
+    url: `/pages/Other/team-video-call?uid=${teamCallData.inviterAccountId}&channelName=${teamCallData.channelName}&roomId=${teamCallData.channelId}&requestId=${teamCallData.requestId}&type=1}`,
+  })
+}
 onUnmounted(() => {
   teamWatch();
   uni.$UIKitNIM.V2NIMTeamService.off('onTeamDismissed', onTeamDismissed)
@@ -639,12 +649,38 @@ onUnmounted(() => {
   )
 
   uni.$off(events.GET_HISTORY_MSG, loadMoreMsgs)
+  uni.$off('open-team-call')
   /** 移除store的数据监听 */
   connectedWatch()
   msgsWatch()
   statusWatch()
   conversationTypeWatch()
 })
+
+let teamCallData=reactive<{
+  isCurrentTeam:boolean,
+  requestId:string,
+  channelName:string,
+  channelId:string,
+  teamId:string,
+}>({
+  isCurrentTeam:false
+})
+// uni.$on('open-team-call',(data=>{
+//   console.warn('open-team-call',data);
+//   teamCallData={
+//     isCurrentTeam:data.teamId==to,
+//     teamId:data.teamId,
+//     requestId:data.requestId,
+//     channelName:data.channelName,
+//     channelId:data.channelId,
+//     inviterAccountId:data.inviterAccountId,
+//   }
+//   // teamId:options.teamId,
+//   //     requestId:obj.requestId,
+//   //     changeName,
+//   //     channelId:roomsInfo.channelId
+// }))
 
 onHide(() => {
   uni.hideKeyboard()
