@@ -24,6 +24,7 @@ import {customNavigateTo} from "@/utils/customNavigate";
 const friendList = ref<PersonSelectItem[]>([])
 // 群ID
 let teamId = ''
+let conversationId = ''
 
 let newTeamMember: string[] = []
 
@@ -43,15 +44,15 @@ const addTeamMember = debounce(() => {
   }
   uni.setStorageSync('inviteUsers', newTeamMember)
   customNavigateTo({
-    url: `/pages/Other/team-video-call?type=2`,
+    url: `/pages/Other/team-video-call?type=2&teamId=${teamId}&conversationId=${conversationId}`,
   })
 }, 400)
 
 onLoad((props) => {
 
   teamId = props ? props.teamId : ''
+  conversationId = props ? props.conversationId : ''
   const res = uni.$UIKitStore.teamMemberStore.getTeamMember(teamId)
-
   const stateMap = uni.$UIKitStore?.subscriptionStore.stateMap
 
   friendList.value = res.map((item) => {

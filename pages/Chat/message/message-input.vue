@@ -503,6 +503,7 @@ const handleSendTextMsg = () => {
   let text = replaceEmoji(inputText.value)
   const textMsg = uni.$UIKitNIM.V2NIMMessageCreator.createTextMessage(text)
 
+
   uni.$UIKitStore.msgStore
       .sendMessageActive({
         msg: textMsg as unknown as V2NIMMessage,

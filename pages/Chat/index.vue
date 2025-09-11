@@ -15,14 +15,14 @@
     <!--      <NetworkAlert />-->
     <!--    </div>-->
     <MessageHeader :title="title" :conversation-type="conversationType" :to="to" @tap.stop="closeInput"></MessageHeader>
-    <div class="announcement" @tap.stop="closeInput" v-if="team && !teamCallData.isCurrentTeam">
+    <div class="announcement" @tap.stop="closeInput" v-if="team">
       <AssetsImage path="/static/gonggao.png" width="14px" height="14px" style="margin-right: 4px"></AssetsImage>
       <span style="flex:1">{{ team.announcement }}</span>
       <!--      <AssetsImage path="/static/cancel.png" width="14px" height="14px" @tap="close"></AssetsImage>-->
     </div>
-    <div class="announcement" @tap.stop="joinTeamCall" v-else>
-      <span style="flex:1">正在群语音</span>
-    </div>
+<!--    <div class="announcement" @tap.stop="joinTeamCall" v-else>-->
+<!--      <span style="flex:1">正在群语音</span>-->
+<!--    </div>-->
     <div :class="isH5 ? 'msg-wrapper-h5' : 'msg-wrapper'" @tap.stop="closeInput">
       <MessageList
           :conversationType="conversationType"

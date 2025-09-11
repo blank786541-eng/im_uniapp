@@ -6,6 +6,8 @@ import {
 } from "nim-web-sdk-ng/dist/v2/NIM_UNIAPP_SDK/V2NIMSignallingService";
 import {V2NIMUser} from "nim-web-sdk-ng/dist/esm/nim/src/V2NIMUserService";
 import InnerAudioContext = UniNamespace.InnerAudioContext;
+import {V2NIMMessage} from "nim-web-sdk-ng/dist/esm/nim/src/V2NIMMessageService";
+import {events} from "@/utils/constants";
 
 export const enum CallEventType {
     PeerOnline = "peer-online",
@@ -36,7 +38,8 @@ export function getExtentionData(data: string): { channelName: string, uid: stri
 
 export function getParamsValues(value: string): {
     name: string,
-    accountId: string
+    accountId: string,
+    teamId?: string,
 } {
     const arr = value.split('&');
     let obj = {}
@@ -197,7 +200,7 @@ export function addCallListeners(client: Client, callback: (event: CallEventType
 }
 
 
-export async function createTeamRoom(client: Client): Promise<{
+export async function createTeamRoom(client: Client, conversationId:string,teamId: string): Promise<{
     roomInfo: V2NIMSignallingChannelInfo,
     channelName: string,
     requestId: string,
@@ -215,7 +218,7 @@ export async function createTeamRoom(client: Client): Promise<{
 
     for (let i = 0; i < ids.length; i++) {
         uni.$UIKitNIM.V2NIMSignallingService.invite({
-            serverExtension: "teamcall",
+            serverExtension: `teamId=${teamId}&conversationId=${conversationId}`,
             channelId: room.channelId,
             inviteeAccountId: ids[i],
             requestId: requestId,
@@ -224,10 +227,10 @@ export async function createTeamRoom(client: Client): Promise<{
     }
 
 
-    await client.join({
-        channelName: room.channelId,
-        uid: uid,
-    })
+    // await client.join({
+    //     channelName: room.channelId,
+    //     uid: uid,
+    // })
     return {
         roomInfo: room,
         channelName: channelName,
@@ -259,36 +262,23 @@ export function formatterTime(times: number | any) {
     let time = Math.ceil(times);
     if (time < 10) {
         timeFormat = "00:0" + time;
-    } else if (time > 10) {
-        timeFormat = "00:" + time;
-    } else {
+    } else if (time > 60) {
+
+        const hourTime = time / 60;
+        const minTime = time % 60;
+
+
         const hour = Math.floor((time / 60)) < 10 ? '0' + Math.floor((time / 60)) : Math.floor((time / 60));
         const min = time % 60 < 10 ? '0' + time % 60 : time % 60;
+
+        console.log(hourTime, minTime, 'time=======', hour, min);
         timeFormat = `${hour}:${min}`;
+    }else if (time >= 10) {
+        timeFormat = "00:" + time;
     }
     return timeFormat;
 }
 
-
-export async function createCallMessage(client: Client, channel: string, conversationId: string) {
-    // client.getSessionStats().then(sessionStats => {
-    //     console.log(`===== sessionStats =====`)
-    //     console.log(`Duration: ${sessionStats.Duration}`)
-    //     console.log(`RecvBitrate: ${sessionStats.RecvBitrate}`)
-    //     console.log(`RecvBytes: ${sessionStats.RecvBytes}`)
-    //     console.log(`SendBitrate: ${sessionStats.SendBitrate}`)
-    //     console.log(`SendBytes: ${sessionStats.SendBytes}`)
-    //     console.log(`UserCount: ${sessionStats.UserCount}`)
-    //
-    //     const textMsg = uni.$UIKitNIM.V2NIMMessageCreator.createCallMessage(1, channel, 1, [sessionStats.duration]);
-    //     await uni.$UIKitStore.msgStore.sendMessageActive({
-    //         msg: textMsg,
-    //         conversationId: conversationId,
-    //     })
-    // });
-}
-
-// 创建音频实例
 
 // 音频文件需放在static目录
 
@@ -353,5 +343,39 @@ export function stopMusic(key: 'call' | 'jieting' | 'jujue') {
             item.value.stop();
         }
     })
+
+}
+
+export async function createCallMessage(opt: {
+    channelId: string, type: number,
+    uid: string,
+    client: Client
+}): Promise<void> {
+    console.warn(opt, 'opts=========')
+    const teamConversationId = uni.$UIKitNIM.V2NIMConversationIdUtil.teamConversationId(
+        opt.uid
+    )
+    let sessionStats = await opt.client.getSessionStats()
+    const msg = uni.$UIKitNIM.V2NIMMessageCreator.createCallMessage(1, opt.channelId, opt.type || 1, [ {
+        accountId: uni.$UIKitStore.userStore.myUserInfo.accountId,
+        /**
+         * 通话时长
+         */
+        duration: Math.ceil(sessionStats.Duration) || 0
+    }])
+
+    try{
+        await uni.$UIKitStore.msgStore
+            .sendMessageActive({
+                msg: msg as unknown as V2NIMMessage,
+                conversationId: teamConversationId,
+                conversationType: V2NIMConst.V2NIMConversationType.V2NIM_CONVERSATION_TYPE_TEAM,
+                sendBefore: () => {
+                    uni.$emit(events.ON_SCROLL_BOTTOM)
+                },
+            })
+    }catch (e) {
+        console.warn(e.toString(),e.message.toString(),'sendMessageActive')
+    }
 
 }

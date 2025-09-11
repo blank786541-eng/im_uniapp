@@ -93,7 +93,10 @@ onLoad(async (options) => {
 
 
 onUnmounted(async () => {
-
+  if (timer) {
+    clearInterval(timer);
+    timer = null;
+  }
   if (params.localStream != null) {
     params.localStream
         .close({
@@ -141,11 +144,12 @@ async function destory() {
   )
   if (connect.value) {
     createCallMessage({
-      channelInfo: {
-        channelId: query.roomId,
-      },
-      operatorAccountId: uni.$UIKitStore.userStore.myUserInfo.accountId,
-    }, 1, id || uni.getStorageSync('currentConversation'),)
+
+      channelId: query.roomId,
+      uid: query.uid,
+      type: 1,
+      conversationId: id || uni.getStorageSync('currentConversation')
+    })
     close();
 
     return;
@@ -170,11 +174,11 @@ async function destory() {
       requestId: query.requestId
     });
     createCallMessage({
-      channelInfo: {
-        channelId: query.roomId,
-      },
-      operatorAccountId: uni.$UIKitStore.userStore.myUserInfo.accountId,
-    }, 3, id)
+      channelId: query.roomId,
+      type: 3,
+      conversationId: id,
+      uid: query.uid
+    })
     // |1|query.uid
 
 
@@ -205,6 +209,10 @@ async function close() {
 const time = ref('');
 
 function getLocalAudioStats() {
+  if (timer) {
+    clearInterval(timer);
+    timer = null;
+  }
   timer = setInterval(async () => {
     // 加入房间之后调用
     let sessionStats = await client.getSessionStats()
@@ -476,7 +484,12 @@ uni.$on('on-invite', async (data: V2NIMSignallingEvent) => {
       success: () => {
 
         playMusic('jujue');
-        createCallMessage(data, 2, otherid)
+        createCallMessage({
+          channelId: data.channelInfo.channelId,
+          conversationId: otherid,
+          type: 2,
+          uid: query.uid
+        })
         close();
       }
     })
@@ -493,8 +506,12 @@ uni.$on('on-invite', async (data: V2NIMSignallingEvent) => {
         playMusic('jujue');
 
         const id = data.operatorAccountId == data.inviterAccountId ? uni.getStorageSync('currentConversation') : otherid
-        createCallMessage(data, 2, id)
-
+        createCallMessage({
+          channelId: data.channelInfo.channelId,
+          conversationId: id,
+          type: 2,
+          uid: query.uid
+        })
         close();
       }
     })
@@ -504,8 +521,12 @@ uni.$on('on-invite', async (data: V2NIMSignallingEvent) => {
       icon: "none",
       duration: 1000,
       success: () => {
-        createCallMessage(data, 2, uni.getStorageSync('currentConversation'))
-
+        createCallMessage({
+          channelId: data.channelInfo.channelId,
+          conversationId: uni.getStorageSync('currentConversation'),
+          type: 2,
+          uid: query.uid
+        })
         playMusic('jujue',);
 
         close();
@@ -515,29 +536,30 @@ uni.$on('on-invite', async (data: V2NIMSignallingEvent) => {
   }
 })
 
-async function createCallMessage(data, type: number, conversationID: string) {
+async function createCallMessage(opt: {
+  channelId: string, type: number, conversationId: string
+}) {
 
-  console.warn(data, 'data====');
   let sessionStats = await client.getSessionStats()
-  const msg = uni.$UIKitNIM.V2NIMMessageCreator.createCallMessage(1, data.channelInfo.channelId, type || 1, [{
+  const msg = uni.$UIKitNIM.V2NIMMessageCreator.createCallMessage(1, opt.channelId, opt.type || 1, [{
     accountId: query.uid,
     /**
      * 通话时长
      */
-    duration: sessionStats.Duration || 0
+    duration: Math.ceil(sessionStats.Duration) || 0
   }, {
     accountId: uni.$UIKitStore.userStore.myUserInfo.accountId,
     /**
      * 通话时长
      */
-    duration: sessionStats.Duration || 0
+    duration: Math.ceil(sessionStats.Duration) || 0
   }])
 
 
   await uni.$UIKitStore.msgStore
       .sendMessageActive({
         msg: msg as unknown as V2NIMMessage,
-        conversationId: conversationID,
+        conversationId: opt.conversationId,
         conversationType: V2NIMConst.V2NIMConversationType.V2NIM_CONVERSATION_TYPE_P2P,
         sendBefore: () => {
           uni.$emit(events.ON_SCROLL_BOTTOM)

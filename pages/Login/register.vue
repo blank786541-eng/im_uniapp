@@ -25,12 +25,12 @@ const query = reactive({
   confirmPassword: "",
   invitationCode: ""
 })
-const privateChecked = ref(true);
+const privateChecked = ref(false);
 
 async function submitLoginForm() {
 
   console.log(query, privateChecked)
-  if (privateChecked.value) return;
+  if (!privateChecked.value) return;
 
   if (!query.account) {
     uni.showToast({
@@ -142,7 +142,7 @@ function getValue(value, key) {
       注册
     </button>
     <div style="height:50px"></div>
- 
+
   </div>
 </template>
 

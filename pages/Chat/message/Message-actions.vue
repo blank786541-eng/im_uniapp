@@ -71,9 +71,9 @@ async function selectAction(item: any, event: any) {
     }else{
       // uni.setStorageSync('inviteUsers',["778899","123456"])
       // const userInfo=uni.$UIKitStore.userStore.myUserInfo;
-      uni.setStorageSync('callTeamId',props.otherAccountId)
+      uni.setStorageSync('currentConversation',props.conversationId)
       customNavigateTo({
-        url: `/pages/Other/select-call-user?teamId=${props.otherAccountId}` ,
+        url: `/pages/Other/select-call-user?teamId=${props.otherAccountId}&conversationId=${props.conversationId}` ,
       })
 
     }
