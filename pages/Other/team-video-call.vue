@@ -428,10 +428,7 @@ async function destroy() {
     try {
       await uni.$UIKitNIM.V2NIMSignallingService.leaveRoom(channelId, false, accountName);
 
-      leave({
-        accountId: uni.$UIKitStore.userStore.myUserInfo.accountId,
-
-      }, channelId, false);
+      leave( channelId, false);
 
 
     } catch (e) {
@@ -519,34 +516,34 @@ uni.$on('on-invite', async (data: V2NIMSignallingEvent) => {
     addListeners();
     initLocalStream();
   } else if (type == 5) {
-    // uni.showToast({
-    //   title: `${obj.name} 已拒绝加入`,
-    //   icon: "none",
-    //   success: () => {
-    //     leave(obj, data.channelInfo.channelId);
+    uni.showToast({
+      title: `${obj.name} 已拒绝加入`,
+      icon: "none",
+      success: () => {
+
+        leave(data.channelInfo.channelId,)
+      }
+    })
+    // if (creater.value) {
     //
-    //   }
-    // })
-    if (creater.value) {
-
-
-      uni.showToast({
-        title: `${obj.name} 已拒绝加入`,
-        icon: "none",
-        success: () => {
-          leave(obj, data.channelInfo.channelId);
-
-        }
-      })
-    } else {
-      getUsers()
-    }
+    //
+    //   uni.showToast({
+    //     title: `${obj.name} 已拒绝加入`,
+    //     icon: "none",
+    //     success: () => {
+    //       leave(obj, data.channelInfo.channelId);
+    //
+    //     }
+    //   })
+    // } else {
+    //   getUsers()
+    // }
   } else if (type == 7) {
 
     uni.showToast({
       title: `${obj.name} 已离开`,
       success: () => {
-        leave(obj, data.channelInfo.channelId);
+        leave( data.channelInfo.channelId);
       }
     })
   } else if (type == 4) {
@@ -595,7 +592,7 @@ uni.$on('on-invite', async (data: V2NIMSignallingEvent) => {
       muteAudioBycreate.value = false;
       setOtherSilence();
       uni.showToast({
-        title: "您解除禁言",
+        title: "您已解除禁言",
         icon: 'none',
         duration: 1000,
         success: () => {
@@ -625,7 +622,7 @@ function muteUserAudio(item, index) {
   uni.$UIKitNIM.V2NIMSignallingService.sendControl(query.roomId, item.accountId, userInfos.value[index].serverExtension);
 }
 
-async function leave(obj: { accountId: string, name: string }, channelId: string, isReciver: boolean = true) {
+async function leave( channelId: string, isReciver: boolean = true) {
   let data: V2NIMSignallingRoomInfo = await uni.$UIKitNIM.V2NIMSignallingService.getRoomInfoByChannelName(query.channelName);
   console.warn('getRoomInfoByChannelName', data.members);
   if (data.members.length == 1 && isReciver) {

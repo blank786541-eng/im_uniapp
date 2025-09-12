@@ -135,7 +135,7 @@ function getValue(value, key) {
 
     </div>
     <button
-        :class="privateChecked ? 'login-btn-disabled' : 'login-btn'"
+        :class="!privateChecked ? 'login-btn-disabled' : 'login-btn'"
         @tap="submitLoginForm"
 
     >
