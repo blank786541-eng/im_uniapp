@@ -218,7 +218,7 @@ export async function createTeamRoom(client: Client, conversationId:string,teamI
 
     for (let i = 0; i < ids.length; i++) {
         uni.$UIKitNIM.V2NIMSignallingService.invite({
-            serverExtension: `teamId=${teamId}&conversationId=${conversationId}`,
+            serverExtension: `teamId=${teamId}&conversationId=${conversationId}&ids=${ids.toString()}`,
             channelId: room.channelId,
             inviteeAccountId: ids[i],
             requestId: requestId,

@@ -15,7 +15,7 @@
     >
       <div class="icon-read-wrapper">
 <!--        <Icon type="icon-read" :size="10"></Icon>-->
-        <span class="font-14 default-text" style="font-size: 10px;text-align: right">{{p2pMsgRotateDeg?'已读':'未读'}}</span>
+        <span class="font-14 default-text" style="font-size: 10px;text-align: right;color:#999">{{p2pMsgRotateDeg?'已读':'未读'}}</span>
       </div>
 
     </div>
@@ -27,7 +27,7 @@
       "
     >
       <div class="icon-read-wrapper" @tap="jumpToTeamMsgReadInfo">
-        <span class="font-14 default-text" style="font-size: 12px;text-align: right">{{ readCount }}人已读</span>
+        <span class="font-14 default-text" style="font-size: 12px;text-align: right;color:#999;" >{{ readCount>0?'已读':'未读' }}</span>
       </div>
 
     </div>

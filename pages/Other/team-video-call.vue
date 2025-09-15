@@ -2,24 +2,23 @@
   <div class="call-wrapper">
     <div class="flex-box flex-direction-column" style="height:100%">
       <div class="flex-box " style="flex-wrap: wrap;padding:10px">
-        <div v-for="(item,index) in userInfos" :key="index" class="flex-box user-item ">
+        <div v-for="(item, index) in userInfos" :key="index" class="flex-box user-item ">
           <Avatar :account="item.accountId" width="30px" height="30px"></Avatar>
           <div style="width: 10px"></div>
           <span>{{ item.name || item.accountId }}</span>
           <div style="width: 10px"></div>
-          <AssetsImage :path="item.serverExtension=='muteUser'?'/static/audio_close.png':'/static/audio_open.png'"
-                       width="20px" height="20px"
-                       v-if="creater" @tap="muteUserAudio(item,index)"/>
+          <AssetsImage :path="item.serverExtension == 'muteUser' ? '/static/audio_close.png' : '/static/audio_open.png'"
+            width="20px" height="20px" v-if="creater" @tap="muteUserAudio(item, index)" />
           <div style="width: 16px"></div>
           <AssetsImage path="/static/cancel.png" width="16px" height="16px" @tap="nickUser(item.accountId)"
-                       v-if="creater"/>
+            v-if="creater" />
         </div>
 
       </div>
       <div style="flex:1" class="flex-center flex-direction-column">
         <avatar :account="query.uid" v-if="!creater"></avatar>
         <div class="default-text font-14" style="color:#fff;margin-top: 15px" v-if="!connect">{{
-            creater ? '等待用户加入' : "加入群语音"
+          creater ? '等待用户加入' : "加入群语音"
           }}
         </div>
         <div class="default-text font-14" style="color:#fff;margin-top: 15px;" v-else>
@@ -27,30 +26,22 @@
         </div>
       </div>
       <div class="flex-box" style="margin-bottom: 60px;justify-content: space-around" v-if="!connect">
-        <AssetsImage
-            @tap="destroy"
-            path="/static/guaduan.png" width="80px" height="80px" :circle="true"></AssetsImage>
+        <AssetsImage @tap="destroy" path="/static/guaduan.png" width="80px" height="80px" :circle="true"></AssetsImage>
         <!--          v-if="!creater"-->
-        <AssetsImage
-            v-if="!creater"
-            path="/static/jieting.png" width="90px" height="90px" :circle="true" @tap="joinRoom"></AssetsImage>
+        <AssetsImage v-if="!creater" path="/static/jieting.png" width="90px" height="90px" :circle="true"
+          @tap="joinRoom"></AssetsImage>
       </div>
       <div v-else class="call-action">
         <div class="icon-container" style=" background-color: #fff;">
-          <AssetsImage
-              @tap="setOrRelieveSilence"
-              :path="isSilence || muteAudioBycreate?'/static/voice_close.png':'/static/voice_open.png'" width="30px"
-              height="30px"></AssetsImage>
+          <AssetsImage @tap="setOrRelieveSilence"
+            :path="isSilence || muteAudioBycreate ? '/static/voice_close.png' : '/static/voice_open.png'" width="30px"
+            height="30px"></AssetsImage>
         </div>
 
-        <AssetsImage
-            @tap="destroy"
-            path="/static/guaduan.png" width="80px" height="80px"></AssetsImage>
+        <AssetsImage @tap="destroy" path="/static/guaduan.png" width="80px" height="80px"></AssetsImage>
         <div class="icon-container" style=" background-color: #666;">
-          <AssetsImage
-
-              :path="closeVolume?'/static/audio_close.png':'/static/audio_open.png'" width="30px" height="30px"
-              @tap="muteAudio"></AssetsImage>
+          <AssetsImage :path="closeVolume ? '/static/audio_close.png' : '/static/audio_open.png'" width="30px"
+            height="30px" @tap="muteAudio"></AssetsImage>
         </div>
 
       </div>
@@ -63,7 +54,7 @@
 
 import Avatar from "@/components/Avatar.vue";
 import AssetsImage from "@/components/AssetsImage.vue";
-import {onUnmounted, reactive, ref} from "vue";
+import { onUnmounted, reactive, ref } from "vue";
 import {
   addCallListeners,
   CallEventType, createCallMessage,
@@ -72,27 +63,27 @@ import {
   randomNumbers,
   removeListeners, stopMusic
 } from "@/pages/Other/help/call";
-import {onLoad} from '@dcloudio/uni-app'
+import { onLoad } from '@dcloudio/uni-app'
 import {
   V2NIMSignallingCallResult,
-  V2NIMSignallingChannelInfo, V2NIMSignallingEvent, V2NIMSignallingRoomInfo
+  V2NIMSignallingChannelInfo, V2NIMSignallingEvent, V2NIMSignallingJoinResult, V2NIMSignallingRoomInfo
 } from "nim-web-sdk-ng/dist/v2/NIM_UNIAPP_SDK/V2NIMSignallingService";
 import NERTC from "nertc-web-sdk";
-import {Stream} from "nertc-web-sdk/types/stream";
-import {V2NIMUser} from "nim-web-sdk-ng/dist/v2/NIM_UNIAPP_SDK/V2NIMUserService";
+import { Stream } from "nertc-web-sdk/types/stream";
+import { V2NIMUser } from "nim-web-sdk-ng/dist/v2/NIM_UNIAPP_SDK/V2NIMUserService";
 import config from "@/utils/config";
 
 
 const isSilence = ref(false);
 const userInfos = ref<V2NIMUser[]>([]);
 let roomsInfo: V2NIMSignallingChannelInfo;
-let changeName: string = "";
+let channelName: string = "";
 let requestId: string = "";
 let client: Client;
 let localStream: Stream;
 let remoteStreams: Stream[] = [];
 let localUid;
-let joinRoomInfo: V2NIMSignallingRoomInfo;
+let joinRoomInfo: V2NIMSignallingJoinResult;
 
 const muteAudioBycreate = ref(false);
 const creater = ref(false);
@@ -116,10 +107,10 @@ onLoad(async (options) => {
 
     let obj = await createTeamRoom(client, options.conversationId, options.teamId)
     requestId = obj.requestId;
-    changeName = obj.channelName;
+    channelName = obj.channelName;
     roomsInfo = obj.roomInfo;
     localUid = obj.streamId;
-    userInfos.value = await uni.$UIKitStore.userStore.getUserListFromCloudActive(uni.getStorageSync('inviteUsers'));
+
     addListeners();
     creater.value = true;
     query.roomId = roomsInfo.channelId
@@ -135,14 +126,17 @@ onLoad(async (options) => {
       inviterAccountId: uni.$UIKitStore.userStore.myUserInfo.accountId
     })
   } else {
-    changeName = options.roomId;
+    channelName = options.channelName;
     requestId = options.requestId;
     localUid = randomNumbers();
     query = options;
-    getUsers()
+    joinRoomInfo = await uni.$UIKitNIM.V2NIMSignallingService.joinRoom({
+      channelId: query.roomId
+    })
   }
-  playMusic('/static/call-music.mp3', 'call')
 
+  playMusic('/static/call-music.mp3', 'call')
+  getUsers();
 })
 
 const closeVolume = ref(false)
@@ -174,30 +168,30 @@ function setOrRelieveSilence() {
   if (isSilence.value) {
     console.warn("关闭mic");
     localStream
-        .close({
-          type: "audio",
-        })
-        .then(() => {
-          console.warn("关闭 mic sucess");
-        })
-        .catch((err) => {
-          console.warn("关闭 mic 失败: ", err);
-        });
+      .close({
+        type: "audio",
+      })
+      .then(() => {
+        console.warn("关闭 mic sucess");
+      })
+      .catch((err) => {
+        console.warn("关闭 mic 失败: ", err);
+      });
   } else {
     console.warn("打开mic");
     if (!localStream) {
       return;
     }
     (localStream as Stream)
-        .open({
-          type: "audio",
-        })
-        .then(() => {
-          console.warn("打开mic sucess");
-        })
-        .catch((err) => {
-          console.warn("打开mic失败: ", err);
-        });
+      .open({
+        type: "audio",
+      })
+      .then(() => {
+        console.warn("打开mic sucess");
+      })
+      .catch((err) => {
+        console.warn("打开mic失败: ", err);
+      });
   }
 }
 
@@ -205,30 +199,30 @@ function setOtherSilence() {
   if (muteAudioBycreate.value) {
     console.warn("关闭mic");
     localStream
-        .close({
-          type: "audio",
-        })
-        .then(() => {
-          console.warn("关闭 mic sucess");
-        })
-        .catch((err) => {
-          console.warn("关闭 mic 失败: ", err);
-        });
+      .close({
+        type: "audio",
+      })
+      .then(() => {
+        console.warn("关闭 mic sucess");
+      })
+      .catch((err) => {
+        console.warn("关闭 mic 失败: ", err);
+      });
   } else {
     console.warn("打开mic");
     if (!localStream) {
       return;
     }
     (localStream as Stream)
-        .open({
-          type: "audio",
-        })
-        .then(() => {
-          console.warn("打开mic sucess");
-        })
-        .catch((err) => {
-          console.warn("打开mic失败: ", err);
-        });
+      .open({
+        type: "audio",
+      })
+      .then(() => {
+        console.warn("打开mic sucess");
+      })
+      .catch((err) => {
+        console.warn("打开mic失败: ", err);
+      });
   }
 }
 
@@ -263,33 +257,33 @@ function initLocalStream() {
   (localStream as Stream).setAudioProfile("speech_low_quality");
   //启动媒体，打开实例对象中设置的媒体设备
   localStream
-      .init()
-      .then(() => {
-        // 发布
+    .init()
+    .then(() => {
+      // 发布
 
-        publish();
-        getLocalAudioStats();
-        // 获取本地流视频统计信息
-        connect.value = true;
-      })
-      .catch((err) => {
-        console.warn("音视频初始化失败: ", err);
+      publish();
+      getLocalAudioStats();
+      // 获取本地流视频统计信息
+      connect.value = true;
+    })
+    .catch((err) => {
+      console.warn("音视频初始化失败: ", err);
 
-        localStream = null;
-      });
+      localStream = null;
+    });
 }
 
 function publish() {
   console.warn("开始发布视频流");
   //发布本地媒体给房间对端
   client
-      .publish(localStream, 'audio')
-      .then(() => {
-        console.warn("本地 publish 成功");
-      })
-      .catch((err) => {
-        console.error("本地 publish 失败: ", err);
-      });
+    .publish(localStream, 'audio')
+    .then(() => {
+      console.warn("本地 publish 成功");
+    })
+    .catch((err) => {
+      console.error("本地 publish 失败: ", err);
+    });
 }
 
 function subscribe(remoteStream) {
@@ -301,18 +295,18 @@ function subscribe(remoteStream) {
     screen: true,
   });
   client
-      .subscribe(remoteStream)
-      .then(() => {
-        console.warn("本地 subscribe 成功");
-      })
-      .catch((err) => {
-        console.warn("本地 subscribe 失败: ", err);
-      });
+    .subscribe(remoteStream)
+    .then(() => {
+      console.warn("本地 subscribe 成功");
+    })
+    .catch((err) => {
+      console.warn("本地 subscribe 失败: ", err);
+    });
 }
 
 function removeStream(stream, userId) {
   remoteStreams = remoteStreams.map((item) =>
-      item.getId() === userId ? stream : item
+    item.getId() === userId ? stream : item
   );
 }
 
@@ -320,7 +314,7 @@ async function addStream(stream, userId) {
   if (remoteStreams.some((item) => item.getId() === userId)) {
     console.warn("收到已订阅的远端发布，需要更新", stream);
     remoteStreams = remoteStreams.map((item) =>
-        item.getId() === userId ? stream : item
+      item.getId() === userId ? stream : item
     );
     //订阅其发布的媒体，可以渲染播放
     await subscribe(stream);
@@ -344,9 +338,7 @@ async function joinRoom() {
   playMusic('/static/call-stop.mp3', 'jieting')
   console.log(query, 'joinRoom=====');
   try {
-    await uni.$UIKitNIM.V2NIMSignallingService.joinRoom({
-      channelId: query.roomId
-    })
+
     await uni.$UIKitNIM.V2NIMSignallingService.acceptInvite({
       channelId: query.roomId,
       inviterAccountId: query.uid,
@@ -362,21 +354,19 @@ async function joinRoom() {
     channelName: query.roomId,
     uid: localUid.toString()
   })
-
+  
 
   initLocalStream();
 
   addListeners();
 
 
-  console.log(joinRoomInfo, 'joinRoomInfo=====')
-  getUsers();
 }
 
 
-async function getUsers() {
-  joinRoomInfo = await uni.$UIKitNIM.V2NIMSignallingService.getRoomInfoByChannelName(query.channelName);
-  let ids = joinRoomInfo.members.map((item) => item.accountId);
+async function getUsers(id?: string) {
+
+  let ids: Array<string> = uni.getStorageSync('inviteUsers') || [];
 
   userInfos.value = await uni.$UIKitStore.userStore.getUserListFromCloudActive(ids)
 
@@ -385,7 +375,10 @@ async function getUsers() {
   if (findIndex > -1) {
     userInfos.value.splice(findIndex, 1);
   }
-
+  if (id) {
+    let index = userInfos.value.findIndex((item) => item.accountId == id);
+    userInfos.value.splice(index, 1);
+  }
 }
 
 async function destroy() {
@@ -393,17 +386,17 @@ async function destroy() {
   if (!connect.value) {
     if (!creater.value) {
 
-      try {
-        await uni.$UIKitNIM.V2NIMSignallingService.rejectInvite({
-          channelId: query.roomId,
-          inviterAccountId: query.uid,
-          requestId: query.requestId,
-          serverExtension: accountName
-        });
-      } catch (e) {
-        console.log(e.toString(), 'e.toString()', e.message.toString());
-      }
-
+      // try {
+      //   await uni.$UIKitNIM.V2NIMSignallingService.rejectInvite({
+      //     channelId: query.roomId,
+      //     inviterAccountId: query.uid,
+      //     requestId: query.requestId,
+      //     serverExtension: accountName
+      //   });
+      // } catch (e) {
+      //   console.log(e.toString(), 'e.toString()', e.message.toString());
+      // }
+      await uni.$UIKitNIM.V2NIMSignallingService.leaveRoom(query.roomId, false, accountName + "&type=reject");
     } else {
 
 
@@ -423,22 +416,16 @@ async function destroy() {
   } else {
 
 
-    let channelId: string = creater.value ? roomsInfo.channelId : joinRoomInfo.channelInfo.channelId
+    let channelId: string = creater.value ? roomsInfo.channelId : joinRoomInfo.roomInfo.channelInfo.channelId
     console.warn(roomsInfo, 'destroy=======', joinRoomInfo);
     try {
       await uni.$UIKitNIM.V2NIMSignallingService.leaveRoom(channelId, false, accountName);
-
-      leave( channelId, false);
-
-
     } catch (e) {
       console.error(e.toString(), 'error======')
     }
     client.leave();
   }
-  uni.removeStorageSync('inviteUsers');
 
-  uni.$off('on-invite')
   if (timer) {
     clearInterval(timer);
     timer = null;
@@ -459,16 +446,16 @@ function addListeners() {
     } else if (type == CallEventType.StreamSubscribed) {
       remoteStreams.forEach((remoteStream) => {
         remoteStream
-            .play(null, {
-              audio: true,
-              video: false,
-            })
-            .then(() => {
-              console.warn("播放音频", remoteStream.getId());
-            })
-            .catch((err) => {
-              console.warn("播放对方音频失败了: ", err);
-            });
+          .play(null, {
+            audio: true,
+            video: false,
+          })
+          .then(() => {
+            console.warn("播放音频", remoteStream.getId());
+          })
+          .catch((err) => {
+            console.warn("播放对方音频失败了: ", err);
+          });
       });
     }
   })
@@ -478,11 +465,11 @@ onUnmounted(() => {
   destoryAudio();
   if (localStream) {
     localStream
-        .close({
-          type: "audio",
-        }).then(res => {
-      localStream.destroy();
-    })
+      .close({
+        type: "audio",
+      }).then(res => {
+        localStream.destroy();
+      })
     remoteStreams.forEach((remoteStream) => {
       remoteStream.stop()
     });
@@ -491,6 +478,9 @@ onUnmounted(() => {
     });
 
   }
+  uni.removeStorageSync('inviteUsers');
+
+  uni.$off('on-invite')
   removeListeners(client)
 })
 
@@ -509,8 +499,11 @@ uni.$on('on-invite', async (data: V2NIMSignallingEvent) => {
       title: `${obj.name} 已加入`,
       icon: "none",
       success: () => {
+        const findIndex = userInfos.value.findIndex(e => e.accountId == obj.accountId);
+        if (findIndex == -1) {
+          userInfos.value.push(obj);
+        }
 
-        getUsers();
       }
     })
     addListeners();
@@ -521,7 +514,7 @@ uni.$on('on-invite', async (data: V2NIMSignallingEvent) => {
       icon: "none",
       success: () => {
 
-        leave(data.channelInfo.channelId,)
+        leave(obj.accountId, data.channelInfo.channelId)
       }
     })
     // if (creater.value) {
@@ -540,12 +533,15 @@ uni.$on('on-invite', async (data: V2NIMSignallingEvent) => {
     // }
   } else if (type == 7) {
 
+    const msg = obj.type == "reject" ? `${obj.name} 已拒绝加入` : `${obj.name} 已离开`
     uni.showToast({
-      title: `${obj.name} 已离开`,
+      title: msg,
       success: () => {
-        leave( data.channelInfo.channelId);
+        leave(obj.accountId, data.channelInfo.channelId)
       }
     })
+
+
   } else if (type == 4) {
     uni.showToast({
       title: "已取消",
@@ -622,16 +618,20 @@ function muteUserAudio(item, index) {
   uni.$UIKitNIM.V2NIMSignallingService.sendControl(query.roomId, item.accountId, userInfos.value[index].serverExtension);
 }
 
-async function leave( channelId: string, isReciver: boolean = true) {
-  let data: V2NIMSignallingRoomInfo = await uni.$UIKitNIM.V2NIMSignallingService.getRoomInfoByChannelName(query.channelName);
-  console.warn('getRoomInfoByChannelName', data.members);
-  if (data.members.length == 1 && isReciver) {
-    uni.showToast({
-      title: `人员已全部离开，3秒后挂断`,
-      duration: 3000,
-      success: () => {
-        setTimeout(() => {
+async function leave(id: string, channelId) {
+  getUsers(id);
+  try {
+  console.warn(channelName,'res.members======');
+    const res = await uni.$UIKitNIM.V2NIMSignallingService.getRoomInfoByChannelName(channelName);
+      console.warn(res.members,'res.members======');
+    if (res.members.length == 1) {
+      if (connect.value) {
+        uni.showToast({
+          title: `人员已全部离开,即将挂断`,
+          duration: 3000,
 
+        })
+        const timeout = setTimeout(() => {
           createCallMessage({
             channelId: channelId,
             type: 1,
@@ -639,14 +639,20 @@ async function leave( channelId: string, isReciver: boolean = true) {
             client: client
           })
           if (timer) clearTimeout(timer);
+          if (timeout) clearTimeout(timeout);
           uni.$UIKitNIM.V2NIMSignallingService.leaveRoom(channelId, false, accountName);
           uni.navigateBack()
         }, 3000)
 
+      } else {
+        if (timer) clearTimeout(timer);
+        uni.$UIKitNIM.V2NIMSignallingService.leaveRoom(channelId, false, accountName);
+        uni.navigateBack();
       }
-    })
-  } else {
-    getUsers();
+
+    }
+  } catch (e) {
+    
   }
 }
 

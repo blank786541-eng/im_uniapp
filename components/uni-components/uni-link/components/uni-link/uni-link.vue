@@ -141,6 +141,8 @@ export default {
 /* #ifndef APP-NVUE */
 .uni-link {
   cursor: pointer;
+  max-width: 11.25rem;
+  word-break: break-word;
 }
 
 /* #endif */

@@ -108,7 +108,7 @@
             V2NIMConst.V2NIMConversationType.V2NIM_CONVERSATION_TYPE_TEAM &&manager
           "
             class="msg-action-btn"
-            @tap="handleDeleteMsg"
+            @tap="handleRecallMsg"
         >
           <Icon
               :size="18"
@@ -717,14 +717,24 @@ const handleRecallMsg = () => {
     confirmColor: '#1861df',
     success(data) {
       if (data.confirm) {
-        const _msg = props.msg
-
+        let _msg = Object.assign({},props.msg,{
+          serverExtension:"teamRecall",
+          // text:props.msg.text +"===teamRecall====",
+        })
         uni.$UIKitStore.msgStore.reCallMsgActive(_msg).catch(() => {
           uni.showToast({
             title: t('recallMsgFailText'),
             icon: 'error',
           })
         })
+        console.log(conversationType==V2NIMConst.V2NIMConversationType.V2NIM_CONVERSATION_TYPE_TEAM,'conversationType==V2NIMConst.V2NIMConversationType.V2NIM_CONVERSATION_TYPE_TEAM====')
+        if(conversationType==V2NIMConst.V2NIMConversationType.V2NIM_CONVERSATION_TYPE_TEAM){
+            uni.$UIKitStore.msgStore.updateMsg(props.msg.conversationId,props.msg.messageClientId,{
+              serverExtension:"teamRecall",
+              isSelf:false,
+            })
+        }
+
       }
     },
     complete() {

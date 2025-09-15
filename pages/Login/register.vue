@@ -29,8 +29,6 @@ const privateChecked = ref(false);
 
 async function submitLoginForm() {
 
-  console.log(query, privateChecked)
-  if (!privateChecked.value) return;
 
   if (!query.account) {
     uni.showToast({

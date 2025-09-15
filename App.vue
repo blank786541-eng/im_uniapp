@@ -65,7 +65,34 @@ export default {
       });
     }
 
+    uni.$UIKitNIM.V2NIMSignallingService.on("onSyncRoomInfoList", (rooms: V2NIMSignallingRoomInfo[]) => {
+      for (let i = 0; i < rooms.length; i++) {
+        uni.$UIKitNIM.V2NIMSignallingService.leaveRoom(rooms[i].channelInfo.channelId);
+      }
+    });
+    
+    uni.$UIKitNIM.V2NIMSignallingService.on("onOnlineEvent", (data: V2NIMSignallingEvent) => {
+      console.warn(data, 'onOnlineEvent=====')
+      if (data.eventType == 3) {
+        const obj = getParamsValues(data.serverExtension)
+        console.log(obj, '=====')
+        uni.setStorageSync('inviteUsers',obj.ids.split(','))
+        if (obj.teamId) {
+          customNavigateTo({
+            url: `/pages/Other/team-video-call?uid=${data.inviterAccountId}&channelName=${data.channelInfo.channelName}&roomId=${data.channelInfo.channelId}&requestId=${data.requestId}&type=${data.channelInfo.channelType}&conversationId=${obj.conversationId}&teamId=${obj.teamId}`,
+          })
+        } else {
+          uni.setStorageSync('currentConversation', data.serverExtension);
+          customNavigateTo({
+            url: `/pages/Other/video-call?uid=${data.inviterAccountId}&audioRoomId=${data.channelInfo.channelName}&roomId=${data.channelInfo.channelId}&requestId=${data.requestId}&type=${data.channelInfo.channelType}`,
+          })
+        }
 
+      } else {
+
+        uni.$emit('on-invite', data)
+      }
+    })
   },
   onShow() {
 
@@ -85,32 +112,7 @@ export default {
     // });
     // // #endif
 
-    uni.$UIKitNIM.V2NIMSignallingService.on("onSyncRoomInfoList", (rooms: V2NIMSignallingRoomInfo[]) => {
-      for (let i = 0; i < rooms.length; i++) {
-        uni.$UIKitNIM.V2NIMSignallingService.leaveRoom(rooms[i].channelInfo.channelId);
-      }
-    });
-    uni.$UIKitNIM.V2NIMSignallingService.on("onOnlineEvent", (data: V2NIMSignallingEvent) => {
-      console.warn(data, 'onOnlineEvent=====')
-      if (data.eventType == 3) {
-        const obj = getParamsValues(data.serverExtension)
-        console.log(obj, '=====')
-        if (obj.teamId) {
-          customNavigateTo({
-            url: `/pages/Other/team-video-call?uid=${data.inviterAccountId}&channelName=${data.channelInfo.channelName}&roomId=${data.channelInfo.channelId}&requestId=${data.requestId}&type=${data.channelInfo.channelType}&conversationId=${obj.conversationId}&teamId=${obj.teamId}`,
-          })
-        } else {
-          uni.setStorageSync('currentConversation', data.serverExtension);
-          customNavigateTo({
-            url: `/pages/Other/video-call?uid=${data.inviterAccountId}&audioRoomId=${data.channelInfo.channelName}&roomId=${data.channelInfo.channelId}&requestId=${data.requestId}&type=${data.channelInfo.channelType}`,
-          })
-        }
-
-      } else {
-
-        uni.$emit('on-invite', data)
-      }
-    })
+    
     onImShowApp()
   },
   onHide() {

@@ -1,12 +1,16 @@
 <template>
   <div>
     <div v-if="conversationType ===
-            V2NIMConst.V2NIMConversationType.V2NIM_CONVERSATION_TYPE_TEAM && props.msg.recallType === 'beReCallMsg' &&
-        !props.msg.isSelf">
+            V2NIMConst.V2NIMConversationType.V2NIM_CONVERSATION_TYPE_TEAM &&
+         (props.msg.serverExtension=='teamRecall' || currentMsg.serverExtension=='teamRecall')">
+
+    </div>
+     <div v-else-if="conversationType ===
+            V2NIMConst.V2NIMConversationType.V2NIM_CONVERSATION_TYPE_TEAM &&  !props.msg.isSelf &&(props.msg.recallType === 'beReCallMsg' || currentMsg.recallType === 'beReCallMsg') ">
 
     </div>
     <div
-
+       v-else
         :class="`msg-item-wrapper ${
       props.msg.pinState &&
       !(
@@ -124,9 +128,9 @@
           <div class="msg-name" v-if="!props.msg.isSelf">
             {{ appellation }}
           </div>
-          <div :class="props.msg.isSelf ? 'self-msg-recall' : 'msg-recall'">
+          <div :class="props.msg.isSelf ? 'self-msg-recall' : 'msg-recall'" @tap="checkMsg">
             <text class="msg-recall2">
-              {{ !props.msg.isSelf ? t('recall2') : `${t('you') + t('recall')}` }}
+              {{ !props.msg.isSelf ? t('recall2') : `${t('you') + t('recall')}` }} {{ props.msg.serverExtension }}
             </text>
           </div>
         </div>
@@ -494,9 +498,7 @@ import TeamMessageRead from "@/pages/Chat/message/team-message-read.vue";
 
 
 
-onMounted(() => {
-
-})
+const currentMsg:V2NIMMessageForUI=ref<V2NIMMessageForUI>({});
 const props = withDefaults(
     defineProps<{
       msg: V2NIMMessageForUI & { timeValue?: number }
@@ -509,7 +511,15 @@ const props = withDefaults(
     }>(),
     {}
 )
+onMounted(() => {
+    console.log(props.msg,'msg=====')
+    currentMsg.value=props.msg;
+})
 
+watch(()=>props.msg,(o,n)=>{
+  // console.log(o,n,"==========")
+  // currentMsg.value=o;
+})
 /** 回复消息 */
 const replyMsg = computed(() => {
   return props.replyMsgsMap && props.replyMsgsMap[props.msg.messageClientId]
@@ -595,6 +605,11 @@ const appellationWatch = autorun(() => {
 onUnmounted(() => {
   appellationWatch()
 })
+
+function checkMsg(){
+   console.log(props.msg);
+    console.log(currentMsg.value.serverExtension);
+}
 </script>
 
 <style scoped lang="scss">

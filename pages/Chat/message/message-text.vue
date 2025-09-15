@@ -1,5 +1,5 @@
 <template>
-  <div class="msg-text flex-box flex-y-center" >
+  <div class="msg-text flex-box  flex-direction-column" >
     <template v-for="item in textArr" :key="item.key">
       <template v-if="item.type === 'text'">
         <span class="msg-text">{{ item.value }}</span>

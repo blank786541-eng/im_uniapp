@@ -701,15 +701,28 @@ const showKeyboard = () => {
   isFocus.value = true
 }
 
-const banned = ref(false)
+const banned = ref<boolean>(false)
+
+
+uni.$UIKitNIM.V2NIMLocalConversationService.on('onConversationChanged',(conversations)=>{
+    conversations.forEach(item=>{
+       if(item.type== V2NIMConst.V2NIMConversationType.V2NIM_CONVERSATION_TYPE_TEAM){
+        checkBanned();
+       }
+    })
+})
 
 function checkBanned() {
 
   const myUser = uni.$UIKitStore.userStore.myUserInfo
   const teamMember = uni.$UIKitStore.teamMemberStore.getTeamMember(props.to, [
     myUser.accountId,
-  ])[0]
-  banned.value = teamMember.chatBanned;
+  ])
+
+  if(teamMember.length>0){
+  banned.value = teamMember[0].chatBanned || false;
+  }
+
 
 }
 uni.$on(events.REPLY_MSG, (msg: V2NIMMessageForUI) => {
@@ -780,6 +793,8 @@ uni.$on(events.AIT_TEAM_MEMBER, (member: MentionedMember) => {
     ),
     member,
   ]
+
+  console.log(member,'member====')
   const newInputText = inputText.value + '@' + member.accountId + ' '
   /** 更新input框的内容 */
   inputText.value = newInputText
@@ -942,6 +957,7 @@ onUnmounted(() => {
   // 表情发送
   uni.$off(events.EMOJI_SEND)
   uni.$off('closeMore')
+  uni.$UIKitNIM.V2NIMLocalConversationService.off('onConversationChanged',()=>{});
   removeReplyMsg()
   teamWatch()
 })

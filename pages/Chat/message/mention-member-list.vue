@@ -174,12 +174,12 @@ const sortGroupMembers = (members: V2NIMTeamMember[], teamId: string) => {
  */
 const handleItemClick = (member: V2NIMTeamMember | MentionedMember) => {
 
-
+  console.log(member,'=====');
   const _member: MentionedMember =
     member.accountId === AT_ALL_ACCOUNT
       ? (member as MentionedMember)
       : {
-          accountId: member.accountId,
+          accountId: member.name,
           appellation: uni.$UIKitStore.uiStore.getAppellation({
             account: member.accountId,
             teamId: (member as V2NIMTeamMember).teamId,

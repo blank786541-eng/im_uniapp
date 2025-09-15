@@ -29,12 +29,10 @@ let conversationId = ''
 let newTeamMember: string[] = []
 
 const checkboxChange = (selectList: string[]) => {
-  console.log(selectList, 'selectList====')
   newTeamMember = selectList
 }
 // 添加群成员
 const addTeamMember = debounce(() => {
-  console.log(newTeamMember, 'newTeamMember0====')
   if (newTeamMember.length == 0) {
     uni.showToast({
       title: "请选择成员",
@@ -42,6 +40,11 @@ const addTeamMember = debounce(() => {
     })
     return;
   }
+  if(!newTeamMember.includes(uni.$UIKitStore.userStore.myUserInfo.accountId)){
+    newTeamMember.push(uni.$UIKitStore.userStore.myUserInfo.accountId);
+  }
+  console.log(newTeamMember, 'selectList====')
+
   uni.setStorageSync('inviteUsers', newTeamMember)
   customNavigateTo({
     url: `/pages/Other/team-video-call?type=2&teamId=${teamId}&conversationId=${conversationId}`,
@@ -54,7 +57,6 @@ onLoad((props) => {
   conversationId = props ? props.conversationId : ''
   const res = uni.$UIKitStore.teamMemberStore.getTeamMember(teamId)
   const stateMap = uni.$UIKitStore?.subscriptionStore.stateMap
-
   friendList.value = res.map((item) => {
     let login = false;
     console.log(stateMap.get(item.accountId), `res===== ${item.accountId}`, uni.$UIKitStore.localOptions.loginStateVisible);
