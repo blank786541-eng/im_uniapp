@@ -33,16 +33,17 @@ onReady(() => {
 // 生成二维码
 async  function make() {
 
-  const url=await  httpRequest({
+  const data=await  httpRequest({
       url:'im/api/getUserCodeAndUrl',
     method:"GET",
     data:{
       account:userInfo.value.accountId,
     }
     })
+  console.log(data.code,'url====')
   var qr = new UQRCode();
   // 设置二维码内容
-  qr.data = url;
+  qr.data = data.url;
   // 设置二维码大小，必须与canvas设置的宽高一致
   qr.size = size.value.windowWidth;
   // 调用制作二维码方法

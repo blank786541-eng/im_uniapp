@@ -12,8 +12,9 @@
           @blur="handleBlur"
           :placeholder="placeholder"
           :maxlength="maxlength"
+          placeholder-class="set_placeholder"
       />
-      <div class="clear-icon" @tap="clearInput()">
+      <div class="clear-icon" @tap="clearInput()" v-if="allowClear">
         <icon v-show="modelValue && allowClear" type="clear" size="16"/>
       </div>
       <slot name="addonAfter"/>

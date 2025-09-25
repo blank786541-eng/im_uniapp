@@ -86,4 +86,10 @@ function update(v){
     height: 13px;
   }
 }
+.set_placeholder {
+  font-weight: 400;
+  font-size: 14px !important;
+  vertical-align: middle;
+  color: #D2D2D2;
+}
 </style>

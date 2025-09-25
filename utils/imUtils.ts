@@ -4,7 +4,12 @@ import {isWxApp} from "@/utils/index";
 import RootStore from "@xkit-yx/im-store-v2";
 import {V2NIMConst} from "nim-web-sdk-ng/dist/esm/nim";
 import {getMsgContentTipByType} from "@/utils/msg";
-import {customRedirectTo, customReLaunch, customSwitchTab} from "@/utils/customNavigate";
+import {customNavigateTo, customRedirectTo, customReLaunch, customSwitchTab} from "@/utils/customNavigate";
+import {
+    V2NIMSignallingEvent,
+    V2NIMSignallingRoomInfo
+} from "nim-web-sdk-ng/dist/v2/NIM_UNIAPP_SDK/V2NIMSignallingService";
+import {getParamsValues} from "@/pages/Other/help/call";
 
 var nimCallKit: any;
 var nimPushPlugin: any;
@@ -320,6 +325,35 @@ function initNim(opts: { account: string; token: string; appkey: string }) {
     }).finally(() => {
         uni.hideLoading()
     });
+    console.log('add events===')
+    uni.$UIKitNIM.V2NIMSignallingService.on("onSyncRoomInfoList", (rooms: V2NIMSignallingRoomInfo[]) => {
+        for (let i = 0; i < rooms.length; i++) {
+            uni.$UIKitNIM.V2NIMSignallingService.leaveRoom(rooms[i].channelInfo.channelId);
+        }
+    });
+
+    uni.$UIKitNIM.V2NIMSignallingService.on("onOnlineEvent", (data: V2NIMSignallingEvent) => {
+        console.warn(data, 'onOnlineEvent=====')
+        if (data.eventType == 3) {
+            const obj = getParamsValues(data.serverExtension)
+            console.log(obj, '=====')
+            uni.setStorageSync('inviteUsers',obj.ids.split(','))
+            if (obj.teamId) {
+                customNavigateTo({
+                    url: `/pages/Other/team-video-call?uid=${data.inviterAccountId}&channelName=${data.channelInfo.channelName}&roomId=${data.channelInfo.channelId}&requestId=${data.requestId}&type=${data.channelInfo.channelType}&conversationId=${obj.conversationId}&teamId=${obj.teamId}`,
+                })
+            } else {
+                uni.setStorageSync('currentConversation', data.serverExtension);
+                customNavigateTo({
+                    url: `/pages/Other/video-call?uid=${data.inviterAccountId}&audioRoomId=${data.channelInfo.channelName}&roomId=${data.channelInfo.channelId}&requestId=${data.requestId}&type=${data.channelInfo.channelType}`,
+                })
+            }
+
+        } else {
+
+            uni.$emit('on-invite', data)
+        }
+    })
 }
 
 function onImShowApp() {
@@ -337,6 +371,7 @@ function onImShowApp() {
             startByNotificationId = `${imOptions.account}|${type}|${res?.sessionId}`;
         }
     });
+
     // #endif
 }
 
@@ -362,6 +397,8 @@ function logout() {
     } catch (error) {
         console.log("音视频通话插件退出失败", error);
     }
+    uni.$UIKitNIM.V2NIMSignallingService.off("onOnlineEvent");
+    uni.$UIKitNIM.V2NIMSignallingService.off("onSyncRoomInfoList");
     // 退出登录
     uni.$UIKitNIM.V2NIMLoginService.logout().then(() => {
         uni.$UIKitStore.destroy();

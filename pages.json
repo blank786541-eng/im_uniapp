@@ -16,6 +16,37 @@
       }
     },
     {
+      "path": "pages/Bao/index",
+      "style": {
+        "navigationStyle": "custom"
+      }
+    }, {
+      "path": "pages/Bao/my-order",
+      "style": {
+        "navigationStyle": "custom"
+      }
+    },{
+      "path": "pages/Bao/team",
+      "style": {
+        "navigationStyle": "custom"
+      }
+    },{
+      "path": "pages/Bao/detail",
+      "style": {
+        "navigationStyle": "custom"
+      }
+    },{
+      "path": "pages/Bao/pay-detail",
+      "style": {
+        "navigationStyle": "custom"
+      }
+    },{
+      "path": "pages/Bao/certification",
+      "style": {
+        "navigationStyle": "custom"
+      }
+    },
+    {
       "path": "pages/Conversation/conversation-search/index",
       "style": {
         "navigationStyle": "custom"
@@ -57,17 +88,20 @@
       "style": {
         "navigationStyle": "custom"
       }
-    }, {
+    },
+    {
       "path": "pages/Other/video-call",
       "style": {
         "navigationStyle": "custom"
       }
-    }, {
+    },
+    {
       "path": "pages/Other/team-video-call",
       "style": {
         "navigationStyle": "custom"
       }
-    },{
+    },
+    {
       "path": "pages/Other/select-call-user",
       "style": {
         "navigationStyle": "custom"
@@ -249,7 +283,8 @@
       "style": {
         "navigationStyle": "custom"
       }
-    },{
+    },
+    {
       "path": "pages/User/my-detail/change-mobile",
       "style": {
         "navigationStyle": "custom"
@@ -328,6 +363,12 @@
         "iconPath": "static/tabbar/user.png",
         "selectedIconPath": "static/tabbar/user-a.png",
         "pagePath": "pages/Contact/index"
+      },
+      {
+        "text": "保险产品",
+        "iconPath": "static/tabbar/baoxian.png",
+        "selectedIconPath": "static/tabbar/baoxian-a.png",
+        "pagePath": "pages/Bao/index"
       },
       {
         "text": "%mineText%",

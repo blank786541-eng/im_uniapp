@@ -1,4 +1,4 @@
-const apiUrl = "https://api.freessl.help/"
+export  const apiUrl = "https://api.imgbt.net/"
 
 export async function httpRequest(opt: { url: string, data: Object, method: string, headers: Object }) {
     uni.showLoading();
@@ -13,7 +13,7 @@ export async function httpRequest(opt: { url: string, data: Object, method: stri
             data: opt.data,
             method: opt.method || "POST",
             success(res) {
-                console.log("success :", res.data);
+                console.log("success :", res.data.data);
 
                 if(res.data.code!=200){
                     uni.showToast({
