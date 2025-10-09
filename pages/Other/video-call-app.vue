@@ -11,21 +11,20 @@ import {
   removeListeners, stopMusic
 } from "@/pages/Other/help/call";
 import {V2NIMUser} from 'nim-web-sdk-ng/dist/v2/NIM_UNIAPP_SDK/V2NIMUserService'
-import NERTC from "nertc-web-sdk";
+import NERTC from "@/NERtcUniappSDK-JS/lib/index";
 import {onLoad} from '@dcloudio/uni-app'
 import Avatar from "@/components/Avatar.vue";
 import AssetsImage from "@/components/AssetsImage.vue";
 import {
   V2NIMSignallingCallResult,
   V2NIMSignallingCallSetupResult,
-  V2NIMSignallingEvent, V2NIMSignallingRoomInfo
+  V2NIMSignallingEvent
 } from "nim-web-sdk-ng/dist/v2/NIM_UNIAPP_SDK/V2NIMSignallingService";
 import {V2NIMConst} from "@/utils/nim";
 import {Stream} from "nertc-web-sdk/types/stream";
 import config from "@/utils/config";
 import {V2NIMMessage} from "nim-web-sdk-ng/dist/esm/nim/src/V2NIMMessageService";
 import {events} from "@/utils/constants";
-import {customNavigateTo} from "@/utils/customNavigate";
 
 let client: Client;
 const connect = ref(false);  //双方的链接状态
@@ -71,10 +70,11 @@ let query = reactive({
 const createUser = ref(false);
 
 onLoad(async (options) => {
-  client = NERTC.createClient({
+  client = NERTC.setupEngineWithContext({
     appkey: config.appKey,
     debug: true,
   });
+
 
   query = options;
   uni.$UIKitStore.userStore.getUserForceActive(options.uid).then((res) => {
@@ -138,16 +138,11 @@ async function addStream(stream, userId) {
 
 
 async function destory() {
-  if (timer) {
-    clearInterval(timer);
-    timer = null;
-  }
   playMusic('/static/call-stop.mp3', 'jieting')
   const id = uni.$UIKitNIM.V2NIMConversationIdUtil.p2pConversationId(
       query.uid
   )
-
-  if (createUser.value && connect.value) {
+  if (connect.value) {
     createCallMessage({
 
       channelId: query.roomId,
@@ -189,7 +184,10 @@ async function destory() {
 
     console.log(`${id}`, 'uni.$UIKitStore.userStore.myUserInfo.accountId|1|query.uid')
   }
-
+  if (timer) {
+    clearInterval(timer);
+    timer = null;
+  }
   uni.navigateBack();
 }
 
@@ -259,7 +257,7 @@ function initLocalStream() {
   params.localStream = NERTC.createStream({
     client: client,
     uid: randomNumbers(),
-    audio: true, //是否启动mic
+    audio: query.type == 1, //是否启动mic
     video: false, //是否启动camera
     screen: false, //是否启动屏幕共享
   });
@@ -281,7 +279,7 @@ function initLocalStream() {
         connect.value = true;
       })
       .catch((err) => {
-        console.warn("音视频初始化失败: ", err.message, err.code);
+        console.warn("音视频初始化失败: ", err);
 
         params.localStream = null;
       });
@@ -430,7 +428,6 @@ async function joinRoom() {
   initLocalStream();
 
   createUser.value = false;
-
 }
 
 
@@ -544,7 +541,7 @@ async function createCallMessage(opt: {
 }) {
 
   let sessionStats = await client.getSessionStats()
-  const msg = uni.$UIKitNIM.V2NIMMessageCreator.createCallMessage(1, opt.channelId, opt.type || 1, connect.value ? [{
+  const msg = uni.$UIKitNIM.V2NIMMessageCreator.createCallMessage(1, opt.channelId, opt.type || 1, [{
     accountId: query.uid,
     /**
      * 通话时长
@@ -556,7 +553,7 @@ async function createCallMessage(opt: {
      * 通话时长
      */
     duration: Math.ceil(sessionStats.Duration) || 0
-  }] : [{accountId: query.uid,}, {accountId: uni.$UIKitStore.userStore.myUserInfo.accountId,}])
+  }])
 
 
   await uni.$UIKitStore.msgStore

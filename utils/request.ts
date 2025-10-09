@@ -13,12 +13,12 @@ export async function httpRequest(opt: { url: string, data: Object, method: stri
             data: opt.data,
             method: opt.method || "POST",
             success(res) {
-                console.log("success :", res.data.data);
+                console.log("success :", res.data.data,res.data.message);
 
                 if(res.data.code!=200){
                     uni.showToast({
                         icon: 'error',
-                        title: res.data.message
+                        title: res.data.message || res.data.msg
                     })
                     reject();
                 }else{

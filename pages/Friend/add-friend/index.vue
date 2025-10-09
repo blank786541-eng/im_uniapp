@@ -77,6 +77,7 @@ const relation = ref<Relation>('stranger')
 const uninstallRelationWatch = autorun(() => {
   // 这行打印用于触发 autorun 执行，不能删除
   console.log('friends: ', uni.$UIKitStore.uiStore.friends)
+
   if (userInfo.value?.accountId) {
     relation.value = uni.$UIKitStore.uiStore.getRelation(
       userInfo.value?.accountId

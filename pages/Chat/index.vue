@@ -38,7 +38,7 @@
           :reply-msgs-map="replyMsgsMap"
           :conversation-type="conversationType"
           :to="to"
-
+          @changeState="changeState"
           :show-more="close"
       />
     </div>

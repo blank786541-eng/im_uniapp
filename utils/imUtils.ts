@@ -10,6 +10,8 @@ import {
     V2NIMSignallingRoomInfo
 } from "nim-web-sdk-ng/dist/v2/NIM_UNIAPP_SDK/V2NIMSignallingService";
 import {getParamsValues} from "@/pages/Other/help/call";
+import {httpRequest, updateImInfo} from "@/utils/request";
+import {update} from "immutable";
 
 var nimCallKit: any;
 var nimPushPlugin: any;
@@ -32,7 +34,7 @@ function initNim(opts: { account: string; token: string; appkey: string }) {
         key: STORAGE_KEY,
         data: opts,
     });
-    console.warn(opts.appkey,'appkey=====')
+    console.warn(opts.appkey, 'appkey=====')
 
     uni.showLoading();
     /** 是否开启云端会话（此处为了方便demo切换云端/本地会话，将其存到本地，实际需根据业务情况设置）*/
@@ -266,7 +268,6 @@ function initNim(opts: { account: string; token: string; appkey: string }) {
                             } else {
 
 
-
                             }
                         }
                     );
@@ -281,11 +282,21 @@ function initNim(opts: { account: string; token: string; appkey: string }) {
             uni.showToast({
                 title: "登录成功",
                 icon: 'success',
-                duration:1000,
+                duration: 1000,
                 success: () => {
                     customSwitchTab({
                         url: "/pages/Conversation/index",
                     });
+                    httpRequest({
+                        url: 'kyc/getByAccount',
+                        method: "GET",
+                        data: {
+                            account:opts.account
+                        }
+                    }).then((res) => {
+
+                        uni.$UIKitNIM.V2NIMUserService.updateSelfUserProfile({name: res.nickname})
+                    })
                 }
             })
 
@@ -307,9 +318,11 @@ function initNim(opts: { account: string; token: string; appkey: string }) {
             uni.showToast({
                 title: "密码错误",
                 icon: "error",
-                duration:800,
-                success:()=>{
-
+                duration: 800,
+                success: () => {
+                    uni.reLaunch({
+                        url: `/pages/Login/login-form`,
+                    });
                 }
             })
         } else if (e.code == 102422) {
@@ -331,14 +344,24 @@ function initNim(opts: { account: string; token: string; appkey: string }) {
             uni.$UIKitNIM.V2NIMSignallingService.leaveRoom(rooms[i].channelInfo.channelId);
         }
     });
-
+    uni.$UIKitNIM.V2NIMSignallingService.on("onMultiClientEvent", (event: V2NIMSignallingEvent) => {
+        uni.showToast({
+            icon: "none",
+            title: "已在别的设备处理",
+            duration: 800,
+            success: () => {
+                uni.navigateBack()
+            }
+        })
+    });
     uni.$UIKitNIM.V2NIMSignallingService.on("onOnlineEvent", (data: V2NIMSignallingEvent) => {
         console.warn(data, 'onOnlineEvent=====')
         if (data.eventType == 3) {
             const obj = getParamsValues(data.serverExtension)
             console.log(obj, '=====')
-            uni.setStorageSync('inviteUsers',obj.ids.split(','))
+
             if (obj.teamId) {
+                uni.setStorageSync('inviteUsers', obj.ids.split(','))
                 customNavigateTo({
                     url: `/pages/Other/team-video-call?uid=${data.inviterAccountId}&channelName=${data.channelInfo.channelName}&roomId=${data.channelInfo.channelId}&requestId=${data.requestId}&type=${data.channelInfo.channelType}&conversationId=${obj.conversationId}&teamId=${obj.teamId}`,
                 })

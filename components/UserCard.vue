@@ -40,7 +40,7 @@ import {V2NIMMessage} from "nim-web-sdk-ng/dist/esm/nim/src/V2NIMMessageService"
 import {events} from "@/utils/constants";
 import {handleNoPermission} from "@/utils/permission";
 import {request} from "node:http";
-import {httpRequest} from "@/utils/request";
+import {apiUrl, httpRequest} from "@/utils/request";
 
 const props = withDefaults(
     defineProps<{
@@ -84,7 +84,7 @@ function changeAvatar() {
       formData.append('accountId', props.account)
 
       uni.uploadFile({
-        url: "https://api.freessl.help/im/api/upload",
+        url: `${apiUrl}im/api/upload`,
         formData: {
           accountId: props.account,
         },

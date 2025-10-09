@@ -41,7 +41,7 @@ import { autorun } from 'mobx'
 function  closeMore(e){
   // uni.$emit('closeMore');
   console.log(e.detail.deltaY)
-  if(e.detail.deltaY > 0){
+  if(e.detail.deltaY > 5){
     uni.$emit('closeMore');
   }
 }
@@ -74,6 +74,8 @@ onBeforeMount(() => {
     if(teamMember){
       manager.value = teamMember.memberRole == V2NIMConst.V2NIMTeamMemberRole.V2NIM_TEAM_MEMBER_ROLE_MANAGER ||
           teamMember.memberRole == V2NIMConst.V2NIMTeamMemberRole.V2NIM_TEAM_MEMBER_ROLE_OWNER;
+
+      console.log(manager.value,'manager======')
     }
 
   })

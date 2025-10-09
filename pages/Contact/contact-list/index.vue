@@ -209,6 +209,7 @@ const handleAcceptApplyFriendClick = async (
           msg.operatorAccountId
       ),
     })
+    uni.$UIKitStore.sysMsgStore.setAllApplyMsgRead();
   } catch (error) {
     console.log('error', error)
   }

@@ -1,37 +1,37 @@
 <template>
-  <div
-      v-if="
-      props.msg.sendingState ==
-      V2NIMConst.V2NIMMessageSendingState.V2NIM_MESSAGE_SENDING_STATE_SUCCEEDED
-    "
-      class="msg-read-wrapper"
-  >
-    <div
-        v-if="
-        conversationType ===
-          V2NIMConst.V2NIMConversationType.V2NIM_CONVERSATION_TYPE_P2P &&
-        p2pMsgReceiptVisible
-      "
-    >
-      <div class="icon-read-wrapper">
-<!--        <Icon type="icon-read" :size="10"></Icon>-->
-        <span class="font-14 default-text" style="font-size: 10px;text-align: right;color:#999">{{p2pMsgRotateDeg?'已读':'未读'}}</span>
-      </div>
+<!--  <div-->
+<!--      v-if="-->
+<!--      props.msg.sendingState ==-->
+<!--      V2NIMConst.V2NIMMessageSendingState.V2NIM_MESSAGE_SENDING_STATE_SUCCEEDED-->
+<!--    "-->
+<!--      class="msg-read-wrapper"-->
+<!--  >-->
+<!--    <div-->
+<!--        v-if="-->
+<!--        conversationType ===-->
+<!--          V2NIMConst.V2NIMConversationType.V2NIM_CONVERSATION_TYPE_P2P &&-->
+<!--        p2pMsgReceiptVisible-->
+<!--      "-->
+<!--    >-->
+<!--      <div class="icon-read-wrapper">-->
+<!--&lt;!&ndash;        <Icon type="icon-read" :size="10"></Icon>&ndash;&gt;-->
+<!--        <span class="font-14 default-text" style="font-size: 10px;text-align: right;color:#999">{{p2pMsgRotateDeg?'已读':'未读'}}</span>-->
+<!--      </div>-->
 
-    </div>
-    <div
-        v-if="
-        conversationType ===
-          V2NIMConst.V2NIMConversationType.V2NIM_CONVERSATION_TYPE_TEAM &&
-        teamManagerVisible
-      "
-    >
-      <div class="icon-read-wrapper" @tap="jumpToTeamMsgReadInfo">
-        <span class="font-14 default-text" style="font-size: 12px;text-align: right;color:#999;" >{{ readCount>0?'已读':'未读' }}</span>
-      </div>
+<!--    </div>-->
+<!--    <div-->
+<!--        v-if="-->
+<!--        conversationType ===-->
+<!--          V2NIMConst.V2NIMConversationType.V2NIM_CONVERSATION_TYPE_TEAM &&-->
+<!--        teamManagerVisible-->
+<!--      "-->
+<!--    >-->
+<!--      <div class="icon-read-wrapper" @tap="jumpToTeamMsgReadInfo">-->
+<!--        <span class="font-14 default-text" style="font-size: 12px;text-align: right;color:#999;" >{{ readCount>0?'已读':'未读' }}</span>-->
+<!--      </div>-->
 
-    </div>
-  </div>
+<!--    </div>-->
+<!--  </div>-->
   <div></div>
 </template>
 

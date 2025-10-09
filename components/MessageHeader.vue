@@ -1,9 +1,10 @@
 <script setup lang="ts">
-import {onBeforeMount, onUnmounted, ref} from "vue";
+import {onBeforeMount, onMounted, onUnmounted, ref} from "vue";
 import AssetsImage from "@/components/AssetsImage.vue";
 import {customNavigateTo, customSwitchTab} from "@/utils/customNavigate";
 import {V2NIMConst} from "@/utils/nim";
 import { autorun } from 'mobx'
+import {httpRequest} from "@/utils/request";
 const props = withDefaults(
     defineProps<{
       conversationType: V2NIMConst.V2NIMConversationType
@@ -21,6 +22,7 @@ onBeforeMount(() => {
   // #ifdef APP-PLUS
   appStatusHeight.value = plus.navigator.getStatusbarHeight();
   // #endif
+
 
 
 })

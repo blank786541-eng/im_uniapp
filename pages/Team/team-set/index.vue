@@ -59,7 +59,11 @@
 
 
       <div class="team-set-item">
-        <div class=" team-set-item-flex" @tap="goPinInTeam">
+        <div class=" team-set-item-flex" @tap="goQrcode">
+          <div>群二维码</div>
+          <Icon iconClassName="more-icon" color="#999" type="icon-jiantou"/>
+        </div>
+        <div class=" team-set-item-flex" @tap="goPinTeam">
           <div>{{ t('pinText') }}</div>
           <Icon iconClassName="more-icon" color="#999" type="icon-jiantou"/>
         </div>
@@ -246,14 +250,19 @@ const toChangeContent = (type, content) => {
 }
 
 /** 群标记 */
-const goPinInTeam = () => {
+const goPinTeam = () => {
   const conversationId =
       uni.$UIKitNIM.V2NIMConversationIdUtil.teamConversationId(teamId)
   customNavigateTo({
     url: `/pages/Chat/message/pin-list?conversationId=${conversationId}`,
   })
 }
+function  goQrcode(){
 
+  customNavigateTo({
+    url: `/pages/Team/team-set/team-qrcode?conversationId=${teamId}`,
+  })
+}
 /** 添加群成员 */
 const addTeamMember = () => {
   if (!canAddMember.value) {

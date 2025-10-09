@@ -13,6 +13,11 @@
         <div class="container-box"></div>
         <span class="value">{{ userInfo.name || userInfo.accountId }}</span>
       </div>
+      <div class="row" @click="toAddnote">
+        <span class="label">备注</span>
+        <div class="container-box"></div>
+        <span class="value">{{ userInfo.alias}}</span>
+      </div>
       <div class="row">
         <span class="label">性别</span>
         <div class="container-box"></div>
@@ -32,14 +37,14 @@
         <span class="value">{{ userInfo.accountId }}</span>
         <AssetsImage path="/static/copy.png" width="16px" height="16px"></AssetsImage>
       </div>
-      <div class="row">
-        <span class="label">手机号</span>
-        <div class="container-box"></div>
-        <div class="value">{{
-            userInfo.mobile
-          }}
-        </div>
-      </div>
+<!--      <div class="row">-->
+<!--        <span class="label">手机号</span>-->
+<!--        <div class="container-box"></div>-->
+<!--        <div class="value">{{-->
+<!--            userInfo.mobile-->
+<!--          }}-->
+<!--        </div>-->
+<!--      </div>-->
       <div class="row">
         <span class="label">个性签名</span>
         <div class="container-box"></div>
@@ -121,6 +126,7 @@ onLoad((props) => {
   // 监听好友个人信息
   friendWatch = autorun(() => {
     userInfo.value = uni.$UIKitStore.uiStore.getFriendWithUserNameCard(account)
+    console.log(userInfo.value,'value======')
   })
 
   // 监听好友关系
@@ -227,7 +233,11 @@ const addFriend = async () => {
     })
   }
 }
-
+function toAddnote(){
+  customNavigateTo({
+    url: `/pages/Chat/message/add-note?conversationId=${userInfo.value?.accountId}`,
+  })
+}
 const gotoChat = async () => {
   const conversationId =
       uni.$UIKitNIM.V2NIMConversationIdUtil.p2pConversationId(

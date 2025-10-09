@@ -50,6 +50,7 @@
       "
       >
         <Avatar
+
             :account="props.msg.senderId"
             :teamId="
           conversationType ===
@@ -87,6 +88,7 @@
       "
       >
         <Avatar
+
             :account="props.msg.senderId"
             :teamId="
           conversationType ===
@@ -113,6 +115,7 @@
       "
       >
         <Avatar
+
             :account="props.msg.senderId"
             :teamId="
           conversationType ===
@@ -145,6 +148,7 @@
           :style="{ flexDirection: !props.msg.isSelf ? 'row' : 'row-reverse' }"
       >
         <Avatar
+
             :account="props.msg.senderId"
             :teamId="
           conversationType ===
@@ -184,6 +188,7 @@
           :style="{ flexDirection: !props.msg.isSelf ? 'row' : 'row-reverse' }"
       >
         <Avatar
+
             :account="props.msg.senderId"
             :teamId="
           conversationType ===
@@ -238,6 +243,7 @@
           :style="{ flexDirection: !props.msg.isSelf ? 'row' : 'row-reverse' }"
       >
         <Avatar
+
             :account="props.msg.senderId"
             :teamId="
           conversationType ===
@@ -291,6 +297,7 @@
           :style="{ flexDirection: !props.msg.isSelf ? 'row' : 'row-reverse' }"
       >
         <Avatar
+
             :account="props.msg.senderId"
             :teamId="
           conversationType ===
@@ -326,6 +333,7 @@
           :style="{ flexDirection: !props.msg.isSelf ? 'row' : 'row-reverse' }"
       >
         <Avatar
+
             :account="props.msg.senderId"
             :teamId="
           conversationType ===
@@ -367,6 +375,7 @@
       }"
       >
         <Avatar
+
             :account="props.msg.senderId"
             :teamId="
           conversationType ===
@@ -411,6 +420,7 @@
           v-else
       >
         <Avatar
+
             :account="props.msg.senderId"
             :teamId="
           conversationType ===
@@ -512,14 +522,11 @@ const props = withDefaults(
     {}
 )
 onMounted(() => {
-    console.log(props.msg,'msg=====')
+
     currentMsg.value=props.msg;
 })
 
-watch(()=>props.msg,(o,n)=>{
-  // console.log(o,n,"==========")
-  // currentMsg.value=o;
-})
+
 /** 回复消息 */
 const replyMsg = computed(() => {
   return props.replyMsgsMap && props.replyMsgsMap[props.msg.messageClientId]

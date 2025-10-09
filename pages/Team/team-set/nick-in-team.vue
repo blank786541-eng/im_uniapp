@@ -20,10 +20,10 @@
           class="input"
           :allow-clear="true"
           :maxlength="15"
-          :value="inputValue"
+          :modelValue="inputValue"
 
           :placeholder="t('nickInTeam')"
-          @input="inputValue"
+          @update:modelValue="onInputChange"
           :confirm-type="t('okText')"
           @focus="onInputFocus"
 
@@ -64,7 +64,7 @@ onLoad((option) => {
 })
 
 const onInputChange = (e: any) => {
-  inputValue.value = e.detail.value
+  inputValue.value = e
 }
 
 const onInputFocus = () => {
@@ -76,6 +76,7 @@ const clearInputValue = () => {
 }
 
 const onOk = () => {
+  console.log('修改昵称')
   uni.$UIKitStore.teamMemberStore
       .updateMyMemberInfoActive({
         teamId,

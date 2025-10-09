@@ -43,7 +43,7 @@ const sells = reactive([
     text: "投保年龄"
   }, {
     name: "终身",
-    unit: '年',
+    unit: '天',
     text: "保障期间"
   },
 ])
@@ -51,7 +51,7 @@ const sells = reactive([
 
 function toPay(){
   customNavigateTo({
-    url: `/pages/Bao/pay-detail?id=${product.value.id}&name=${product.value.productName}`,
+    url: `/pages/Bao/pay-detail?id=${product.value.id}&name=${product.value.productName}&price=${product.value.premium}`,
   })
 }
 </script>
@@ -71,7 +71,7 @@ function toPay(){
         <div class="pro-text">
           <div style="flex:1">
             <div style="text-align: center">
-              <span class="t1">{{ product.coverageAmount }}</span>
+              <span class="t1">{{ product.coverageAmount/10000 }}</span>
               <span class="t2">万</span>
             </div>
             <div class="t3">
@@ -86,7 +86,7 @@ function toPay(){
           </div>
           <div style="flex:1">
             <div style="text-align: center">
-              <span class="t1"> {{ product.hospitalNumber }}万</span>
+              <span class="t1"> {{ product.hospitalNumber }}</span>
               <span class="t2">万</span>
             </div>
             <div class="t3">
@@ -152,7 +152,7 @@ function toPay(){
         </div>
       </div>
       <div class="text-box sick-name" style="font-size: 16px;font-weight: 600;padding: 14px 12px">
-        保障金额:{{product.coverageAmount}}
+        保障金额:{{product.coverageAmount/10000}}万
       </div>
 <!--      <div class="text-box">-->
 <!--        <div class="sick-name">产品特色</div>-->

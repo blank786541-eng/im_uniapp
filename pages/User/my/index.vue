@@ -4,7 +4,7 @@
     <div class="flex-box flex-space-between ">
       <div class="flex-box flex-y-center" @tap="toUserDetail">
         <Avatar :account="myUserInfo.accountId"></Avatar>
-        <div class="user-name">
+        <div class="user-name" style="flex-shrink:0">
           <div>
             {{ myUserInfo.name || myUserInfo.accountId }}
           </div>
@@ -23,20 +23,20 @@
         </div>
       </div>
     </div>
-    <!--    <div class="user-content-box">-->
-    <!--      <div class="sub-title">-->
-    <!--        我的钱包-->
-    <!--      </div>-->
-    <!--      <div class="sub-text">-->
-    <!--        129,990,621-->
-    <!--      </div>-->
-    <!--    </div>-->
+        <div class="user-content-box">
+          <div class="sub-title">
+            我的钱包
+          </div>
+          <div class="sub-text">
+            {{stateMap.balance}}
+          </div>
+        </div>
     <div class="user-content-box">
       <div class="sub-title">
         我的医疗保险总额
       </div>
       <div class="sub-text">
-        {{ stateMap. alreadyReceived}}
+        {{ stateMap.alreadyReceived}}
       </div>
 
       <div class="flex-box flex-space-between" style="margin-top: 12px;">
@@ -53,7 +53,7 @@
         </div>
       </div>
       <div class="notice">
-        详情：保险激活后需每日签到领取保险金，如意外事故发生以当前保险总额计算赔付金，详情请咨询国宝通在线客服。
+        详情：保险激活后需每日签到领取保险金，如意外事故发生以当前保险总额计算赔付金，详情请咨询国保通在线客服。
       </div>
     </div>
     <div class="setting-box">
@@ -73,7 +73,7 @@
         <AssetsImage :path="'/static/right-b.png'" width="16px" height="16px"></AssetsImage>
       </div>
     </div>
-    <div class="kefu">
+    <div class="kefu" @click="toOpen">
       国保通在线客服
     </div>
     <div class="team-btn flex-center" @tap="toSettingPage('/pages/Bao/team')">
@@ -144,17 +144,18 @@ const settings = [
     name: '我的保单',
     url: "/pages/Bao/my-order"
   },
-  // {
-  //   name: '邀请好友',
-  //   url: "/pages/User/my-detail/my-qrcode"
-  // },
-  //
+
+
   {
     name: '关于国保通',
-    url: ""
+    url: `/pages/User/my/about`
   }, {
     name: '设置',
     url: `/pages/User/my/my-detail`
+  },
+  {
+    name: '修改密码',
+    url: "/pages/Login/changePassword"
   },
 ]
 const uninstallMyUserInfoWatch = autorun(() => {
@@ -163,7 +164,7 @@ const uninstallMyUserInfoWatch = autorun(() => {
 const inviteCode = ref('');
 const stateMap = ref({});
 const getState = ref(false);
-
+const serviceUrl='';
 function getData() {
   const userInfo = uni.$UIKitStore.userStore.myUserInfo
   if(!userInfo.accountId) return;
@@ -256,6 +257,12 @@ function toSettingPage(url) {
     url: url
   })
 }
+
+function  toOpen(){
+  customNavigateTo({
+    url: `/pages/Other/webview?url=${stateMap.value.customerServiceUrl}`
+  })
+}
 </script>
 
 <style lang="scss">
@@ -267,7 +274,7 @@ function toSettingPage(url) {
   background-size: 100% 100%;
   background-image: url("/static/baobg.png");
   box-sizing: border-box;
-
+  overflow-y: scroll;
 }
 
 .user-name {

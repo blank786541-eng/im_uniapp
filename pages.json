@@ -57,6 +57,11 @@
       "style": {
         "navigationStyle": "custom"
       }
+    }, {
+      "path": "pages/Login/changePassword",
+      "style": {
+        "navigationStyle": "custom"
+      }
     },
     {
       "path": "pages/Login/register",
@@ -88,6 +93,11 @@
       "style": {
         "navigationStyle": "custom"
       }
+    },{
+      "path": "pages/Other/webview",
+      "style": {
+        "navigationStyle": "custom"
+      }
     },
     {
       "path": "pages/Other/video-call",
@@ -112,6 +122,11 @@
       "style": {
         "navigationStyle": "custom"
       }
+    },{
+      "path": "pages/Chat/message/add-note",
+      "style": {
+        "navigationStyle": "custom"
+      }
     },
     {
       "path": "pages/Chat/message/pin-list",
@@ -133,6 +148,11 @@
     },
     {
       "path": "pages/Team/team-set/index",
+      "style": {
+        "navigationStyle": "custom"
+      }
+    },   {
+      "path": "pages/Team/team-set/team-qrcode",
       "style": {
         "navigationStyle": "custom"
       }

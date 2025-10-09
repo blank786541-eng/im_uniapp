@@ -7,7 +7,7 @@
       <div class="form-login">
         <label-input icon="/static/account.png"
                      :value="loginForm.account"
-                     label="账号" placeholder="请输入账号"
+                     label="账号" placeholder="请输入手机号"
                      :rule="mobileInputRule"
                      labelKey="account"
                      :error-text="accEtx"
@@ -93,13 +93,7 @@ const loginForm = reactive({
 async function submitLoginForm() {
   if (privateChecked.value) return;
 
-  await httpRequest({
-    url:"im/api/blacklist",
-    method:"GET",
-    data:{
-      account:loginForm.account,
-    }
-  })
+
   initNim(loginForm)
 
 }

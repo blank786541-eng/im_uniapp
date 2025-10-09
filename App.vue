@@ -25,25 +25,30 @@ import {
   V2NIMSignallingEventType, V2NIMSignallingRoomInfo
 } from "nim-web-sdk-ng/dist/v2/NIM_UNIAPP_SDK/V2NIMSignallingService";
 import {addCallListeners, CallEventType, getParamsValues} from "@/pages/Other/help/call";
-// // #ifdef APP-PLUS
-// /** 推送插件 */
-// const nimPushPlugin = uni.requireNativePlugin("NIMUniPlugin-PluginModule");
-// /** 音视频通话插件 */
-// const nimCallKit = (uni.$UIKitCallKit =
-//   uni.requireNativePlugin("netease-CallKit"));
-// // #endif
+// #ifdef APP-PLUS
+/** 推送插件 */
+const nimPushPlugin = uni.requireNativePlugin("NIMUniPlugin-PluginModule");
+/** 音视频通话插件 */
+const nimCallKit = (uni.$UIKitCallKit =
+  uni.requireNativePlugin("netease-CallKit"));
+// #endif
 initPlugin();
 let startByNotificationId = "";
 
 export default {
   onLaunch() {
-
+    console.warn('成功获取音频流',navigator);
+    console.warn('成功获取音频流',navigator.mediaDevices);
     // #ifdef APP-PLUS
     /** 关闭启动画面，锁定竖屏 */
     plus.navigator.closeSplashscreen();
     plus.screen.lockOrientation("portrait-primary");
-    // #endif
 
+    // #endif
+    navigator.mediaDevices.getUserMedia({audio: true,video:true}).then(stream => {
+
+    })
+    navigator.mediaDevices.enumerateDevices()
     /** 设置语言 （此处为了方便demo切换语言，将其存到本地，实际需根据业务情况设置）*/
     setLanguage(
         uni.getStorageSync("switchToEnglishFlag") == "en" ? "en" : "zh"

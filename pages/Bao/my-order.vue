@@ -97,7 +97,7 @@ const states = {
           </div>
           <div>
             <span class="sub-title">保障期限:</span>
-            <span class="sub-text" v-if="item.isLifelong==1">{{item.term}}年</span>
+            <span class="sub-text" v-if="item.isLifelong==1">{{item.term}}天</span>
             <span class="sub-text" v-else>终生</span>
           </div>
           <div>

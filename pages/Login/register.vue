@@ -3,7 +3,7 @@
 import i18n from "@/pages/Login/i18n/zh-cn";
 import LabelInput from "@/pages/Login/components/label-input.vue";
 import {reactive, ref} from "vue";
-import {httpRequest} from '@/utils/request'
+import {httpRequest, updateImInfo} from '@/utils/request'
 import DefaultHeader from "@/components/defaultHeader.vue";
 import AssetsImage from "@/components/AssetsImage.vue";
 
@@ -23,7 +23,8 @@ const query = reactive({
   account: "",
   password: "",
   confirmPassword: "",
-  invitationCode: ""
+  invitationCode: "",
+  nikeName: "",
 })
 const privateChecked = ref(false);
 
@@ -75,6 +76,7 @@ async function submitLoginForm() {
       title: "注册成功",
       duration: 1000,
       success: () => {
+
         uni.navigateBack();
       }
     })
@@ -99,7 +101,7 @@ function getValue(value, key) {
       </div>
       <div class="form-login">
         <label-input icon="/static/account.png"
-                     label="账号" placeholder="请输入账号"
+                     label="账号" placeholder="请输入手机号"
                      label-key="account"
                      @update-model-value="getValue"
                      :value="query.account"
@@ -126,7 +128,14 @@ function getValue(value, key) {
                          label-key="invitationCode"
                          @update-model-value="getValue"
                          :value="query.invitationCode"
-                         label="邀请码" placeholder="请输入邀请人账号"></label-input>
+                         label="邀请码" placeholder="请输入邀请码"></label-input>
+          </div>
+          <div style="margin-top: 18px">
+            <label-input icon="/static/account.png"
+                         label-key="nikeName"
+                         @update-model-value="getValue"
+                         :value="query.nikeName"
+                         label="名称" placeholder="请输入名称"></label-input>
           </div>
         </div>
       </div>

@@ -12,6 +12,7 @@
           @blur="handleBlur"
           :placeholder="placeholder"
           :maxlength="maxlength"
+          :disabled="props.disabled"
           placeholder-class="set_placeholder"
       />
       <div class="clear-icon" @tap="clearInput()" v-if="allowClear">
@@ -25,7 +26,7 @@
 </template>
 
 <script lang="ts" setup>
-import {ref, computed} from 'vue'
+import {ref, computed, watch} from 'vue'
 
 const $emit = defineEmits([
   'update:modelValue',
@@ -43,6 +44,7 @@ const props = withDefaults(
       allowClear?: boolean
       rule?: any
       maxlength?: number
+      disabled: boolean
     }>(),
     {
       className: '',
@@ -50,6 +52,7 @@ const props = withDefaults(
       modelValue: '',
       placeholder: '',
       allowClear: false,
+      disabled: false,
       rule: null,
       maxlength: 140,
     }
@@ -58,7 +61,8 @@ const props = withDefaults(
 const inputFocus = ref(false)
 const inputError = ref(false)
 // const inputKey = ref(0);
-
+// const disable = ref(false);
+// watch(()=>props.disabled,(n,o)=>{disable.value=n})
 const inputClass = computed(() => {
   return [
     props.className,
@@ -91,6 +95,9 @@ const handleInput = (event: any) => {
   }
   // 强制刷新input
   // inputKey.value++;
+  if(event.detail.value.length ==0){
+      inputError.value = false;
+  }
 }
 
 const clearInput = () => {
@@ -138,5 +145,8 @@ $error-color: #f56c6c;
   color: $error-color;
   font-size: 12px;
   margin-top: 5px;
+}
+input:disabled,.uni-input-input:disabled  {
+  color: #999 !important;
 }
 </style>

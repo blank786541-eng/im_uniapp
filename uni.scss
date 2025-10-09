@@ -149,7 +149,6 @@ $uni-font-size-paragraph: 15px;
 .font-16{
   font-size: 16px;
 }
-
 .login-btn {
   height: 50px;
   width: 90%;
@@ -201,4 +200,11 @@ $uni-font-size-paragraph: 15px;
 uni-textarea{
   width: 100% !important;
 }
-
+input:disabled,.uni-input-input:disabled  {
+  color: #999 !important;
+}
+iframe{
+  width: 100% !important;
+  height: 100% !important;
+  border: none;
+}

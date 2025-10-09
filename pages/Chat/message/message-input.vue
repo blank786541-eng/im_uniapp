@@ -102,7 +102,7 @@
             </div>
 
 <!--            <mumu-recorder ref='recorder' @success='handlerSuccess' @error='handlerError'></mumu-recorder>-->
-            <div v-if="!inputText"
+            <div v-if="!inputText && !emojiVisible"
                  class="flex-center"
                  style="width: 40px"
                  @tap="handleAudioVisible"

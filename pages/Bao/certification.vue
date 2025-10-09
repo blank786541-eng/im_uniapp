@@ -5,6 +5,8 @@ import {onMounted, ref} from "vue";
 import Icon from "@/components/Icon.vue";
 import AssetsImage from "@/components/AssetsImage.vue";
 import {apiUrl, httpRequest} from "@/utils/request";
+import LabelInput from "@/pages/Login/components/label-input.vue";
+import FormInput from "@/pages/Login/components/form-input.vue";
 
 
 const imgs = ref([
@@ -24,10 +26,18 @@ const imgs = ref([
 ])
 const loading = ref(false);
 const accountId = uni.$UIKitStore.userStore.myUserInfo.accountId;
-const state=ref(2);
-const error=ref(null);
+const state = ref(2);
+const error = ref(null);
+const name = ref('');
+const idCard = ref('');
+const idCardRule = {
+  reg: /^[a-zA-Z0-9]{18}$/,
+  message: "请输入18位数字加字母组合",
+  trigger: 'blur',
+}
+
 function uploadImage(index: number) {
-  if(state.value!=2) return;
+  if (state.value != 2) return;
   imgs.value[index].loading = true;
   uni.chooseImage({
     count: 1,
@@ -51,7 +61,7 @@ function uploadImage(index: number) {
           console.log(JSON.parse(res.data));
           imgs.value[index].value = JSON.parse(res.data).data;
         },
-        fail:(err) => {
+        fail: (err) => {
           imgs.value[index].loading = false;
         },
         complete: (res) => {
@@ -63,10 +73,27 @@ function uploadImage(index: number) {
 }
 
 function upload() {
-  if(state.value!=2) return;
+  if (state.value != 2) return;
+
+  if (!name.value) {
+    uni.showToast({
+      title: '请输入姓名',
+      icon: "none",
+    })
+    return;
+  }
+
+  if (!idCard.value || !idCardRule.reg.test(idCard.value)) {
+    uni.showToast({
+      title: '请输入身份证',
+      icon: "none",
+    })
+    return;
+  }
+  let msg = "";
   for (let i = 0; i < imgs.value.length; i++) {
     if (!imgs.value[i].value) {
-      let msg = "";
+
       if (i == 0) {
         msg = "请上传身份证正面"
       } else if (i == 1) {
@@ -81,38 +108,42 @@ function upload() {
       break;
     }
   }
-
+  if(msg) return;
   let query = {
-    account: accountId-0,
+    account: accountId - 0,
     headPortraitImg: imgs.value[0].value,
     nationalEmblemImg: imgs.value[1].value,
     handImg: imgs.value[2].value,
+    name: name.value,
+    idCard: idCard.value,
+
   }
-  console.log(query);
+
   httpRequest({
     url: `kyc/kycApply`,
     method: "post",
     data: query,
-  }).then(res=>{
-     uni.showToast({
-       title:res,
-       icon:"none",
-       duration:1000,
-       success:()=>{
-         uni.navigateBack();
-       }
-     })
+  }).then(res => {
+    uni.showToast({
+      title: res,
+      icon: "none",
+      duration: 1000,
+      success: () => {
+        uni.navigateBack();
+      }
+    })
   })
 }
+
 // stateMap.kycStatus == 2 ? '上传证件实名认证' : stateMap.kycStatus == 1 ? "已认证" : "认证中"
 
-const states=["认证中",'已认证','立即上传']
-onMounted(()=>{
+const states = ["认证中", '已认证', '立即上传']
+onMounted(() => {
   httpRequest({
-    url:`im/api/getUserKyc?account=${accountId}`,
-    method:"get",
+    url: `im/api/getUserKyc?account=${accountId}`,
+    method: "get",
 
-  }).then(res=>{
+  }).then(res => {
     // account
     //     :
     //     "13907495924"
@@ -140,21 +171,62 @@ onMounted(()=>{
     // updatedAt
     //     :
     //     "
-    imgs.value[0].value=res.headPortraitImg;
-    imgs.value[1].value=res.nationalEmblemImg;
-    imgs.value[2].value=res.handImg;
-    state.value=res.state;
-    error.value=res.message;
+    imgs.value[0].value = res.headPortraitImg;
+    imgs.value[1].value = res.nationalEmblemImg;
+    imgs.value[2].value = res.handImg;
+    state.value = res.state;
+    error.value = res.message;
     console.log(res);
   })
+  httpRequest({
+    url: 'kyc/getByAccount',
+    method: "GET",
+    data: {
+      account: uni.$UIKitStore.userStore.myUserInfo.accountId
+    }
+  }).then((res) => {
+    name.value = res.name;
+    idCard.value = res.idCard;
+  });
 })
+
+
+function getIdCardValue(v) {
+  idCard.value = v;
+}
+
+function getNameValue(v) {
+  name.value = v;
+}
 </script>
 
 <template>
   <div class="flex-box flex-direction-column" style="height: 100%;padding-bottom: 90px">
     <default-header title="实名认证"></default-header>
     <div class="container-box" style="padding: 0 16px">
+      <div>
+        <FormInput
+           :value="name"
 
+            @updateModelValue="getNameValue"
+            placeholder="请输入姓名"
+        >
+          <template v-slot:addonBefore>
+            <div style="margin-right: 24px">姓名</div>
+          </template>
+        </FormInput>
+        <FormInput
+            :value="idCard"
+            @updateModelValue="getIdCardValue"
+            placeholder="请输入姓名"
+            :maxLength="18"
+            :rule="idCardRule"
+        >
+          <template v-slot:addonBefore>
+            <div style="margin-right: 24px">身份证</div>
+          </template>
+        </FormInput>
+      </div>
       <div v-for="(item,index) in imgs" style="margin-top: 12px;" @click="uploadImage(index)">
         <div v-if="item.value"
              style="width: 368px;height: 165px;border:1px solid #efefef;border-radius: 12px;position: relative;z-index: 10">
@@ -162,7 +234,8 @@ onMounted(()=>{
         </div>
         <div class="flex-center" v-else
              style="width: 368px;height: 165px;border:1px solid #efefef;border-radius: 8px;position: relative;z-index: 10">
-          <AssetsImage path="/static/loading.png" width="24px" height="24px" class="addAnimation" v-if="item.loading"></AssetsImage>
+          <AssetsImage path="/static/loading.png" width="24px" height="24px" class="addAnimation"
+                       v-if="item.loading"></AssetsImage>
           <img :src="item.holder" style="width: 100%;">
         </div>
 
@@ -171,8 +244,8 @@ onMounted(()=>{
       <img src="/static/black4.png" style="width: 100%;margin: 24px 0;">
     </div>
     <div class="footer">
-      <div  class="error" v-if="error">
-        <span>审核消息：{{error}}</span>
+      <div class="error" v-if="error">
+        <span>审核消息：{{ error }}</span>
       </div>
       <div class="watch-btn" @click="upload" :style="{opacity:state==2?1:0.8}">
         {{ states[state] }}
@@ -187,20 +260,22 @@ onMounted(()=>{
 page {
   height: 100%;
 }
-.error{
-  color:red;
+
+.error {
+  color: red;
   font-size: 13px;
-  padding:10px 10px;
+  padding: 10px 10px;
 }
 
 
-.footer{
+.footer {
   position: fixed;
   bottom: 24px;
   left: 16px;
   right: 16px;
   background-color: #fff;
 }
+
 .watch-btn {
   border-radius: 8px;
   background: #DBB077;

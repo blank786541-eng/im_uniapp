@@ -14,6 +14,10 @@
         </div>
       </div>
       <div class="p2p-set-card">
+        <div class="p2p-set-item p2p-set-item-flex-sb" @tap="toAddnote">
+          <div>备注</div>
+          <Icon iconClassName="more-icon" color="#999" type="icon-jiantou" />
+        </div>
         <div class="p2p-set-item p2p-set-item-flex-sb" @tap="goPinInP2p">
           <div>{{ t('pinText') }}</div>
           <Icon iconClassName="more-icon" color="#999" type="icon-jiantou" />
@@ -95,6 +99,11 @@ const addTeamMember = () => {
 const goPinInP2p = () => {
   customNavigateTo({
     url: `/pages/Chat/message/pin-list?conversationId=${conversationId.value}`,
+  })
+}
+const toAddnote = () => {
+  customNavigateTo({
+    url: `/pages/Chat/message/add-note?conversationId=${account.value}`,
   })
 }
 

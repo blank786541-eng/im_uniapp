@@ -1,11 +1,12 @@
 <script setup lang="ts">
-import {onBeforeMount, ref} from "vue";
+import {onBeforeMount, onMounted, ref} from "vue";
 import AssetsImage from "@/components/AssetsImage.vue";
 import {t} from "@/utils/i18n";
 import Icon from "@/components/Icon.vue";
 import {customNavigateTo} from "@/utils/customNavigate";
 import {onHide} from '@dcloudio/uni-app'
 import {getUniPlatform} from "@/utils";
+import {httpRequest} from "@/utils/request";
 
 const props = defineProps({
   label: {
@@ -21,8 +22,16 @@ onBeforeMount(() => {
   appStatusHeight.value = plus.navigator.getStatusbarHeight();
   // #endif
 })
-
-
+const states=ref({})
+onMounted(()=>{
+  httpRequest({
+    method: "GET",
+    url: "im/api/getUserByAccount?account=" + uni.$UIKitStore.userStore.myUserInfo.accountId,
+  }).then(res => {
+    states.value=res;
+    uni.setStorageSync("addFriend",res.addFriend);
+  })
+})
 /** 跳转至搜索页面 */
 const goToSearchPage = () => {
   customNavigateTo({
@@ -73,13 +82,17 @@ onHide((option: any) => {
         <AssetsImage path="/static/add.png" width="22px" height="22px" @touchstart="showAddDropdown"></AssetsImage>
         <div v-if="addDropdownVisible" class="dropdown-container">
           <div class="add-menu-list">
-            <div class="add-menu-item" @tap="onDropdownClick('addFriend')">
+            <div class="add-menu-item"
+                 v-if="states.addFriend===0"
+                 @tap="onDropdownClick('addFriend')">
               <div :style="{ marginRight: '5px' }">
                 <Icon type="icon-tianjiahaoyou"/>
               </div>
               {{ t('addFriendText') }}
             </div>
-            <div class="add-menu-item" @tap="onDropdownClick('createGroup')">
+            <div class="add-menu-item"
+                 v-if="states.groupPermissions===0"
+                 @tap="onDropdownClick('createGroup')">
               <div :style="{ marginRight: '5px' }">
                 <Icon type="icon-chuangjianqunzu"/>
               </div>

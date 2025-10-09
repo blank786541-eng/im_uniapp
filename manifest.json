@@ -1,7 +1,7 @@
 {
     "name" : "云信IM",
     "fallbackLocale" : "zh-Hans",
-    "appid" : "__UNI__FF4108D",
+    "appid" : "__UNI__6B333E2",
     "description" : "",
     "versionName" : "10.4.0",
     "versionCode" : 1030,
@@ -44,7 +44,8 @@
                     "<uses-feature android:name=\"android.hardware.camera\"/>",
                     "<uses-permission android:name=\"android.permission.WRITE_SETTINGS\"/>",
                     "<uses-permission android:name=\"android.permission.RECORD_AUDIO\"/>",
-                    "<uses-permission android:name=\"android.permission.MODIFY_AUDIO_SETTINGS\"/>"
+                    "<uses-permission android:name=\"android.permission.MODIFY_AUDIO_SETTINGS\"/>",
+                    "<uses-permission android:name=\"android.hardware.microphone\"/>"
                 ],
                 "minSdkVersion" : 21
             },
@@ -131,7 +132,7 @@
     },
     "vueVersion" : "3",
     "h5" : {
-        "title" : "即时通讯 IM",
+        "title" : "国保通",
         "router" : {
             "mode" : "hash",
             "base" : "./"
@@ -139,6 +140,14 @@
         "optimization" : {
             "treeShaking" : {
                 "enable" : false
+            }
+        },
+        "permissions" : {
+            "scope.record" : {
+                "desc" : "请授权使用录音功能"
+            },
+            "scope.microphone" : {
+                "desc" : "请授权使用麦克风功能"
             }
         }
     },

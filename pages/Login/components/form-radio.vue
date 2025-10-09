@@ -20,12 +20,13 @@ onMounted(()=>{
 </script>
 
 <template>
-  <div class="flex-box flex-y-center" @click="select" >
+  <div class="flex-box flex-y-center" @click="select" style="flex-shrink: 0">
     <div class="radio">
       <div class="selection" :class="tap?'selection-a':'selection-in'">
       </div>
     </div>
     <span class="label">{{ label }}</span>
+    <slot></slot>
   </div>
 </template>
 
@@ -37,6 +38,7 @@ onMounted(()=>{
   padding: 2px;
   border: 1px solid $uni-color-primary;
   margin-right: 6px;
+  flex-shrink: 0
 }
 
 .selection {

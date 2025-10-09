@@ -6,10 +6,12 @@
           class="input"
           :type="type"
           :value="value"
+          v-model="inputValue"
           @input="handleInput"
           :focus="inputFocus"
           @focus="inputFocus = true"
           @blur="handleBlur"
+          :maxlength="maxLength"
           :placeholder="placeholder"
           placeholder-class="set_placeholder"
       />
@@ -53,6 +55,9 @@ const props = defineProps({
   placeholder: {
     type: String,
     default: '',
+  }, maxLength: {
+    type: Number,
+    default: 255,
   },
   allowClear: {
     type: Boolean,
@@ -67,11 +72,10 @@ const props = defineProps({
 const inputFocus = ref(false)
 const inputError = ref(false)
 const ext = ref("")
-
-
-
-onMounted(()=>{
-  emit('updateModelValue', props.value)
+const inputValue = ref("")
+onMounted(() => {
+  inputValue.value=props.value;
+  emit('updateModelValue', inputValue.value)
 })
 
 const inputClass = computed(() => {
@@ -87,14 +91,16 @@ const handleInput = (event: any) => {
   if (props.type === 'tel') {
     value = value.replace(/\D/g, '')
   }
-  emit('updateModelValue', value,props.labelKey)
+  emit('updateModelValue', value, props.labelKey)
   // inputKey.value++;
 }
 
 const handleBlur = () => {
   inputFocus.value = false
+  inputError.value = false
+  console.log( inputValue.value);
   if (props.rule && props.rule.trigger === 'blur') {
-    inputError.value = !props.rule.reg.test(props.value || '')
+    inputError.value = !props.rule.reg.test(inputValue.value || '')
 
   }
   return inputFocus.value;

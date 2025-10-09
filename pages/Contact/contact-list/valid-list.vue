@@ -162,6 +162,7 @@ import Appellation from '../../../components/Appellation.vue'
 import {V2NIMMessage} from 'nim-web-sdk-ng/dist/esm/nim/src/V2NIMMessageService'
 import {logout} from "@/utils/imUtils";
 import {V2NIMTeamJoinActionType} from "nim-web-sdk-ng/dist/esm/nim/src/V2NIMTeamService";
+import {setContactTabUnread, setTabUnread} from "@/utils/msg";
 
 /** 验证消息 */
 const validMsg = ref<V2NIMFriendAddApplicationForUI[]>([])
@@ -182,6 +183,7 @@ const handleRejectApplyFriendClick = async (
     msg: V2NIMFriendAddApplicationForUI
 ) => {
   applyFriendLoading.value = true
+  readMsg(msg.applicantAccountId)
   try {
     await uni.$UIKitStore.friendStore.rejectAddApplicationActive(msg)
     uni.showToast({
@@ -194,6 +196,7 @@ const handleRejectApplyFriendClick = async (
       icon: 'error',
     })
   } finally {
+    uni.$UIKitStore.sysMsgStore.setAllApplyMsgRead();
     applyFriendLoading.value = false
   }
 }
@@ -203,6 +206,7 @@ const handleAcceptApplyFriendClick = async (
     msg: V2NIMFriendAddApplicationForUI
 ) => {
   applyFriendLoading.value = true
+  readMsg(msg.applicantAccountId)
   try {
     try {
       await uni.$UIKitStore.friendStore.acceptAddApplicationActive(msg)
@@ -231,12 +235,29 @@ const handleAcceptApplyFriendClick = async (
     console.log('error', error)
   } finally {
     applyFriendLoading.value = false
+
   }
 }
-
+function  readMsg(accountId){
+  uni.$UIKitStore.sysMsgStore.setAllApplyMsgRead();
+  uni.$UIKitStore.sysMsgStore.updateFriendApplyMsg([
+    {
+      operatorAccountId:  uni.$UIKitStore.userStore.myUserInfo.accountId,
+      applicantAccountId: accountId,
+      recipientAccountId:   uni.$UIKitStore.userStore.myUserInfo.accountId,
+      timestamp: Date.now(),
+      status: 1 /* V2NIMConst.V2NIMFriendAddApplicationStatus
+                            .V2NIM_FRIEND_ADD_APPLICATION_STATUS_AGREED */,
+      isRead: true,
+      read: true,
+    },
+  ])
+}
 async function handleAcceptApplyTeam(msg: V2NIMTeamJoinActionInfoForUI) {
   msg.read = true;
   msg.actionStatus = 1
+  setTabUnread()
+  setContactTabUnread()
   await uni.$UIKitStore.teamStore.acceptTeamInviteActive(msg);
   await uni.$UIKitStore.teamStore.updateTeamActive(msg)
   uni.showToast({
@@ -246,7 +267,8 @@ async function handleAcceptApplyTeam(msg: V2NIMTeamJoinActionInfoForUI) {
 }
 
 async function handleRejectApplyTeam(msg: V2NIMTeamJoinActionInfoForUI) {
-
+  setTabUnread()
+  setContactTabUnread()
   uni.showModal({
     title: "提示",
     content: '拒绝加入群聊吗',

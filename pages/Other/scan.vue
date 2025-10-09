@@ -2,38 +2,138 @@
 import {getUniPlatform} from "@/utils";
 import {onMounted, ref} from "vue";
 
-import {  onReady } from '@dcloudio/uni-app'
+import {onReady} from '@dcloudio/uni-app'
 import Cshaptx4869Scancode
   from "@/uni_modules/cshaptx4869-scancode/components/cshaptx4869-scancode/cshaptx4869-scancode.vue";
+import {getParamsValues} from "@/pages/Other/help/call";
+import {V2NIMTeam} from "nim-web-sdk-ng/dist/esm/nim/src/V2NIMTeamService";
+import geH5Scancode from "@/components/ge-h5-scancode/ge-h5-scancode.vue"
 
-onReady(()=>{
+onReady(() => {
   scanCode();
 })
 const h5ScanCodeRef = ref();
+
 function scanCode() {
   // #ifdef H5
-  h5ScanCodeRef.value.open();
+  // h5ScanCodeRef.value.open();
   // #endif
   // #ifndef H5
-  uni.scanCode({
-    success: (res) => {
-      uni.showToast({
-        icon: "none",
-        title: res.result,
-      });
+  // uni.scanCode({
+  //   success: async (res) => {
+  //     console.warn(res, 'scan result');
+  //     if (res.result.indexOf("teamId") > -1) {
+  //       const {teamId} = getParamsValues(res.result);
+  //
+  //
+  //       const list: V2NIMTeam[] = await uni.$UIKitStore.teamStore.getJoinedTeamListActive()
+  //
+  //       let hasIn: boolean = list.some((item) => item.teamId == teamId);
+  //       if (hasIn) {
+  //         uni.showToast({
+  //           icon: "none",
+  //           title: "已在群组中",
+  //         });
+  //       } else {
+  //         const team = await uni.$UIKitStore.teamStore.applyTeamActive(teamId)
+  //         uni.showToast({
+  //           icon: "none",
+  //           title: team.name,
+  //         });
+  //       }
+  //
+  //     }
+  //
+  //
+  //   },
+  //   fail: (err) => {
+  //     console.log("err", err);
+  //   },
+  // });
+  // #endif
+  h5ScanCodeRef.value.start({
+    success: async (decodedText, decodedResult) => {
+      console.warn(decodedText, decodedResult,'h5ScanCodeRef=====');
+      if (decodedText.indexOf("teamId") > -1) {
+        const obj = getParamsValues(decodedText);
+        console.warn(obj, 'teamId=====');
+
+        const list: V2NIMTeam[] = await uni.$UIKitStore.teamStore.getJoinedTeamListActive()
+
+        let hasIn: boolean = list.some((item) => item.teamId == obj.teamId);
+        if (hasIn) {
+          uni.showToast({
+            icon: "none",
+            title: "已在群组中",
+            duration: 1000,
+            success: () => {
+              uni.navigateBack();
+            }
+          });
+        } else {
+          const team = await uni.$UIKitStore.teamStore.applyTeamActive(obj.teamId)
+          uni.showToast({
+            icon: "none",
+            title: "已申请加入群聊",
+            duration: 1000,
+            success: () => {
+              uni.navigateBack();
+            }
+          });
+        }
+
+      }
     },
     fail: (err) => {
-      console.log("err", err);
+      console.log('err', err)
+      uni.showToast({
+        icon: "none",
+        title: "扫描失败",
+        success: () => {
+          uni.navigateBack();
+        }
+      })
     },
-  });
-  // #endif
+  })
 }
-function handleSuccess(res) {
+
+async function handleSuccess(res) {
   uni.showToast({
     icon: "none",
-    title: res.result,
+    title: res,
+    duration: 1000,
   });
+  if (res.result.indexOf("teamId") > -1) {
+    const obj = getParamsValues(res.result);
+    console.warn(obj, 'teamId=====');
+
+    const list: V2NIMTeam[] = await uni.$UIKitStore.teamStore.getJoinedTeamListActive()
+
+    let hasIn: boolean = list.some((item) => item.teamId == obj.teamId);
+    if (hasIn) {
+      uni.showToast({
+        icon: "none",
+        title: "已在群组中",
+        duration: 1000,
+        success: () => {
+          uni.navigateBack();
+        }
+      });
+    } else {
+      const team = await uni.$UIKitStore.teamStore.applyTeamActive(obj.teamId)
+      uni.showToast({
+        icon: "none",
+        title: "已申请加入群聊",
+        duration: 1000,
+        success: () => {
+          uni.navigateBack();
+        }
+      });
+    }
+
+  }
 }
+
 function handleFail(err) {
   uni.showModal({
     title: err.errName,
@@ -44,11 +144,12 @@ function handleFail(err) {
 
 <template>
   <div>
-    <cshaptx4869-scancode
-        ref="h5ScanCodeRef"
-        @success="handleSuccess"
-        @fail="handleFail"
-    ></cshaptx4869-scancode>
+    <!--    <cshaptx4869-scancode-->
+    <!--        ref="h5ScanCodeRef"-->
+    <!--        @success="handleSuccess"-->
+    <!--        @fail="handleFail"-->
+    <!--    ></cshaptx4869-scancode>-->
+    <geH5Scancode ref="h5ScanCodeRef"></geH5Scancode>
   </div>
 </template>
 

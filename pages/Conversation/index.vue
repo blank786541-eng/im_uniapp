@@ -12,7 +12,6 @@ import {getExtentionData} from "@/pages/Other/help/call";
 import {customNavigateTo} from "@/utils/customNavigate";
 import {V2NIMMessageStatus} from "nim-web-sdk-ng/dist/v2/NIM_UNIAPP_SDK/V2NIMMessageService";
 import {onMounted} from "vue";
-
 let timeout: any
 const userInfo = uni.$UIKitStore.userStore.myUserInfo;
 
@@ -41,7 +40,10 @@ onShow(() => {
 
 
 })
+onMounted(async ()=>{
 
+
+})
 onHide(() => {
   clearTimeout(timeout)
 })

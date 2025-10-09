@@ -34,7 +34,7 @@ function toDetail(id: number, status) {
 
 <template>
   <div class="bao-container">
-    <default-header title="国宝通" background-color="transparent" :show-back="false"></default-header>
+    <default-header title="国保通" background-color="transparent" :show-back="false"></default-header>
     <div class="bao-content" v-for="(item,index) in resData">
       <div class="flex-box flex-center">
         <div style="flex:1">
@@ -52,7 +52,7 @@ function toDetail(id: number, status) {
         </div>
         <div v-else :class="item.status!='SOLDOUT'?'watch-btn':'watch-btn-disabled'"
              @tap="toDetail(item.id,item.status)">
-          点击查看
+          {{item.status=='SOLDOUT'?'已售罄':"点击查看"}}
         </div>
       </div>
       <div>
