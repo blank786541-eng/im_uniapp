@@ -1,0 +1,70 @@
+{
+  "hash": "37588259",
+  "configHash": "6c9a4413",
+  "lockfileHash": "acb53476",
+  "browserHash": "382ce157",
+  "optimized": {
+    "vconsole": {
+      "src": "../../../../../node_modules/vconsole/dist/vconsole.min.js",
+      "file": "vconsole.js",
+      "fileHash": "cbbaa788",
+      "needsInterop": true
+    },
+    "nim-web-sdk-ng/dist/esm/nim": {
+      "src": "../../../../../node_modules/nim-web-sdk-ng/dist/esm/nim.js",
+      "file": "nim-web-sdk-ng_dist_esm_nim.js",
+      "fileHash": "91302727",
+      "needsInterop": false
+    },
+    "nim-web-sdk-ng/dist/v2/NIM_UNIAPP_SDK": {
+      "src": "../../../../../node_modules/nim-web-sdk-ng/dist/v2/NIM_UNIAPP_SDK.js",
+      "file": "nim-web-sdk-ng_dist_v2_NIM_UNIAPP_SDK.js",
+      "fileHash": "2f29e492",
+      "needsInterop": true
+    },
+    "@xkit-yx/im-store-v2": {
+      "src": "../../../../../node_modules/@xkit-yx/im-store-v2/dist/index.esm.js",
+      "file": "@xkit-yx_im-store-v2.js",
+      "fileHash": "dd26608e",
+      "needsInterop": false
+    },
+    "mobx": {
+      "src": "../../../../../node_modules/mobx/dist/mobx.esm.js",
+      "file": "mobx.js",
+      "fileHash": "667796cf",
+      "needsInterop": false
+    },
+    "@xkit-yx/utils/dist/uniapp": {
+      "src": "../../../../../node_modules/@xkit-yx/utils/dist/uniapp.js",
+      "file": "@xkit-yx_utils_dist_uniapp.js",
+      "fileHash": "3f094220",
+      "needsInterop": false
+    },
+    "dayjs": {
+      "src": "../../../../../node_modules/dayjs/dayjs.min.js",
+      "file": "dayjs.js",
+      "fileHash": "2b0fa04b",
+      "needsInterop": true
+    },
+    "@xkit-yx/utils": {
+      "src": "../../../../../node_modules/@xkit-yx/utils/dist/index.esm.js",
+      "file": "@xkit-yx_utils.js",
+      "fileHash": "29499d68",
+      "needsInterop": false
+    }
+  },
+  "chunks": {
+    "chunk-JYV3HI4P": {
+      "file": "chunk-JYV3HI4P.js"
+    },
+    "chunk-E5XF6PSN": {
+      "file": "chunk-E5XF6PSN.js"
+    },
+    "chunk-X6CISQTJ": {
+      "file": "chunk-X6CISQTJ.js"
+    },
+    "chunk-LQ2VYIYD": {
+      "file": "chunk-LQ2VYIYD.js"
+    }
+  }
+}

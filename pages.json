@@ -1,0 +1,401 @@
+{
+  "pages": [
+    {
+      "path": "pages/Conversation/index",
+      "style": {
+        "navigationStyle": "custom",
+        "app-plus": {
+          "titleNView": false
+        }
+      }
+    },
+    {
+      "path": "pages/index/index",
+      "style": {
+        "navigationStyle": "custom"
+      }
+    },
+    {
+      "path": "pages/Bao/index",
+      "style": {
+        "navigationStyle": "custom"
+      }
+    }, {
+      "path": "pages/Bao/my-order",
+      "style": {
+        "navigationStyle": "custom"
+      }
+    },{
+      "path": "pages/Bao/team",
+      "style": {
+        "navigationStyle": "custom"
+      }
+    },{
+      "path": "pages/Bao/detail",
+      "style": {
+        "navigationStyle": "custom"
+      }
+    },{
+      "path": "pages/Bao/pay-detail",
+      "style": {
+        "navigationStyle": "custom"
+      }
+    },{
+      "path": "pages/Bao/certification",
+      "style": {
+        "navigationStyle": "custom"
+      }
+    },
+    {
+      "path": "pages/Conversation/conversation-search/index",
+      "style": {
+        "navigationStyle": "custom"
+      }
+    },
+    {
+      "path": "pages/Login/login-form",
+      "style": {
+        "navigationStyle": "custom"
+      }
+    }, {
+      "path": "pages/Login/changePassword",
+      "style": {
+        "navigationStyle": "custom"
+      }
+    },
+    {
+      "path": "pages/Login/register",
+      "style": {
+        "navigationStyle": "custom"
+      }
+    },
+    {
+      "path": "pages/Chat/index",
+      "style": {
+        "navigationBarBackgroundColor": "#F6F8FA",
+        "navigationBarTextStyle": "black",
+        "navigationStyle": "custom",
+        "enablePullDownRefresh": false,
+        "app-plus": {
+          "softinputNavBar": "none",
+          "bounce": "none"
+        }
+      }
+    },
+    {
+      "path": "pages/Chat/video-play",
+      "style": {
+        "navigationStyle": "custom"
+      }
+    },
+    {
+      "path": "pages/Other/scan",
+      "style": {
+        "navigationStyle": "custom"
+      }
+    },{
+      "path": "pages/Other/webview",
+      "style": {
+        "navigationStyle": "custom"
+      }
+    },
+    {
+      "path": "pages/Other/video-call",
+      "style": {
+        "navigationStyle": "custom"
+      }
+    },
+    {
+      "path": "pages/Other/team-video-call",
+      "style": {
+        "navigationStyle": "custom"
+      }
+    },
+    {
+      "path": "pages/Other/select-call-user",
+      "style": {
+        "navigationStyle": "custom"
+      }
+    },
+    {
+      "path": "pages/Chat/message/p2p-set",
+      "style": {
+        "navigationStyle": "custom"
+      }
+    },{
+      "path": "pages/Chat/message/add-note",
+      "style": {
+        "navigationStyle": "custom"
+      }
+    },
+    {
+      "path": "pages/Chat/message/pin-list",
+      "style": {
+        "navigationStyle": "custom"
+      }
+    },
+    {
+      "path": "pages/Chat/forward",
+      "style": {
+        "navigationStyle": "custom"
+      }
+    },
+    {
+      "path": "pages/Chat/message-read-info",
+      "style": {
+        "navigationStyle": "custom"
+      }
+    },
+    {
+      "path": "pages/Team/team-set/index",
+      "style": {
+        "navigationStyle": "custom"
+      }
+    },   {
+      "path": "pages/Team/team-set/team-qrcode",
+      "style": {
+        "navigationStyle": "custom"
+      }
+    },
+    {
+      "path": "pages/Team/team-set/team-info-edit",
+      "style": {
+        "navigationStyle": "custom"
+      }
+    },
+    {
+      "path": "pages/Team/team-set/team-name-edit",
+      "style": {
+        "navigationStyle": "custom"
+      }
+    },
+    {
+      "path": "pages/Team/team-set/team-intro-edit",
+      "style": {
+        "navigationStyle": "custom"
+      }
+    },
+    {
+      "path": "pages/Team/team-set/team-avatar-edit",
+      "style": {
+        "navigationStyle": "custom"
+      }
+    },
+    {
+      "path": "pages/Team/team-set/nick-in-team",
+      "style": {
+        "navigationStyle": "custom"
+      }
+    },
+    {
+      "path": "pages/Team/team-set/team-manage",
+      "style": {
+        "navigationStyle": "custom"
+      }
+    },
+    {
+      "path": "pages/Team/team-set/transform-team",
+      "style": {
+        "navigationStyle": "custom"
+      }
+    },
+    {
+      "path": "pages/Team/team-set/team-manager-list",
+      "style": {
+        "navigationStyle": "custom"
+      }
+    },
+    {
+      "path": "pages/Team/team-set/add-team-manager",
+      "style": {
+        "navigationStyle": "custom"
+      }
+    },
+    {
+      "path": "pages/Team/team-member/index",
+      "style": {
+        "navigationStyle": "custom"
+      }
+    },
+    {
+      "path": "pages/Team/team-create/index",
+      "style": {
+        "navigationStyle": "custom"
+      }
+    },
+    {
+      "path": "pages/Team/team-add/index",
+      "style": {
+        "navigationStyle": "custom"
+      }
+    },
+    {
+      "path": "pages/Contact/index",
+      "style": {
+        "navigationStyle": "custom",
+        "app-plus": {
+          "titleNView": false
+        }
+      }
+    },
+    {
+      "path": "pages/Contact/contact-list/group-list",
+      "style": {
+        "navigationStyle": "custom"
+      }
+    },
+    {
+      "path": "pages/Contact/contact-list/valid-list",
+      "style": {
+        "navigationStyle": "custom"
+      }
+    },
+    {
+      "path": "pages/Contact/contact-list/black-list",
+      "style": {
+        "navigationStyle": "custom"
+      }
+    },
+    {
+      "path": "pages/User/friend/add-friend",
+      "style": {
+        "navigationStyle": "custom"
+      }
+    },
+    {
+      "path": "pages/User/friend/friend-edit",
+      "style": {
+        "navigationStyle": "custom"
+      }
+    },
+    {
+      "path": "pages/User/friend/index",
+      "style": {
+        "navigationStyle": "custom"
+      }
+    },
+    {
+      "path": "pages/User/my/index",
+      "style": {
+        "navigationStyle": "custom"
+      }
+    },
+    {
+      "path": "pages/User/my/about",
+      "style": {
+        "navigationStyle": "custom"
+      }
+    },
+    {
+      "path": "pages/User/my/setting",
+      "style": {
+        "navigationStyle": "custom"
+      }
+    },
+    {
+      "path": "pages/User/my/my-detail",
+      "style": {
+        "navigationStyle": "custom"
+      }
+    },
+    {
+      "path": "pages/User/my-detail/change-name",
+      "style": {
+        "navigationStyle": "custom"
+      }
+    },
+    {
+      "path": "pages/User/my-detail/change-mobile",
+      "style": {
+        "navigationStyle": "custom"
+      }
+    },
+    {
+      "path": "pages/User/my-detail/my-qrcode",
+      "style": {
+        "navigationStyle": "custom"
+      }
+    },
+    {
+      "path": "pages/User/my-detail/change-sign",
+      "style": {
+        "navigationStyle": "custom"
+      }
+    },
+    {
+      "path": "pages/User/my/collection-card",
+      "style": {
+        "navigationStyle": "custom"
+      }
+    },
+    {
+      "path": "pages/User/my/collection-list",
+      "style": {
+        "navigationStyle": "custom"
+      }
+    },
+    {
+      "path": "pages/User/my-detail/index",
+      "style": {
+        "navigationStyle": "custom"
+      }
+    },
+    {
+      "path": "pages/User/detail-item/index",
+      "style": {
+        "navigationStyle": "custom"
+      }
+    },
+    {
+      "path": "pages/Team/team-set/change-intro",
+      "style": {
+        "navigationStyle": "custom"
+      }
+    }
+  ],
+  "globalStyle": {
+    "navigationBarTextStyle": "black"
+  },
+  "h5": {
+    "optimization": {
+      "treeShaking": {
+        "enable": true,
+        "exclude": [
+          "cshaptx4869-scancode"
+        ]
+      }
+    }
+  },
+  "tabBar": {
+    "backgroundColor": "#FFFFFF",
+    "color": "#000000",
+    "selectedColor": "#DBB077",
+    "height": "60px",
+    "list": [
+      {
+        "text": "%messageText%",
+        "iconPath": "static/tabbar/home.png",
+        "selectedIconPath": "static/tabbar/home-a.png",
+        "pagePath": "pages/Conversation/index"
+      },
+      {
+        "text": "%cantactsText%",
+        "iconPath": "static/tabbar/user.png",
+        "selectedIconPath": "static/tabbar/user-a.png",
+        "pagePath": "pages/Contact/index"
+      },
+      {
+        "text": "保险产品",
+        "iconPath": "static/tabbar/baoxian.png",
+        "selectedIconPath": "static/tabbar/baoxian-a.png",
+        "pagePath": "pages/Bao/index"
+      },
+      {
+        "text": "%mineText%",
+        "pagePath": "pages/User/my/index",
+        "iconPath": "static/tabbar/my.png",
+        "selectedIconPath": "static/tabbar/my-a.png"
+      }
+    ]
+  }
+}

@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="referrer" content="no-referrer" />
+      <meta name="google-ads" content="none">
+    <title>即时通讯 IM</title>
+      <style>
+          #app{
+              overflow-x: hidden;
+              user-select: none;
+              -webkit-user-select: none;
+              -moz-user-select: none;
+              -ms-user-select: none;
+          }
+          body{
+              user-select: none;
+              -webkit-user-select: none;
+              -moz-user-select: none;
+              -ms-user-select: none;
+          }
+      </style>
+
+    <script>
+      document.write(
+        '<meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0,user-scalable=no,viewport-fit=cover" />'
+      )
+    </script>
+    <script src="//cdn.jsdelivr.net/npm/eruda"></script>
+    <script>
+      // eruda.init()
+      function getQueryParams(url) {
+        var queryParams = {}
+        var queryString = url.split('?')[1]
+        if (queryString) {
+          var pairs = queryString.split('&')
+          for (var i = 0; i < pairs.length; i++) {
+            var pair = pairs[i].split('=')
+            queryParams[decodeURIComponent(pair[0])] = decodeURIComponent(
+              pair[1] || ''
+            )
+          }
+        }
+        return queryParams
+      }
+
+      if (getQueryParams(location.href).debug === 'true') {
+        eruda.init()
+      }
+    </script>
+
+    <!--preload-links-->
+    <!--app-context-->
+  </head>
+  <body>
+    <div id="app"><!--app-html--></div>
+    <script type="module" src="/main.js"></script>
+  </body>
+</html>
