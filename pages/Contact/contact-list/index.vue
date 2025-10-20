@@ -76,7 +76,7 @@
           <div class="flex-box flex-y-center">
             <AssetsImage path="/static/super.png" width="46px" height="46px" style="margin-right: 21px"></AssetsImage>
 
-            <span class="default-text font-15"> 我的超级聊</span>
+            <span class="default-text font-15"> 我的超级群聊</span>
           </div>
         </div>
         <div class="contact-item" @click=" handleBlacklistClick">

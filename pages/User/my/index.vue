@@ -17,7 +17,7 @@
 <!--        <div>-->
 <!--          <AssetsImage path="/static/er-icon.png" width="22px" height="25px"></AssetsImage>-->
 <!--        </div>-->
-        <div class="user-name" style="font-weight: 400;font-size: 12px;margin-top: 4px;">我的推荐码:{{
+        <div class="user-name" style="font-weight: 400;font-size: 12px;margin-top: 4px;">我的邀请码:{{
             inviteCode
           }}
         </div>
@@ -160,6 +160,7 @@ const settings = [
 ]
 const uninstallMyUserInfoWatch = autorun(() => {
   myUserInfo.value = uni.$UIKitStore.userStore.myUserInfo
+  console.log(myUserInfo.value,'myUserInfo')
 })
 const inviteCode = ref('');
 const stateMap = ref({});
@@ -182,6 +183,7 @@ function getData() {
     url: "im/api/getUserByAccount?account=" + uni.$UIKitStore.userStore.myUserInfo.accountId,
   }).then(res => {
     stateMap.value = res;
+    settings[1].url=`/pages/Other/webview?url=${stateMap.value.aboutUs}`;
   })
   httpRequest({
     url: 'im/api/getUserCodeAndUrl',
@@ -215,13 +217,14 @@ function getInsMoney() {
 
 const enableAutoAddFriends = ref(false)
 onMounted(() => {
-  uninstallMyUserInfoWatch();
+
   enableAutoAddFriends.value = uni.getStorageSync(myUserInfo.value?.accountId + 'autoAddFriends') === 'on'
 
 
 })
 onShow((options) => {
   getData();
+  myUserInfo.value = uni.$UIKitStore.userStore.myUserInfo
 })
 
 const logUserOut = () => {
@@ -265,11 +268,11 @@ function  toOpen(){
 }
 </script>
 
-<style lang="scss">
+<style scoped lang="scss">
 .user-container {
   height: 100%;
   width: 100%;
-  padding: 20px 14px 0;
+  padding: 0px 14px 0;
   background-repeat: no-repeat;
   background-size: 100% 100%;
   background-image: url("/static/baobg.png");

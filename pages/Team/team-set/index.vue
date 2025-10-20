@@ -260,7 +260,7 @@ const goPinTeam = () => {
 function  goQrcode(){
 
   customNavigateTo({
-    url: `/pages/Team/team-set/team-qrcode?conversationId=${teamId}`,
+    url: `/pages/User/my-detail/my-qrcode?conversationId=${teamId}&team=1&avatar=${team.value.avatar}&name=${team.value?.name}`,
   })
 }
 /** 添加群成员 */

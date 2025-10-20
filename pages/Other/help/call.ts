@@ -8,6 +8,7 @@ import {V2NIMUser} from "nim-web-sdk-ng/dist/esm/nim/src/V2NIMUserService";
 import InnerAudioContext = UniNamespace.InnerAudioContext;
 import {V2NIMMessage} from "nim-web-sdk-ng/dist/esm/nim/src/V2NIMMessageService";
 import {events} from "@/utils/constants";
+import {ConnectionState} from "nertc-web-sdk/types/types";
 
 export const enum CallEventType {
     PeerOnline = "peer-online",
@@ -19,7 +20,8 @@ export const enum CallEventType {
     StreamSubscribed = "stream-subscribed",
     AUDIOLEVEL_NOT_SUPPORTED = "AUDIOLEVEL_NOT_SUPPORTED",
     Error = "exception",
-    DISCONNECTED = "connection-state-change",
+    DISCONNECTED = "DISCONNECTED",
+    CONNECTED = "CONNECTED",
 }
 
 export function getExtentionData(data: string): { channelName: string, uid: string } {
@@ -104,10 +106,10 @@ export function addCallListeners(client: Client, callback: (event: CallEventType
     client.on("connection-state-change", (evt) => {
 
         console.warn(
-            `connection-state-change: ${evt}`
+            `connection-state-change: ${evt.curState}  ${evt.prevState} ${evt.reconnect}`
         );
-        if (evt.curState === "DISCONNECTED") {
-            callback()
+        if (evt.curState === "CONNECTED") {
+            callback(CallEventType.CONNECTED,{})
         }
     });
     client.on("exception", (evt) => {
@@ -187,6 +189,10 @@ export function addCallListeners(client: Client, callback: (event: CallEventType
         console.warn(
             `网络状态变更: ${evt.prevState} => ${evt.curState}, 当前是否在重连：${evt.reconnect}`
         );
+        if(evt.curState=='CONNECTED'){
+            callback()
+        }
+
     });
 
     // this.getToken()

@@ -31,10 +31,21 @@ const teamId =
 const notificationContent = ref('')
 
 /** 通知消息监听 */
-const notificationContentWatch = autorun(() => {
-  const getNotificationContent = () => {
+const notificationContentWatch = autorun(async  () => {
+
+  const getNotificationContent =async () => {
     const attachment = props.msg
       .attachment as V2NIMMessageNotificationAttachment
+    let name=[];
+    let accounts=attachment?.targetIds || [];
+    for (const account of accounts) {
+      let user=await uni.$UIKitStore.userStore.getUserActive(account)
+      name.push(user.name)
+    }
+    console.log(name,'props.msg.senderId====')
+
+
+
     switch (attachment?.type) {
       case V2NIMConst.V2NIMMessageNotificationType
         .V2NIM_MESSAGE_NOTIFICATION_TYPE_TEAM_UPDATE_TINFO: {
@@ -98,39 +109,52 @@ const notificationContentWatch = autorun(() => {
             )
           }
         }
-        return content.length
-          ? `${uni.$UIKitStore.uiStore.getAppellation({
-              account: props.msg.senderId,
-              teamId,
-            })} ${content.join('、')}`
-          : ''
+        // uni.$UIKitStore.uiStore.getAppellation({
+        //   //       account: props.msg.senderId,
+        //   //       teamId,
+        //   //     })
+        return content.length?`${name.join('、')} ${content.join('、')}`:""
+
+        // return content.length
+        //   ? `${uni.$UIKitStore.uiStore.getAppellation({
+        //       account: props.msg.senderId,
+        //       teamId,
+        //     })} ${content.join('、')}`
+        //   : ''
       }
       case V2NIMConst.V2NIMMessageNotificationType
         .V2NIM_MESSAGE_NOTIFICATION_TYPE_TEAM_APPLY_PASS:
       case V2NIMConst.V2NIMMessageNotificationType
         .V2NIM_MESSAGE_NOTIFICATION_TYPE_TEAM_INVITE_ACCEPT: {
-        return `${uni.$UIKitStore.uiStore.getAppellation({
-          account: props.msg.senderId,
-          teamId,
-        })} ${t('joinTeamText')}`
+        // const name=uni.$UIKitStore.uiStore.getAppellation({
+        //   account: props.msg.senderId,
+        //   teamId,
+        // });
+        // console.log(name,'name=====');
+        return  `${name.join('')} ${t('joinTeamText')}`
+
+        // return `${uni.$UIKitStore.uiStore.getAppellation({
+        //   account: props.msg.senderId,
+        //   teamId,
+        // })} ${t('joinTeamText')}`
       }
       case V2NIMConst.V2NIMMessageNotificationType
         .V2NIM_MESSAGE_NOTIFICATION_TYPE_TEAM_INVITE: {
-        const accounts: string[] = attachment?.targetIds || []
-        accounts.map(async (item) => {
-          await uni.$UIKitStore.userStore.getUserActive(item)
-        })
-        const nicks = accounts
-          .map((item) => {
-            return uni.$UIKitStore.uiStore.getAppellation({
-              account: item,
-              teamId,
-            })
-          })
-          .filter((item) => !!item)
-          .join('、')
+        // const users=accounts.map(async (item) => {
+        //  return  await uni.$UIKitStore.userStore.getUserActive(item)
+        // })
 
-        return `${nicks} ${t('joinTeamText')}`
+        // const nicks = accounts
+        //   .map((item) => {
+        //     return uni.$UIKitStore.uiStore.getAppellation({
+        //       account: item,
+        //       teamId,
+        //     })
+        //   })
+        //   .filter((item) => !!item)
+        //   .join('、')
+        console.log(name,'name-=------')
+        return `${name.join('、')} ${t('joinTeamText')}`
       }
       case V2NIMConst.V2NIMMessageNotificationType
         .V2NIM_MESSAGE_NOTIFICATION_TYPE_TEAM_KICK: {
@@ -138,17 +162,17 @@ const notificationContentWatch = autorun(() => {
         accounts.map(async (item) => {
           await uni.$UIKitStore.userStore.getUserActive(item)
         })
-        const nicks = accounts
-          .map((item) => {
-            return uni.$UIKitStore.uiStore.getAppellation({
-              account: item,
-              teamId,
-            })
-          })
-          .filter((item) => !!item)
-          .join('、')
+        // const nicks = accounts
+        //   .map((item) => {
+        //     return uni.$UIKitStore.uiStore.getAppellation({
+        //       account: item,
+        //       teamId,
+        //     })
+        //   })
+        //   .filter((item) => !!item)
+        //   .join('、')
 
-        return `${nicks} ${t('beRemoveTeamText')}`
+        return `${name.join('、')} ${t('beRemoveTeamText')}`
       }
       case V2NIMConst.V2NIMMessageNotificationType
         .V2NIM_MESSAGE_NOTIFICATION_TYPE_TEAM_ADD_MANAGER: {
@@ -156,17 +180,17 @@ const notificationContentWatch = autorun(() => {
         accounts.map(async (item) => {
           await uni.$UIKitStore.userStore.getUserActive(item)
         })
-        const nicks = accounts
-          .map((item) => {
-            return uni.$UIKitStore.uiStore.getAppellation({
-              account: item,
-              teamId,
-            })
-          })
-          .filter((item) => !!item)
-          .join('、')
+        // const nicks = accounts
+        //   .map((item) => {
+        //     return uni.$UIKitStore.uiStore.getAppellation({
+        //       account: item,
+        //       teamId,
+        //     })
+        //   })
+        //   .filter((item) => !!item)
+        //   .join('、')
 
-        return `${nicks} ${t('beAddTeamManagersText')}`
+        return `${name.join('、')} ${t('beAddTeamManagersText')}`
       }
       case V2NIMConst.V2NIMMessageNotificationType
         .V2NIM_MESSAGE_NOTIFICATION_TYPE_TEAM_REMOVE_MANAGER: {
@@ -174,37 +198,39 @@ const notificationContentWatch = autorun(() => {
         accounts.map(async (item) => {
           await uni.$UIKitStore.userStore.getUserActive(item)
         })
-        const nicks = accounts
-          .map((item) => {
-            return uni.$UIKitStore.uiStore.getAppellation({
-              account: item,
-              teamId,
-            })
-          })
-          .filter((item) => !!item)
-          .join('、')
+        // const nicks = accounts
+        //   .map((item) => {
+        //     return uni.$UIKitStore.uiStore.getAppellation({
+        //       account: item,
+        //       teamId,
+        //     })
+        //   })
+        //   .filter((item) => !!item)
+        //   .join('、')
 
-        return `${nicks} ${t('beRemoveTeamManagersText')}`
+        return `${name.join('、')} ${t('beRemoveTeamManagersText')}`
       }
       case V2NIMConst.V2NIMMessageNotificationType
         .V2NIM_MESSAGE_NOTIFICATION_TYPE_TEAM_LEAVE: {
-        return `${uni.$UIKitStore.uiStore.getAppellation({
-          account: props.msg.senderId,
-          teamId,
-        })} ${t('leaveTeamText')}`
+        return  `${name.join('、')} ${t('leaveTeamText')}`
+        // return `${uni.$UIKitStore.uiStore.getAppellation({
+        //   account: props.msg.senderId,
+        //   teamId,
+        // })} ${t('leaveTeamText')}`
       }
       case V2NIMConst.V2NIMMessageNotificationType
         .V2NIM_MESSAGE_NOTIFICATION_TYPE_TEAM_OWNER_TRANSFER: {
-        return `${uni.$UIKitStore.uiStore.getAppellation({
-          account: (attachment?.targetIds || [])[0],
-          teamId,
-        })} ${t('newGroupOwnerText')}`
+        return  `${name.join('、')} ${t('newGroupOwnerText')}`
+        // return `${uni.$UIKitStore.uiStore.getAppellation({
+        //   account: (attachment?.targetIds || [])[0],
+        //   teamId,
+        // })} ${t('newGroupOwnerText')}`
       }
       default:
         return ''
     }
   }
-  notificationContent.value = getNotificationContent()
+  notificationContent.value =await getNotificationContent()
 })
 
 onUnmounted(() => {

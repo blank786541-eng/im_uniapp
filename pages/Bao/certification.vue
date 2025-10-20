@@ -98,7 +98,7 @@ function upload() {
         msg = "请上传身份证正面"
       } else if (i == 1) {
         msg = "请上传身份证背面"
-      } else if (i == 1) {
+      } else if (i == 2) {
         msg = "请上传手持身份证"
       }
       uni.showToast({
@@ -201,9 +201,9 @@ function getNameValue(v) {
 </script>
 
 <template>
-  <div class="flex-box flex-direction-column" style="height: 100%;padding-bottom: 90px">
+  <div class="flex-box flex-direction-column" style="height: 100%;padding-bottom:140px">
     <default-header title="实名认证"></default-header>
-    <div class="container-box" style="padding: 0 16px">
+    <div   class="container-box" style="padding: 0 16px;">
       <div>
         <FormInput
            :value="name"
@@ -218,7 +218,7 @@ function getNameValue(v) {
         <FormInput
             :value="idCard"
             @updateModelValue="getIdCardValue"
-            placeholder="请输入姓名"
+            placeholder="请输入身份证号码"
             :maxLength="18"
             :rule="idCardRule"
         >
@@ -247,7 +247,7 @@ function getNameValue(v) {
       <div class="error" v-if="error">
         <span>审核消息：{{ error }}</span>
       </div>
-      <div class="watch-btn" @click="upload" :style="{opacity:state==2?1:0.8}">
+      <div class="watch-btn2" @click="upload" :style="{opacity:state==2?1:0.8}">
         {{ states[state] }}
       </div>
 
@@ -276,7 +276,7 @@ page {
   background-color: #fff;
 }
 
-.watch-btn {
+.watch-btn2 {
   border-radius: 8px;
   background: #DBB077;
 

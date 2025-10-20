@@ -23,6 +23,7 @@ import { onLoad } from '@dcloudio/uni-app'
 import { customRedirectTo } from '../../../utils/customNavigate'
 import { V2NIMTeam } from 'nim-web-sdk-ng/dist/esm/nim/src/V2NIMTeamService'
 import { V2NIMConst } from '../../../utils/nim'
+import {httpRequest} from "@/utils/request";
 
 // 如果有这个值，代表着从单聊页面跳转而来
 let p2pConversationId = ''
@@ -58,6 +59,7 @@ const checkboxChange = (selectList: string[]) => {
 
 // 构建群名
 const createTeamName = (teamMembers: string[]) => {
+
   const _memberNickArr: string[] = []
   teamMembers.map((item) => {
     _memberNickArr.push(
@@ -89,6 +91,13 @@ let flag = false
 
 // 创建群聊/讨论组
 const createTeam = async () => {
+  if(states.groupPermissions===1) {
+    uni.showToast({
+      title:"创建失败,请联系管理员",
+      icon:"none",
+    })
+    return;
+  }
   try {
     if (flag) return
     if (teamMembers?.value?.length == 0) {
@@ -165,6 +174,8 @@ const createTeam = async () => {
   }
 }
 
+let states={};
+
 onLoad((options) => {
   // 获取路由跳转参数
   p2pConversationId = options?.p2pConversationId
@@ -180,6 +191,13 @@ onLoad((options) => {
     .filter((item) => {
       return item.accountId !== p2pConversationId
     })
+  httpRequest({
+    method: "GET",
+    url: "im/api/getUserByAccount?account=" + uni.$UIKitStore.userStore.myUserInfo.accountId,
+  }).then(res => {
+    states=res;
+
+  })
 })
 </script>
 

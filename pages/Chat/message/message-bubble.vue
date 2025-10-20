@@ -701,14 +701,16 @@ const handleReplyMsg = async () => {
 /** 撤回消息 */
 const handleRecallMsg = () => {
   const diff = Date.now() - props.msg.createTime
-  if (diff > msgRecallTime) {
-    uni.showToast({
-      title: t('msgRecallTimeErrorText'),
-      icon: 'none',
-    })
-    closeTooltip()
-    return
-  }
+
+
+  // if (diff > msgRecallTime) {
+  //   uni.showToast({
+  //     title: t('msgRecallTimeErrorText'),
+  //     icon: 'none',
+  //   })
+  //   closeTooltip()
+  //   return
+  // }
   uni.showModal({
     title: t('recallText'),
     content: t('recall3'),

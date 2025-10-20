@@ -151,11 +151,6 @@
       "style": {
         "navigationStyle": "custom"
       }
-    },   {
-      "path": "pages/Team/team-set/team-qrcode",
-      "style": {
-        "navigationStyle": "custom"
-      }
     },
     {
       "path": "pages/Team/team-set/team-info-edit",

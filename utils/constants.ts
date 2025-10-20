@@ -87,4 +87,4 @@ export const g2StatusMap: any = {
   5: t('callBusyText'),
 }
 
-export const msgRecallTime = 2 * 60 * 1000
+export const msgRecallTime = 5 * 60 * 1000

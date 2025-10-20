@@ -25,24 +25,24 @@
           正在通话中&nbsp;&nbsp;&nbsp;{{ time }}
         </div>
       </div>
-      <div class="flex-box" style="margin-bottom: 60px;justify-content: space-around" v-if="!connect">
+      <div class="flex-box " style="margin-bottom: 60px;justify-content: space-around" v-if="!connect">
         <AssetsImage @tap="destroy" path="/static/guaduan.png" width="80px" height="80px" :circle="true"></AssetsImage>
         <!--          v-if="!creater"-->
-        <AssetsImage v-if="!creater" path="/static/jieting.png" width="90px" height="90px" :circle="true"
+        <AssetsImage v-if="!creater" path="/static/jieting.png" width="80px" height="80px" :circle="true"
           @tap="joinRoom"></AssetsImage>
       </div>
       <div v-else class="call-action">
-        <div class="icon-container" style=" background-color: #fff;">
-          <AssetsImage @tap="setOrRelieveSilence"
-            :path="isSilence || muteAudioBycreate ? '/static/voice_close.png' : '/static/voice_open.png'" width="30px"
-            height="30px"></AssetsImage>
-        </div>
+<!--        <div class="icon-container" style=" background-color: #fff;">-->
+<!--          <AssetsImage @tap="setOrRelieveSilence"-->
+<!--            :path="isSilence || muteAudioBycreate ? '/static/voice_close.png' : '/static/voice_open.png'" width="30px"-->
+<!--            height="30px"></AssetsImage>-->
+<!--        </div>-->
 
         <AssetsImage @tap="destroy" path="/static/guaduan.png" width="80px" height="80px"></AssetsImage>
-        <div class="icon-container" style=" background-color: #666;">
-          <AssetsImage :path="closeVolume ? '/static/audio_close.png' : '/static/audio_open.png'" width="30px"
-            height="30px" @tap="muteAudio"></AssetsImage>
-        </div>
+<!--        <div class="icon-container" style=" background-color: #666;">-->
+<!--          <AssetsImage :path="closeVolume ? '/static/audio_close.png' : '/static/audio_open.png'" width="30px"-->
+<!--            height="30px" @tap="muteAudio"></AssetsImage>-->
+<!--        </div>-->
 
       </div>
     </div>
@@ -354,7 +354,7 @@ async function joinRoom() {
     channelName: query.roomId,
     uid: localUid.toString()
   })
-  
+
 
   initLocalStream();
 
@@ -536,6 +536,7 @@ uni.$on('on-invite', async (data: V2NIMSignallingEvent) => {
     const msg = obj.type == "reject" ? `${obj.name} 已拒绝加入` : `${obj.name} 已离开`
     uni.showToast({
       title: msg,
+      icon: "none",
       success: () => {
         leave(obj.accountId, data.channelInfo.channelId)
       }
@@ -652,7 +653,7 @@ async function leave(id: string, channelId) {
 
     }
   } catch (e) {
-    
+
   }
 }
 
@@ -681,7 +682,7 @@ async function leave(id: string, channelId) {
 
 .call-action {
   display: flex;
-  justify-content: space-around;
+  justify-content:center;
   margin-bottom: 160px;
 }
 

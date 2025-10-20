@@ -287,16 +287,7 @@ function initNim(opts: { account: string; token: string; appkey: string }) {
                     customSwitchTab({
                         url: "/pages/Conversation/index",
                     });
-                    httpRequest({
-                        url: 'kyc/getByAccount',
-                        method: "GET",
-                        data: {
-                            account:opts.account
-                        }
-                    }).then((res) => {
 
-                        uni.$UIKitNIM.V2NIMUserService.updateSelfUserProfile({name: res.nickname})
-                    })
                 }
             })
 
@@ -328,6 +319,14 @@ function initNim(opts: { account: string; token: string; appkey: string }) {
         } else if (e.code == 102422) {
             uni.showToast({
                 title: e.message,
+                icon: "error",
+            })
+            uni.navigateTo({
+                url: `/pages/Login/login-form`,
+            })
+        } else if (e.code == 102404) {
+            uni.showToast({
+                title:'账号不存在',
                 icon: "error",
             })
             uni.navigateTo({

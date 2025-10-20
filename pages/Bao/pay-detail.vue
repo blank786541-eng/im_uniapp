@@ -38,7 +38,7 @@ const query = ref({
   occupation: "",
   idCard: "",
   phone: "",
-  payProductId:8088
+  payProductId: '0007'
 });
 const selectIndex = ref(1)
 const date = ref(new Date());
@@ -58,13 +58,13 @@ onLoad((options) => {
     url: 'kyc/getByAccount',
     method: "GET",
     data: {
-      account:uni.$UIKitStore.userStore.myUserInfo.accountId
+      account: uni.$UIKitStore.userStore.myUserInfo.accountId
     }
   }).then((res) => {
-    query.value.name=res.name;
-    query.value.idCard=res.idCard;
-    isEdit.value=idCardRule.reg.test(res.idCard);
-    console.log(isEdit.value,'isEdit====')
+    query.value.name = res.name;
+    query.value.idCard = res.idCard;
+    isEdit.value = idCardRule.reg.test(res.idCard);
+    console.log(isEdit.value, 'isEdit====')
   });
 })
 const dateSelectVisiable = ref(false);
@@ -78,6 +78,7 @@ function toCertification() {
   }
 
 }
+
 const idCardRule = {
   reg: /^[a-zA-Z0-9]{18}$/,
   message: "请输入18位数字加字母组合",
@@ -98,6 +99,7 @@ const items = [
   // }
 ]
 const isEdit = ref(false)
+
 function onChange(v) {
   console.log(v)
   params.value.gender = v.detail.value;
@@ -128,7 +130,7 @@ function submit() {
 
   query.value.account = uni.$UIKitStore.userStore.myUserInfo.accountId;
   query.value.productId = params.value.id;
-  query.value.payProductId=selectIndex.value==0?8001:8088
+  query.value.payProductId = selectIndex.value == 1 ? '0006':selectIndex.value==2?'0': '0007'
   for (let queryKey in query.value) {
     if (!query.value[queryKey] || query.value[queryKey].toString().length == 0) {
       noneKey = queryKey;
@@ -166,32 +168,43 @@ function submit() {
       data: query.value,
       method: 'post',
     }).then(res => {
-      console.log(res,'res======')
-      if(res==null){
+      ctx.refs.popupRef.close()
+      if (!res) {
         uni.showToast({
-          title: res,
+          title: "钱包支付成功",
           icon: "none",
-          duration: 1000,
-          success: () => {
-            uni.switchTab({
-              url: '/pages/Bao/index',
-            })
+          duration: 800,
+
+          complete:()=>{
+
           }
         })
-      }else{
-        customNavigateTo({
-          url: `/pages/Other/webview?url=${res}`
-        })
+        setTimeout(()=>{
+          uni.switchTab({
+            url: '/pages/Bao/index',
+          })
+        },1000)
+      } else {
+        let popup = window.open(res, '_blank');
+        if (!popup || popup.closed) {
+          console.error('弹窗被拦截');
+          // 降级方案：跳转当前页
+          window.location.href = res;
+        } else {
+          popup.location.href = res
+        }
+
       }
     })
   }
 
 }
 
-function changeSelect(index){
+function changeSelect(index) {
   selectIndex.value = index;
 }
-function  toOpen(){
+
+function toOpen() {
   customNavigateTo({
     url: `/pages/Other/webview?url=${stateMap.value.customerServiceUrl}`
   })
@@ -200,14 +213,14 @@ function  toOpen(){
 
 <template>
   <div class="bao-container">
-    <bao-header label="国保通特权医疗保险I" label-weight="400"></bao-header>
+    <bao-header :label="params.name" label-weight="400"></bao-header>
     <div class="content">
       <div class="form-box">
         <div class="row flex-box flex-space-between flex-y-center">
           <span>姓名</span>
           <FormInput class="input" placeholder="请输入姓名"
                      v-model="query.name"
-                      :disabled="isEdit"
+                     :disabled="isEdit"
                      :allow-clear="false"></FormInput>
         </div>
         <div class="row flex-box flex-space-between flex-y-center">
@@ -287,35 +300,43 @@ function  toOpen(){
           <span class="price">{{ params.price }}</span>
           <span class="unit">元</span>
         </div>
-        <div class="flex-center">
-<!--          <div class="pay-item" :style="{-->
-<!--            backgroundColor: selectIndex==0?'#FFF7EC':'#F3F3F3',-->
-<!--            border:selectIndex==0?'1px solid #DBB077':'',-->
-<!--          }" @click="changeSelect(0)">-->
-<!--            <AssetsImage path="/static/weixin-pay.png" width="30px" height="30px"-->
-<!--                         style="margin-right: 6px"></AssetsImage>-->
-<!--            <span>微信支付</span>-->
-<!--          </div>-->
+        <div class="flex-box flex-space-between">
+          <div class="pay-item" :style="{
+            backgroundColor: selectIndex==0?'#FFF7EC':'#F3F3F3',
+            border:selectIndex==0?'1px solid #DBB077':'',
+          }" @click="changeSelect(0)">
+            <AssetsImage path="/static/weixin-pay.png" width="30px" height="30px"
+                         style="margin-right: 6px"></AssetsImage>
+            <span>微信支付</span>
+          </div>
           <div class="pay-item" :style="{
             backgroundColor: selectIndex==1?'#FFF7EC':'#F3F3F3',
               border:selectIndex==1?'1px solid #DBB077':'',
-          }" @click="changeSelect(1)">
+          }" @click="changeSelect(1)" style="margin: 0 10px">
             <AssetsImage path="/static/ali-pay.png" width="30px" height="30px" style="margin-right: 6px"></AssetsImage>
             <span>支付宝支付</span>
           </div>
+          <div class="pay-item" :style="{
+            backgroundColor: selectIndex==2?'#FFF7EC':'#F3F3F3',
+              border:selectIndex==2?'1px solid #DBB077':'',
+          }" @click="changeSelect(2)">
+            <AssetsImage path="/static/bag.png" width="30px" height="30px" style="margin-right: 6px"></AssetsImage>
+            <span>钱包支付</span>
+          </div>
         </div>
         <div style="margin-top: 8px">
-<!--          <FormRadio label="" :onchange="radioChange">-->
-<!--            <div class="notice">-->
-<!--             <span style="color: #000"> 我已认证阅读并确认 </span><span>《参保须知》</span> <span>《健康状态告知义务》</span> <span>《投保须知提示书》</span><span>《用户协议》</span><span>《授权声明》</span><span>《隐私政策》</span>-->
-<!--            </div>-->
-<!--          </FormRadio>-->
+          <!--          <FormRadio label="" :onchange="radioChange">-->
+          <!--            <div class="notice">-->
+          <!--             <span style="color: #000"> 我已认证阅读并确认 </span><span>《参保须知》</span> <span>《健康状态告知义务》</span> <span>《投保须知提示书》</span><span>《用户协议》</span><span>《授权声明》</span><span>《隐私政策》</span>-->
+          <!--            </div>-->
+          <!--          </FormRadio>-->
           <div class="notice">
-            <span style="color: #000"> 我已认证阅读并确认 </span><span>《参保须知》</span> <span>《健康状态告知义务》</span> <span>《投保须知提示书》</span><span>《用户协议》</span><span>《授权声明》</span><span>《隐私政策》</span>
+            <span style="color: #000"> 我已认证阅读并确认 </span><span>《参保须知》</span> <span>《健康状态告知义务》</span>
+            <span>《投保须知提示书》</span><span>《用户协议》</span><span>《授权声明》</span><span>《隐私政策》</span>
           </div>
         </div>
         <div class="watch-btn" @tap="submit">
-            立即支付
+          立即支付
         </div>
       </div>
     </UniPopup>
@@ -398,6 +419,7 @@ function  toOpen(){
 }
 
 .pay-item {
+  flex:1;
   font-weight: 400;
   font-size: 14px;
   leading-trim: NONE;
@@ -407,7 +429,7 @@ function  toOpen(){
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 16px 31px;
+  padding: 16px 0px;
   border-radius: 7px;
 }
 
@@ -433,8 +455,9 @@ function  toOpen(){
   align-self: center;
   color: #000;
 }
-.notice{
+
+.notice {
   font-size: 12px;
-  color:#2972F6;
+  color: #2972F6;
 }
 </style>

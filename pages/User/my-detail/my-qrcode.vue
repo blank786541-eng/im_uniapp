@@ -9,7 +9,7 @@ const userInfo = ref<V2NIMUser>({
   accountId:"",
   name:""
 })
-import {onShow, onReady} from '@dcloudio/uni-app'
+import {onReady, onLoad} from '@dcloudio/uni-app'
 import Avatar from "@/components/Avatar.vue";
 import {getPlatform} from "@/utils";
 import {httpRequest} from "@/utils/request";
@@ -19,8 +19,14 @@ const size=ref({
   windowWidth: 390,
   windowHeight: 844,
 });
-onShow(() => {
+const option=ref({
+  team:0,
+  conversationId:""
+})
+onLoad((options) => {
   userInfo.value = uni.$UIKitStore.userStore.myUserInfo
+  option.value=options;
+
 })
 onReady(() => {
 
@@ -43,7 +49,8 @@ async  function make() {
   console.log(data.code,'url====')
   var qr = new UQRCode();
   // 设置二维码内容
-  qr.data = data.url;
+  let url= option.value.team==1?"teamId=" +  option.value.conversationId:"addFriend="+userInfo.value.accountId;
+  qr.data =url;
   // 设置二维码大小，必须与canvas设置的宽高一致
   qr.size = size.value.windowWidth;
   // 调用制作二维码方法
@@ -73,6 +80,24 @@ function Save() {
   },500)
 
 }
+function blobToBase64(blob) {
+  return new Promise((resolve, reject) => {
+    // 1. 创建文件读取器实例
+    const reader = new FileReader();
+
+    // 2. 注册加载完成回调
+    reader.onloadend = () => {
+      // 4. 获取结果：data:image/png;base64,iVBORw0KGgo...
+      resolve(reader.result);
+    };
+
+    // 3. 开始异步读取操作
+    reader.readAsDataURL(blob);
+
+    // 错误处理
+    reader.onerror = (err) => reject(err);
+  });
+}
 // H5端截图
 function captureH5() {
   const element = document.getElementById('container');
@@ -81,23 +106,55 @@ function captureH5() {
   html2canvas(element, {
     backgroundColor: '#f5f7fa',
     scale: 2 // 提高清晰度
-  }).then(canvas => {
+  }).then( canvas => {
     // 转换为图片
-    canvas.toBlob(blob => {
-      // 创建下载链接
-      const url = URL.createObjectURL(blob);
-      const link = document.createElement('a');
-      link.download = 'uniapp-screenshot.png';
-      link.href = url;
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
 
-      uni.showToast('截图已保存');
+    canvas.toBlob(async blob => {
+      // 创建下载链接
+    const system=uni.getSystemInfoSync();
+    console.log(system)
+      if (jsBridge.inApp) {
+        jsBridge.requestPermissions([  "WritePhotos","ReadPhotos" ], async function(res) {
+
+          if (res.granted) {
+            const base64 = await blobToBase64(blob);
+            jsBridge.saveImageToAlbum(base64,(succ)=>{
+              uni.showToast({
+                title:succ ? "保存成功" : "保存失败：转码失败或没有相册使用权限",
+                icon:"none"
+              });
+            })
+          } else {
+            uni.showToast({
+              title: "保存失败：没有相册使用权限",
+              icon:"none"
+            });
+          }
+        });
+      } else {
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.download = 'uniapp-screenshot.png';
+        link.href = url;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+
+      }
+
+
+
+
+
+
     });
   }).catch(err => {
     console.error('截图失败', err);
-    uni.showToast('截图失败');
+
+    uni.showToast({
+      title:'保存失败',
+      icon:"none"
+    });
   }).finally(()=>{
     showBtn.value=true;
   });
@@ -150,7 +207,7 @@ function captureApp() {
 
 <template>
   <div class="container" id="container">
-    <default-header title="我的二维码" background-color="#DBB077"
+    <default-header :title="option.team==1?'群二维码':'我的二维码'" background-color="#DBB077"
                     title-color="#fff"
                     back-icon="back-c"></default-header>
     <div  >
@@ -158,10 +215,12 @@ function captureApp() {
       <div class="content" id="content">
         <div class="user">
 <!--          <Avatar :account="userInfo.accountId"></Avatar>-->
-          <image :src="userInfo.avatar" style="width: 53px;height: 53px;position: relative;z-index: 10000;"></image>
+          <image :src="option.team!=1?userInfo.avatar:option.avatar"
+                 style="width: 53px;height: 53px;position: relative;z-index: 10000;"></image>
           <div style="align-self: flex-end;margin-left: 14px">
-            <div class="name">{{ userInfo.name }}</div>
-            <div class="account">用户号:&nbsp{{ userInfo.accountId }}</div>
+            <div class="name" >{{ option.team!=1?userInfo.name:option.name }}</div>
+            <div class="account" v-if="option.team!=1">用户号:&nbsp{{ userInfo.accountId }}</div>
+            <div class="account" v-else>群号:&nbsp{{ option.conversationId }}</div>
           </div>
         </div>
         <div style="padding:20px;background-color: #fff;border-radius: 9px">
@@ -170,7 +229,7 @@ function captureApp() {
           ></canvas>
         </div>
         <div class="scan">
-          扫一扫二维码，加我为好友
+          {{option.team!=1?'  扫一扫二维码，加我为好友':'扫一扫加入群聊'}}
         </div>
         <div class="btn flex-center" @tap="Save" :style="{opacity:showBtn?1:0}">
           保存到手机

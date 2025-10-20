@@ -5,12 +5,12 @@
          (props.msg.serverExtension=='teamRecall' || currentMsg.serverExtension=='teamRecall')">
 
     </div>
-     <div v-else-if="conversationType ===
+    <div v-else-if="conversationType ===
             V2NIMConst.V2NIMConversationType.V2NIM_CONVERSATION_TYPE_TEAM &&  !props.msg.isSelf &&(props.msg.recallType === 'beReCallMsg' || currentMsg.recallType === 'beReCallMsg') ">
 
     </div>
     <div
-       v-else
+        v-else
         :class="`msg-item-wrapper ${
       props.msg.pinState &&
       !(
@@ -100,7 +100,7 @@
             width="35px"
             height="35px"
         />
-        <MessageBubble :msg="props.msg" :bg-visible="true"  :manager="manager">
+        <MessageBubble :msg="props.msg" :bg-visible="true" :manager="manager">
           <div class="recall-text">{{ t('you') + t('recall') }}</div>
         </MessageBubble>
       </div>
@@ -506,9 +506,7 @@ import {V2NIMConst} from '../../../utils/nim'
 import TeamMessageRead from "@/pages/Chat/message/team-message-read.vue";
 
 
-
-
-const currentMsg:V2NIMMessageForUI=ref<V2NIMMessageForUI>({});
+const currentMsg: V2NIMMessageForUI = ref<V2NIMMessageForUI>({});
 const props = withDefaults(
     defineProps<{
       msg: V2NIMMessageForUI & { timeValue?: number }
@@ -517,13 +515,13 @@ const props = withDefaults(
         [key: string]: V2NIMMessageForUI
       }
       broadcastNewAudioSrc: string,
-      manager:boolean
+      manager: boolean
     }>(),
     {}
 )
 onMounted(() => {
 
-    currentMsg.value=props.msg;
+  currentMsg.value = props.msg;
 })
 
 
@@ -599,23 +597,24 @@ const handleReeditMsg = (msg: V2NIMMessageForUI) => {
 /** 监听昵称变化 */
 const appellationWatch = autorun(() => {
   /** 昵称展示顺序 群昵称 > 备注 > 个人昵称 > 帐号 */
-  appellation.value = uni.$UIKitStore.uiStore.getAppellation({
-    account: props.msg.senderId,
-    teamId:
-        conversationType ===
-        V2NIMConst.V2NIMConversationType.V2NIM_CONVERSATION_TYPE_TEAM
-            ? to
-            : '',
-  })
+  // appellation.value = uni.$UIKitStore.uiStore.getAppellation({
+  //   account: props.msg.senderId,
+  //   teamId:
+  //       conversationType ===
+  //       V2NIMConst.V2NIMConversationType.V2NIM_CONVERSATION_TYPE_TEAM
+  //           ? to
+  //           : '',
+  // })
+  appellation.value = uni.$UIKitStore?.userStore?.users?.get(props.msg.senderId).name || "";
 })
 
 onUnmounted(() => {
   appellationWatch()
 })
 
-function checkMsg(){
-   console.log(props.msg);
-    console.log(currentMsg.value.serverExtension);
+function checkMsg() {
+  console.log(props.msg);
+  console.log(currentMsg.value.serverExtension);
 }
 </script>
 

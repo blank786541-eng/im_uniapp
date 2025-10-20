@@ -8,6 +8,7 @@ import Cshaptx4869Scancode
 import {getParamsValues} from "@/pages/Other/help/call";
 import {V2NIMTeam} from "nim-web-sdk-ng/dist/esm/nim/src/V2NIMTeamService";
 import geH5Scancode from "@/components/ge-h5-scancode/ge-h5-scancode.vue"
+import {V2NIMConst} from "@/utils/nim";
 
 onReady(() => {
   scanCode();
@@ -54,8 +55,9 @@ function scanCode() {
   h5ScanCodeRef.value.start({
     success: async (decodedText, decodedResult) => {
       console.warn(decodedText, decodedResult,'h5ScanCodeRef=====');
+      const obj = getParamsValues(decodedText);
       if (decodedText.indexOf("teamId") > -1) {
-        const obj = getParamsValues(decodedText);
+
         console.warn(obj, 'teamId=====');
 
         const list: V2NIMTeam[] = await uni.$UIKitStore.teamStore.getJoinedTeamListActive()
@@ -82,6 +84,35 @@ function scanCode() {
           });
         }
 
+      }
+      else if(decodedText.indexOf('addFriend') > -1) {
+        let index=uni.$UIKitStore.uiStore.friends.findIndex(item=>obj.addFriend==item.accountId);
+        if(index>-1){
+          uni.showToast({
+            icon: "none",
+            title: "已是好友",
+            duration: 1000,
+            success: () => {
+              uni.navigateBack();
+            }
+          });
+        }else{
+          await uni.$UIKitStore.friendStore.addFriendActive(obj.addFriend, {
+            addMode: V2NIMConst.V2NIMFriendAddMode.V2NIM_FRIEND_MODE_TYPE_APPLY,
+            postscript: '',
+          })
+
+          // 发送申请成功后解除黑名单
+          await uni.$UIKitStore.relationStore.removeUserFromBlockListActive(obj.addFriend)
+          uni.showToast({
+            icon: "none",
+            title: "已发送好友申请",
+            duration: 1000,
+            success: () => {
+              uni.navigateBack();
+            }
+          });
+        }
       }
     },
     fail: (err) => {

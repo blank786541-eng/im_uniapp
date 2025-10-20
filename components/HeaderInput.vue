@@ -22,16 +22,17 @@ onBeforeMount(() => {
   appStatusHeight.value = plus.navigator.getStatusbarHeight();
   // #endif
 })
-const states=ref({})
-onMounted(()=>{
-  httpRequest({
-    method: "GET",
-    url: "im/api/getUserByAccount?account=" + uni.$UIKitStore.userStore.myUserInfo.accountId,
-  }).then(res => {
-    states.value=res;
-    uni.setStorageSync("addFriend",res.addFriend);
-  })
-})
+// const states=ref({})
+// onMounted(()=>{
+//   httpRequest({
+//     method: "GET",
+//     url: "im/api/getUserByAccount?account=" + uni.$UIKitStore.userStore.myUserInfo.accountId,
+//   }).then(res => {
+//     states.value=res;
+//     uni.setStorageSync("addFriend",res.addFriend);
+//   })
+//   v-if="states.addFriend===0"
+// })
 /** 跳转至搜索页面 */
 const goToSearchPage = () => {
   customNavigateTo({
@@ -83,7 +84,7 @@ onHide((option: any) => {
         <div v-if="addDropdownVisible" class="dropdown-container">
           <div class="add-menu-list">
             <div class="add-menu-item"
-                 v-if="states.addFriend===0"
+
                  @tap="onDropdownClick('addFriend')">
               <div :style="{ marginRight: '5px' }">
                 <Icon type="icon-tianjiahaoyou"/>
@@ -91,7 +92,7 @@ onHide((option: any) => {
               {{ t('addFriendText') }}
             </div>
             <div class="add-menu-item"
-                 v-if="states.groupPermissions===0"
+
                  @tap="onDropdownClick('createGroup')">
               <div :style="{ marginRight: '5px' }">
                 <Icon type="icon-chuangjianqunzu"/>

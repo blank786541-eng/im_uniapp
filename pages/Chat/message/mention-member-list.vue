@@ -94,7 +94,10 @@ const teamExt = ref('')
 /** 群成员 不包括当前登录用户 */
 const teamMembersWithoutSelf = computed(() => {
   return teamMembers.value.filter(
-    (item) => item.accountId !== uni.$UIKitStore.userStore.myUserInfo.accountId
+    (item)=>{
+       console.log(item,'item=====')
+      return  item.accountId !== uni.$UIKitStore.userStore.myUserInfo.accountId;
+  }
   )
 })
 
@@ -194,6 +197,8 @@ const onClosePopup = () => {
 }
 /** 监听群成员 */
 const teamMemberWatch = autorun(() => {
+  console.log(uni.$UIKitStore.teamMemberStore.getTeamMember(props.teamId),'======');
+
   if (props.teamId) {
     teamMembers.value = sortGroupMembers(
       //@ts-ignore

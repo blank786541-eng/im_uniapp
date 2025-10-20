@@ -4,7 +4,7 @@
     <!--    <NavBar :title="t('addFriendText')" />-->
 
 
-      <search-input :placeholder="t('enterAccount')" @search="handleSearch" @change="onInputValueChange"></search-input>
+    <search-input :placeholder="t('enterAccount')" @search="handleSearch" @change="onInputValueChange"></search-input>
     <Empty
         :text="t('noExistUser')"
         v-if="searchResState == 'searchEmpty'"
@@ -37,7 +37,7 @@
 </template>
 
 <script lang="ts" setup>
-import {onUnmounted, ref} from 'vue'
+import {onMounted, onUnmounted, ref} from 'vue'
 import Avatar from '../../../components/Avatar.vue'
 import NavBar from '../../../components/NavBar.vue'
 import Icon from '../../../components/Icon.vue'
@@ -51,6 +51,7 @@ import type {Relation} from '@xkit-yx/im-store-v2'
 import DefaultHeader from "@/components/defaultHeader.vue";
 import AssetsImage from "@/components/AssetsImage.vue";
 import SearchInput from "@/components/search-input.vue";
+import {httpRequest} from "@/utils/request";
 
 // 搜索结果状态
 const searchResState = ref<'beginSearch' | 'searchEmpty' | 'searchResult'>(
@@ -63,6 +64,16 @@ const userInfo = ref<V2NIMUser>()
 // 关系
 const relation = ref<Relation>('stranger')
 
+let states = {};
+onMounted(() => {
+  httpRequest({
+    method: "GET",
+    url: "im/api/getUserByAccount?account=" + uni.$UIKitStore.userStore.myUserInfo.accountId,
+  }).then(res => {
+    states = res;
+
+  })
+})
 // 监听关系变化
 const relationWatch = autorun(() => {
   // 这行打印用于触发 autorun 执行，不能删除
@@ -75,12 +86,13 @@ const relationWatch = autorun(() => {
 })
 
 // 搜索好友
-const handleSearch = async (value:string) => {
-  console.log(value);
-  console.log("value====");
+const handleSearch = async (value: string) => {
+
+
+  if (states.addFriend ===1) return;
   try {
     const user: V2NIMUser = await uni.$UIKitStore.userStore.getUserActive(
-       value
+        value
     )
 
     if (!user) {

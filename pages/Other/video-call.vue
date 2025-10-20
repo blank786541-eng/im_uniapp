@@ -33,8 +33,6 @@ const renderBox = ref();
 const params = reactive({
   isSilence: false,
   isStop: false,
-
-  localUid: '',
   localStream: null,
   remoteStreams: [],
   max: 20,
@@ -80,7 +78,6 @@ onLoad(async (options) => {
   uni.$UIKitStore.userStore.getUserForceActive(options.uid).then((res) => {
     userInfo.value = res;
   })
-  params.localUid = uni.$UIKitStore.userStore.myUserInfo.accountId;
 
   if (!options.roomId) {
     query.roomId = channelName;
@@ -147,7 +144,7 @@ async function destory() {
       query.uid
   )
 
-  if (createUser.value && connect.value) {
+  if (connect.value) {
     createCallMessage({
 
       channelId: query.roomId,
@@ -158,9 +155,7 @@ async function destory() {
     close();
 
     return;
-  }
-
-  if (createUser.value) {
+  } else if (createUser.value && !connect.value) {
     await uni.$UIKitNIM.V2NIMSignallingService.cancelInvite({
       requestId: requestId,
       inviteeAccountId: query.uid,
@@ -172,7 +167,8 @@ async function destory() {
     //   },
     //   operatorAccountId: uni.$UIKitStore.userStore.myUserInfo.accountId,
     // },2,id)
-  } else {
+    uni.navigateBack();
+  } else if (!connect.value) {
     await uni.$UIKitNIM.V2NIMSignallingService.rejectInvite({
       channelId: query.roomId,
       inviterAccountId: query.uid,
@@ -186,11 +182,13 @@ async function destory() {
     })
     // |1|query.uid
 
-
+    uni.navigateBack();
     console.log(`${id}`, 'uni.$UIKitStore.userStore.myUserInfo.accountId|1|query.uid')
+  } else {
+    close();
   }
 
-  uni.navigateBack();
+
 }
 
 async function close() {
@@ -401,11 +399,16 @@ async function joinRoom() {
     channelName: query.audioRoomId,
     uid: randomNumbers()
   })
+  initLocalStream();
+
+  createUser.value = false;
+
   playMusic('/static/call-stop.mp3', 'jieting')
   addCallListeners(client, (type: CallEventType, data) => {
 
 
-    if (type == CallEventType.PeerOnline) {
+    if (type == CallEventType.CONNECTED) {
+      if (!params.localStream) initLocalStream();
     } else if (type == CallEventType.StreamAdded) {
       addStream(data.stream, data.uid)
     } else if (type == CallEventType.StreamRemove) {
@@ -427,9 +430,6 @@ async function joinRoom() {
       });
     }
   })
-  initLocalStream();
-
-  createUser.value = false;
 
 }
 
@@ -588,31 +588,31 @@ async function createCallMessage(opt: {
         正在通话中&nbsp;&nbsp;&nbsp;{{ time }}
       </div>
     </div>
-    <div class="call-action" v-if="!connect">
+    <div class="call-action" v-if="!connect" style="justify-content: space-around">
       <AssetsImage
           @tap="destory"
           path="/static/guaduan.png" width="80px" height="80px" :circle="true"></AssetsImage>
       <AssetsImage
           v-if="!createUser"
-          path="/static/jieting.png" width="90px" height="90px" :circle="true" @tap="joinRoom"></AssetsImage>
+          path="/static/jieting.png" width="80px" height="80px" :circle="true" @tap="joinRoom"></AssetsImage>
     </div>
-    <div v-else class="call-action">
-      <div class="icon-container" style=" background-color: #fff;">
-        <AssetsImage
-            @tap="setOrRelieveSilence"
-            :path="params.isSilence?'/static/voice_close.png':'/static/voice_open.png'" width="30px"
-            height="30px"></AssetsImage>
-      </div>
+    <div v-else class="call-action flex-x-center">
+<!--      <div class="icon-container" style=" background-color: #fff;">-->
+<!--        <AssetsImage-->
+<!--            @tap="setOrRelieveSilence"-->
+<!--            :path="params.isSilence?'/static/voice_close.png':'/static/voice_open.png'" width="30px"-->
+<!--            height="30px"></AssetsImage>-->
+<!--      </div>-->
 
       <AssetsImage
           @tap="destory"
           path="/static/guaduan.png" width="80px" height="80px"></AssetsImage>
-      <div class="icon-container" style=" background-color: #666;">
-        <AssetsImage
+<!--      <div class="icon-container" style=" background-color: #666;">-->
+<!--        <AssetsImage-->
 
-            :path="closeVolume?'/static/audio_close.png':'/static/audio_open.png'" width="30px" height="30px"
-            @tap="muteAudio"></AssetsImage>
-      </div>
+<!--            :path="closeVolume?'/static/audio_close.png':'/static/audio_open.png'" width="30px" height="30px"-->
+<!--            @tap="muteAudio"></AssetsImage>-->
+<!--      </div>-->
 
     </div>
   </div>
@@ -831,8 +831,8 @@ async function createCallMessage(opt: {
 
 .call-action {
   display: flex;
-  justify-content: space-around;
   margin-bottom: 100px;
+  width: 100%;
 }
 
 .icon-container {

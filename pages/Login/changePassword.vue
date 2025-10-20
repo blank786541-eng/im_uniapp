@@ -44,7 +44,7 @@ function update() {
     })
     return;
   }
-  query.value.accountId = uni.$UIKitStore.userStore.myUserInfo.accountId;
+  query.value.account = uni.$UIKitStore.userStore.myUserInfo.accountId;
   httpRequest({
     url: `im/user/updateUserAccount`,
     method: "POST",

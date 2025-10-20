@@ -49,8 +49,8 @@ export async function updateImInfo(opt: {gender:number, nickname: string, mobile
         url: "im/api/updateUser",
         method: 'POST',
         data: Object.assign({},{
-            accountId:uni.$UIKitStore.userStore.myUserInfo.accountId,
-        },opt)
+            account:uni.$UIKitStore.userStore.myUserInfo.accountId,
+        })
     })
     if (opt.nickname != null) {
         uni.$UIKitNIM.V2NIMUserService.updateSelfUserProfile({name: opt.nickname}).then((res) => {

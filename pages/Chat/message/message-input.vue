@@ -92,7 +92,7 @@
                cursor-spacing="20"
                adjust-position="true"
                confirm-type="send"
-               @confirm=""
+               @confirm="handleSendTextMsg"
                :auto-height="true"
                @blur="handleInputBlur"
                @input="handleInput"
@@ -520,6 +520,7 @@ const handleSendTextMsg = () => {
         })
       })
       .finally(() => {
+
         scrollBottom()
       })
 
@@ -527,6 +528,7 @@ const handleSendTextMsg = () => {
   isReplyMsg.value = false
   replyMsg.value = undefined
   selectedAtMembers.value = []
+  uni.hideKeyboard();
 }
 
 
@@ -609,7 +611,6 @@ const height = ref(100);
 const width = ref(100);
 
 function reset() {
-  alert('reset====')
   recordStata.value = false;
   height.value = 100;
   width.value = 100;
@@ -795,7 +796,7 @@ uni.$on(events.AIT_TEAM_MEMBER, (member: MentionedMember) => {
   ]
 
   console.log(member,'member====')
-  const newInputText = inputText.value + '@' + member.accountId + ' '
+  const newInputText = inputText.value + '@' + member.appellation + ' '
   /** 更新input框的内容 */
   inputText.value = newInputText
 })

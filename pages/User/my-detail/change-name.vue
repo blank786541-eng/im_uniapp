@@ -19,12 +19,17 @@ function  save(){
   if(name.value == ""){
     return;
   }
+  console.log(name,'name====');
   updateImInfo({nickname:name.value})
 
 }
 
 onLoad((options) => {
-  name.value=options.name
+  if(options.name && options.name!="undefined"){
+    name.value=options.name
+  }
+
+
 });
 </script>
 

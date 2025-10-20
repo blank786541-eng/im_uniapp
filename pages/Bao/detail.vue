@@ -43,7 +43,7 @@ const sells = reactive([
     text: "投保年龄"
   }, {
     name: "终身",
-    unit: '天',
+    unit: '年',
     text: "保障期间"
   },
 ])
@@ -76,7 +76,7 @@ function toPay(){
             </div>
             <div class="t3">
               <div>
-                最高赔付{{ product.coverageAmount }}万
+                最高赔付{{ product.coverageAmount/10000 }}万
               </div>
               <div style="margin-top: 4px;">
                 覆盖120种疾病

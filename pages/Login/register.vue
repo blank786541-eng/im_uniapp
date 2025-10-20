@@ -34,8 +34,14 @@ async function submitLoginForm() {
   if (!query.account) {
     uni.showToast({
       icon: 'error',
-
       title: "账号不能为空"
+    })
+    return;
+  }
+  if (!query.nikeName && query.nikeName.trim().length == 0) {
+    uni.showToast({
+      icon: 'error',
+      title: "昵称不能为空"
     })
     return;
   }
@@ -100,6 +106,12 @@ function getValue(value, key) {
         <image src="/static/logo.png" class="logo"></image>
       </div>
       <div class="form-login">
+        <div style="margin-top: 18px">
+          <label-input icon="/static/account.png"
+                       label-key="nikeName"
+                       @update-model-value="getValue"
+                       :value="query.nikeName"
+                       label="昵称" placeholder="请输入昵称"></label-input>
         <label-input icon="/static/account.png"
                      label="账号" placeholder="请输入手机号"
                      label-key="account"
@@ -130,12 +142,7 @@ function getValue(value, key) {
                          :value="query.invitationCode"
                          label="邀请码" placeholder="请输入邀请码"></label-input>
           </div>
-          <div style="margin-top: 18px">
-            <label-input icon="/static/account.png"
-                         label-key="nikeName"
-                         @update-model-value="getValue"
-                         :value="query.nikeName"
-                         label="名称" placeholder="请输入名称"></label-input>
+
           </div>
         </div>
       </div>
